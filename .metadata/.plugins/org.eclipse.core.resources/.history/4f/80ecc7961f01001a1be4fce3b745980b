@@ -1,0 +1,35 @@
+package com.temp.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.temp.dao.Board;
+import com.temp.dao.Reply;
+
+public interface BoardService {
+
+	// 게시판 목록 받아오기
+	public List<Board> selectBoardList(int parameter);
+	
+	// 게시글 갯수 받아오기
+	public int selectBoardCount();
+	
+	// 해당 게시글 댓글 갯수 불러오기
+	public int countReply(int board_no);
+	
+	// 특정 글 상세보기
+	public Board selectBoardOne(int boardno);
+	
+	// 조회수 up
+	public int updateBoardHit(int boardno);
+	
+	// 게시글 수정
+	public int updateBoardOne(Map<String, Object> map);
+	
+	// 게시글 삭제
+	public int deleteBoardOne(int boardno);
+	
+	// 게시글 등록
+	public int writeBoardOne(Map<String, Object> map);
+	
+}

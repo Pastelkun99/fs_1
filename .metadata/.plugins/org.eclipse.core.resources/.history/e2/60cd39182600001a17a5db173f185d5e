@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+					"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="boardMapper">
+	<select id="selectBoardList" resultType="com.temp.dao.Board">
+		SELECT * FROM BOARDTBL WHERE board_deletecon = 0 ORDER BY board_no DESC
+	</select>
+	
+	<select id="selectBoardOne" parameterType="int" resultType="com.temp.dao.Board">
+		SELECT * FROM BOARDTBL WHERE board_no = #{boardno}
+	</select>
+	
+	<update id="updateBoardHit" parameterType="int">
+		UPDATE BOARDTBL SET board_hit = board_hit + 1 WHERE board_no = #{boardno}
+	</update>
+	
+	<update id="updateBoardOne" parameterType="map">
+		UPDATE BOARDTBL SET board_title=#{board_title}, board_content=#{board_content}, board_date = sysdate WHERE board_no = #{board_no}
+	</update>
+	
+	<update id="deleteBoardOne" parameterType="int">
+		UPDATE BOARDTBL SET board_deletecon = 1 WHERE board_no = #{board_no}
+	</update>
+	
+	<insert id="writeBoardOne" parameterType="map">
+		INSERT INTO BOARDTBL VALUES(SEQ_USERNO.NEXTVAL, #{board_writer}, #{board_title}, #{board_content}, 0, sysdate, 0)
+	</insert>
+</mapper>

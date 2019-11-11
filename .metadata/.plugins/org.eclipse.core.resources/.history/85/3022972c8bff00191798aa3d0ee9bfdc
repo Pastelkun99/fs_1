@@ -1,0 +1,5 @@
+package com.temp.service;
+
+public interface UserService {
+
+}

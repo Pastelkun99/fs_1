@@ -1,0 +1,10 @@
+package com.temp.service;
+
+import com.temp.dao.User;
+
+public interface UserService {
+
+	public User userLoginCheck(String inputID);
+	
+	public int userRegister(String redID, String regPassword, String regName);
+}

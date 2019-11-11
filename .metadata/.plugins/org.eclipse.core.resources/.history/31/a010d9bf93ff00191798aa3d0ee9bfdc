@@ -1,0 +1,8 @@
+package com.temp.service;
+
+import com.temp.dao.User;
+
+public interface UserService {
+
+	public User userLoginCheck(String inputID);
+}

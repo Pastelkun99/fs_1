@@ -1,0 +1,17 @@
+package com.temp.dao;
+
+public class PagenationVO {
+
+	private int pageSize = 10;
+	private int curPage = 1;
+	
+	// 총 게시글 수
+	private int listCnt;
+	
+	private int startPage = 1;
+	private int endPage = 1;
+	
+	private int prevPage;
+	private int nextPage;
+	
+}

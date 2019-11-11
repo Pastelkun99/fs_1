@@ -1,0 +1,5 @@
+package com.fusion1.dao;
+
+public class BoardVO {
+
+}

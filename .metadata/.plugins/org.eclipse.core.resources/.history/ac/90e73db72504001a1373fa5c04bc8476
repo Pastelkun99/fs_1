@@ -1,0 +1,8 @@
+package com.fusion1.service;
+
+
+public interface testService {
+
+	public List<contents> getContents();
+	
+}

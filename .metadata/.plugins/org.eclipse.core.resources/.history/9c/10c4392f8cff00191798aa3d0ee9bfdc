@@ -1,0 +1,17 @@
+package com.temp.service;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.temp.dao.User;
+
+public class UserServiceImpl implements UserService {
+
+	@Autowired
+	private SqlSession sqlSession;
+	@Override
+	public User userLoginCheck(String inputID) {
+		return null;
+	}
+
+}

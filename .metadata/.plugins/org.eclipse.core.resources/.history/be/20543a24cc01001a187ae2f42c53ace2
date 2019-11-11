@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+					"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="boardMapper">
+	<select id="selectBoardList" parameterType="com.temp.dao.PagenationVO" resultType="com.temp.dao.Board">
+		<![CDATA[
+				SELECT *
+				  FROM
+   					   ( SELECT ROWNUM as rn
+   					   			,A.board_no
+   					   			,A.board_writer
+   					   			,A.board_id
+   					   			,A.board_title
+   					   			,A.board_content
+   					   			,A.board_hit
+   					   			,A.board_date
+   					   			,A.board_deletecon 
+    			  		  FROM ( SELECT * 
+    			  		  		   FROM boardtbl
+    			  		  		 ORDER BY board_no DESC ) A
+    			 		 WHERE ROWNUM <= #{totalCount} ) B
+				 WHERE rn > (#{page_no}*10)-10 
+				   AND rn <= #{page_no}*10
+				   AND board_deletecon = 0
+		]]>
+	</select>
+	
+	<select id="boardSearch" parameterType="com.temp.dao.PagenationVO" resultType="com.temp.dao.Board">
+		<![CDATA[
+				SELECT *
+				  FROM
+   					   ( SELECT ROWNUM as rn
+   					   			,A.board_no
+   					   			,A.board_writer
+   					   			,A.board_id
+   					   			,A.board_title
+   					   			,A.board_content
+   					   			,A.board_hit
+   					   			,A.board_date
+   					   			,A.board_deletecon 
+    			  		  FROM ( SELECT * 
+    			  		  		   FROM boardtbl
+    			  		  		 ORDER BY board_no DESC ) A
+    			 		 WHERE ROWNUM <= #{totalCount} ) B
+				 WHERE rn > (#{page_no}*10)-10 
+				   AND rn <= #{page_no}*10
+				   AND board_deletecon = 0
+				   AND board_content LIKE '%'||#{keyword, jdbcType=VARCHAR}||'%'
+		]]>
+	</select>
+	
+	<select id="selectBoardCount" resultType="int">
+		SELECT COUNT(*) FROM BOARDTBL WHERE board_deletecon = 0
+	</select>
+	
+	<select id="selectBoardOne" parameterType="int" resultType="com.temp.dao.Board">
+		SELECT * FROM BOARDTBL WHERE board_no = #{boardno}
+	</select>
+	
+	<update id="updateBoardHit" parameterType="int">
+		UPDATE BOARDTBL SET board_hit = board_hit + 1 WHERE board_no = #{boardno}
+	</update>
+	
+	<update id="updateBoardOne" parameterType="map">
+		UPDATE BOARDTBL SET board_title=#{board_title}, board_content=#{board_content}, board_date = sysdate WHERE board_no = #{board_no}
+	</update>
+	
+	<update id="deleteBoardOne" parameterType="int">
+		UPDATE BOARDTBL SET board_deletecon = 1 WHERE board_no = #{board_no}
+	</update>
+	
+	<insert id="writeBoardOne" parameterType="map">
+		INSERT INTO BOARDTBL VALUES(SEQ_BOARDNO.NEXTVAL, #{board_writer}, #{board_id}, #{board_title}, #{board_content}, 0, sysdate, 0)
+	</insert>
+	
+	<select id="countReply" parameterType="int" resultType="int">
+		SELECT COUNT(*) FROM REPLYTBL WHERE reply_board = #{board_no}
+	</select>
+</mapper>

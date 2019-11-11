@@ -1,0 +1,5 @@
+package com.temp.controller;
+
+public class ErrorController {
+
+}

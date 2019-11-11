@@ -1,0 +1,12 @@
+package com.temp.service;
+
+import java.util.Map;
+
+import com.temp.dao.User;
+
+public interface UserService {
+
+	public User userLoginCheck(String inputID);
+	
+	public int userRegister(Map<String, Object> tempMap);
+}

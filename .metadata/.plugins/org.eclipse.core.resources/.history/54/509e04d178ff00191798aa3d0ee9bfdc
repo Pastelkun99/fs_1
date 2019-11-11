@@ -1,0 +1,12 @@
+package com.temp.service;
+
+import java.util.List;
+
+import com.temp.dao.Board;
+
+public interface BoardService {
+
+	public List<Board> selectBoardList();
+	
+	
+}

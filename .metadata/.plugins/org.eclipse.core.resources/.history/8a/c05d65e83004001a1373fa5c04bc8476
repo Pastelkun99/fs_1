@@ -1,0 +1,20 @@
+package com.fusion1.service;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fusion1.dao.UserVO;
+
+public class UserServiceImpl implements UserService {
+
+	@Autowired
+	@Resource(name="sqlSession")
+	@Override
+	public List<UserVO> getUserList() {
+		return ;
+	}
+
+}

@@ -1,0 +1,75 @@
+package com.temp.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.temp.dao.User;
+import com.temp.service.UserService;
+import com.temp.service.UserServiceImpl;
+
+@Controller
+@RequestMapping("/user")
+public class UserController {
+	
+	@Autowired
+	UserServiceImpl us;
+	
+	@RequestMapping(value="/userlogin.do", method=RequestMethod.GET)
+	public String userLogin() {
+		return "";
+	}
+
+	@RequestMapping(value="/userlogin.do", method=RequestMethod.POST)
+	public String userLogin(@RequestParam String inputID, @RequestParam String inputPassword, HttpServletRequest request,
+							Model model, HttpSession session) {
+		try {
+			User user = us.userLoginCheck(inputID);
+			if(inputPassword.equals(user.getUser_password())) {
+				model.addAttribute("msg", "로그인에 성공하였습니다.");
+				model.addAttribute("href", request.getContextPath()+"/main.do");
+				session.setAttribute("username", user.getUser_name());
+				return "alert";
+			}
+			else {
+				model.addAttribute("msg", "로그인 정보가 잘못되었습니다.");
+				model.addAttribute("href", request.getContextPath());
+				return "alert";
+			}
+		} catch (Exception e) {
+			model.addAttribute("msg", "로그인 정보가 잘못되었습니다.");
+			model.addAttribute("href", request.getContextPath());
+			return "alert";
+		}
+	}
+	
+	@RequestMapping(value="/userSignUp.do", method=RequestMethod.GET)
+	public String userSignUp() {
+		return "user/userSignUp";
+	}
+	
+	@RequestMapping(value="/userSignUp.do", method=RequestMethod.POST)
+	public String userSignUp(@RequestParam("regID") String regID, @RequestParam("regPassword") String regPassword,
+							 @RequestParam("regName") String regName, Model model, HttpServletRequest request) {
+		
+		Map<String, Object> tempMap = new HashMap<String, Object>();
+		tempMap.put("regID", regID);
+		tempMap.put("regPassword", regPassword);
+		tempMap.put("regName", regName);
+		int result = us.userRegister(tempMap);
+		if(result != -1) {
+			model.addAttribute("msg", "회원등록에 실패하였습니다.");
+			model.addAttribute("href", request.getContextPath()+"/user/userSignUp");
+		}
+		return "main";
+	}
+}

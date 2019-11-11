@@ -1,0 +1,36 @@
+package com.temp.service;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.temp.dao.Reply;
+import com.temp.dao.ReplyDAOImpl;
+
+@Service
+public class ReplyServiceImpl implements ReplyService {
+	
+	@Autowired
+	ReplyDAOImpl dao;
+
+	@Override
+	public int replyWrite(Reply reply) {
+		return dao.replyWrite(reply);
+	}
+
+	@Override
+	public List<Reply> getReplyList(Reply reply) {
+		return dao.getReplyList(reply);
+	}
+
+	@Override
+	public int deleteReply(Map map) {
+		return dao.deleteReply(map);
+	}
+
+}
