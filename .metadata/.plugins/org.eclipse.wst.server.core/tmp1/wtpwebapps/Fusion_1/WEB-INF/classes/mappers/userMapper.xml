@@ -9,7 +9,7 @@
 	</select>
 	
 	<insert id="userRegister" parameterType="com.fusion1.dao.UserVO">
-		INSERT INTO USERTBL VALUES (#{userid}, #{userpw}, #{username}, 0)
+		INSERT INTO USERTBL VALUES (0, #{userid}, #{userpw}, #{username}, 0)
 	</insert>
 	
 </mapper>

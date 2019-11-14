@@ -1,7 +1,5 @@
 package com.fusion1.controller;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,19 +28,24 @@ public class UserController {
 							HttpServletRequest request, Model model,
 							HttpSession session) {
 		
+		// 입력한 로그인 ID를 토대로 유저 정보를 불러옴.
 		UserVO uservo = us.userLogin(inputID);
+		
 		if(uservo == null) {
 			model.addAttribute("msg", "로그인 정보가 일치하지 않습니다.");
 			model.addAttribute("href", request.getContextPath() + "/");
 			return "alert";
 		} else {
+			// 입력한 비밀번호가 DB에서 불러온 비밀번호와 일치하는지 확인함.
 			if(inputPW.equals(uservo.getUserpw())) {
+				// 일치할 경우 세션에 현재 로그인한 유저의 정보를 등록시킴.
 				session.setAttribute("userid", uservo.getUserid());
 				session.setAttribute("username", uservo.getUsername());
 				model.addAttribute("msg", "로그인에 성공했습니다.");
-				model.addAttribute("href", "/boardList.do?pageno=1&pageSize=10");
+				model.addAttribute("href", "/boardList.do?page_no=1&pageSize=10");
 				return "alert";
 			} else {
+				// 일치하지 않을 경우 경고창 반환.
 				model.addAttribute("msg", "로그인 정보가 일치하지 않습니다.");
 				model.addAttribute("href", request.getContextPath() + "/");
 				return "alert";
@@ -52,6 +55,7 @@ public class UserController {
 	
 	@RequestMapping(value="/user/userSignOut.do", method=RequestMethod.GET)
 	public String userSignOut(Model model, HttpSession session, HttpServletRequest request) {
+		// 로그아웃 하는 경우 모든 세션 정보를 제거 함. (추후 기능 업데이트에 따라 다른 방법을 해야 할 수도..)
 		session.invalidate();
 		model.addAttribute("msg", "로그아웃 되었습니다.");
 		model.addAttribute("href", request.getContextPath()+"/");
@@ -66,6 +70,7 @@ public class UserController {
 	@RequestMapping(value="/user/userIdCheck.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String userIdCheck(HttpServletRequest request, Model model) {
+		// ajax를 사용한 아이디 체크. DB에 접속하여 해당 아이디가 존재하는지 여부를 반환함.
 		String regId = request.getParameter("regId");
 		int result = 0;
 		if(regId == null || regId.equals("")) {
@@ -94,17 +99,21 @@ public class UserController {
 		final Matcher matcher = pattern.matcher(regID);
 		final Matcher matcher2 = patterns.matcher(regID);
 		
+		// 정규표현식에 따라 불가능한 문자가 포함된 경우
 		if(matcher.find() || matcher2.find()) {
 			model.addAttribute("msg", "부적절한 아이디를 사용하였습니다. 다시 입력해주십시오.");
 			model.addAttribute("href", request.getContextPath() + "/user/userSignUp.do");
 			return "alert";
 		} else {
 			if(regPassword.equals(regPasswordConfirm)) {
+				
+				// 새로운 User객체를 만들고, 그 정보를 DB에 입력
 				UserVO uservo = new UserVO();
 				uservo.setUserid(regID);
 				uservo.setUserpw(regPassword);
 				uservo.setUsername(regName);
 				int result = us.userRegister(uservo);
+				
 				if(result != 1) {
 					model.addAttribute("msg", "비밀번호가 일치하지 않습니다.");
 					model.addAttribute("href", request.getContextPath()+"/user/userSignUp.do");
@@ -115,7 +124,7 @@ public class UserController {
 					return "alert";
 				}
 			} else {
-				model.addAttribute("msg", "회원등록에 실패하였습니다.");
+				model.addAttribute("msg", "회원등록에 실패하였습니다. 비밀번호가 일치하지 않습니다.");
 				model.addAttribute("href", request.getContextPath()+"/user/userSignUp.do");
 				return "alert";
 			}

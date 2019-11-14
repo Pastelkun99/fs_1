@@ -3,6 +3,7 @@
 	<item value="C:\Users\admin\Desktop\sqldeveloper\jdbc\lib" key="org.eclipse.jdt.ui.lastextjar"/>
 	<item value="filter_imports;" key="filters_last_used"/>
 	<section name="org.eclipse.ltk.ui.refactoring.settings">
+		<item value="false" key="renameSubpackages"/>
 		<item value="false" key="updateQualifiedNames"/>
 		<item value="*" key="patterns"/>
 		<item value="false" key="updateSimilarElements"/>
@@ -79,46 +80,10 @@
 	<section name="quick_assist_proposal_size">
 	</section>
 	<section name="JavaSearchPage">
-		<item value="10" key="HISTORY_SIZE"/>
+		<item value="11" key="HISTORY_SIZE"/>
 		<item value="false" key="CASE_SENSITIVE"/>
 		<item value="11" key="INCLUDE_MASK"/>
 		<section name="HISTORY6">
-			<item value="false" key="isCaseSensitive"/>
-			<item value="" key="javaElement"/>
-			<item value="0" key="scope"/>
-			<item value="11" key="includeMask"/>
-			<item value="mainPage" key="pattern"/>
-			<item value="2" key="limitTo"/>
-			<item value="0" key="matchLocations"/>
-			<item value="0" key="searchFor"/>
-			<list key="workingSets">
-			</list>
-		</section>
-		<section name="HISTORY7">
-			<item value="false" key="isCaseSensitive"/>
-			<item value="" key="javaElement"/>
-			<item value="0" key="scope"/>
-			<item value="11" key="includeMask"/>
-			<item value="mainPage.do" key="pattern"/>
-			<item value="2" key="limitTo"/>
-			<item value="0" key="matchLocations"/>
-			<item value="0" key="searchFor"/>
-			<list key="workingSets">
-			</list>
-		</section>
-		<section name="HISTORY4">
-			<item value="false" key="isCaseSensitive"/>
-			<item value="" key="javaElement"/>
-			<item value="0" key="scope"/>
-			<item value="11" key="includeMask"/>
-			<item value="writeReplyAction" key="pattern"/>
-			<item value="2" key="limitTo"/>
-			<item value="0" key="matchLocations"/>
-			<item value="1" key="searchFor"/>
-			<list key="workingSets">
-			</list>
-		</section>
-		<section name="HISTORY5">
 			<item value="false" key="isCaseSensitive"/>
 			<item value="" key="javaElement"/>
 			<item value="0" key="scope"/>
@@ -130,43 +95,19 @@
 			<list key="workingSets">
 			</list>
 		</section>
-		<section name="HISTORY8">
+		<section name="HISTORY7">
 			<item value="false" key="isCaseSensitive"/>
 			<item value="" key="javaElement"/>
 			<item value="0" key="scope"/>
 			<item value="11" key="includeMask"/>
-			<item value="일정현황" key="pattern"/>
+			<item value="mainPage" key="pattern"/>
 			<item value="2" key="limitTo"/>
 			<item value="0" key="matchLocations"/>
 			<item value="0" key="searchFor"/>
 			<list key="workingSets">
 			</list>
 		</section>
-		<section name="HISTORY9">
-			<item value="false" key="isCaseSensitive"/>
-			<item value="" key="javaElement"/>
-			<item value="0" key="scope"/>
-			<item value="11" key="includeMask"/>
-			<item value="EgovFile" key="pattern"/>
-			<item value="2" key="limitTo"/>
-			<item value="0" key="matchLocations"/>
-			<item value="0" key="searchFor"/>
-			<list key="workingSets">
-			</list>
-		</section>
-		<section name="HISTORY2">
-			<item value="false" key="isCaseSensitive"/>
-			<item value="" key="javaElement"/>
-			<item value="0" key="scope"/>
-			<item value="11" key="includeMask"/>
-			<item value="boardList" key="pattern"/>
-			<item value="2" key="limitTo"/>
-			<item value="0" key="matchLocations"/>
-			<item value="1" key="searchFor"/>
-			<list key="workingSets">
-			</list>
-		</section>
-		<section name="HISTORY3">
+		<section name="HISTORY4">
 			<item value="false" key="isCaseSensitive"/>
 			<item value="" key="javaElement"/>
 			<item value="0" key="scope"/>
@@ -178,12 +119,84 @@
 			<list key="workingSets">
 			</list>
 		</section>
+		<section name="HISTORY10">
+			<item value="false" key="isCaseSensitive"/>
+			<item value="" key="javaElement"/>
+			<item value="0" key="scope"/>
+			<item value="11" key="includeMask"/>
+			<item value="EgovFile" key="pattern"/>
+			<item value="2" key="limitTo"/>
+			<item value="0" key="matchLocations"/>
+			<item value="0" key="searchFor"/>
+			<list key="workingSets">
+			</list>
+		</section>
+		<section name="HISTORY5">
+			<item value="false" key="isCaseSensitive"/>
+			<item value="" key="javaElement"/>
+			<item value="0" key="scope"/>
+			<item value="11" key="includeMask"/>
+			<item value="writeReplyAction" key="pattern"/>
+			<item value="2" key="limitTo"/>
+			<item value="0" key="matchLocations"/>
+			<item value="1" key="searchFor"/>
+			<list key="workingSets">
+			</list>
+		</section>
+		<section name="HISTORY8">
+			<item value="false" key="isCaseSensitive"/>
+			<item value="" key="javaElement"/>
+			<item value="0" key="scope"/>
+			<item value="11" key="includeMask"/>
+			<item value="mainPage.do" key="pattern"/>
+			<item value="2" key="limitTo"/>
+			<item value="0" key="matchLocations"/>
+			<item value="0" key="searchFor"/>
+			<list key="workingSets">
+			</list>
+		</section>
+		<section name="HISTORY9">
+			<item value="false" key="isCaseSensitive"/>
+			<item value="" key="javaElement"/>
+			<item value="0" key="scope"/>
+			<item value="11" key="includeMask"/>
+			<item value="일정현황" key="pattern"/>
+			<item value="2" key="limitTo"/>
+			<item value="0" key="matchLocations"/>
+			<item value="0" key="searchFor"/>
+			<list key="workingSets">
+			</list>
+		</section>
+		<section name="HISTORY2">
+			<item value="false" key="isCaseSensitive"/>
+			<item value="" key="javaElement"/>
+			<item value="0" key="scope"/>
+			<item value="11" key="includeMask"/>
+			<item value="boardlist" key="pattern"/>
+			<item value="2" key="limitTo"/>
+			<item value="0" key="matchLocations"/>
+			<item value="0" key="searchFor"/>
+			<list key="workingSets">
+			</list>
+		</section>
+		<section name="HISTORY3">
+			<item value="false" key="isCaseSensitive"/>
+			<item value="" key="javaElement"/>
+			<item value="0" key="scope"/>
+			<item value="11" key="includeMask"/>
+			<item value="boardList" key="pattern"/>
+			<item value="2" key="limitTo"/>
+			<item value="0" key="matchLocations"/>
+			<item value="1" key="searchFor"/>
+			<list key="workingSets">
+			</list>
+		</section>
 		<section name="HISTORY0">
 			<item value="false" key="isCaseSensitive"/>
 			<item value="" key="javaElement"/>
 			<item value="0" key="scope"/>
 			<item value="11" key="includeMask"/>
-			<item value="행정안전부" key="pattern"/>
+			<item value="select" key="pattern"/>
 			<item value="2" key="limitTo"/>
 			<item value="0" key="matchLocations"/>
 			<item value="0" key="searchFor"/>
@@ -195,7 +208,7 @@
 			<item value="" key="javaElement"/>
 			<item value="0" key="scope"/>
 			<item value="11" key="includeMask"/>
-			<item value="boardlist" key="pattern"/>
+			<item value="행정안전부" key="pattern"/>
 			<item value="2" key="limitTo"/>
 			<item value="0" key="matchLocations"/>
 			<item value="0" key="searchFor"/>

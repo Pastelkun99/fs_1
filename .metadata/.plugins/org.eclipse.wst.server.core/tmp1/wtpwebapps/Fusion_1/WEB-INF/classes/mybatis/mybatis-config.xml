@@ -8,7 +8,7 @@
 	</settings>
 	
 	<typeAliases>
-		<package name="com.fusioin1.dao" />
+		<package name="com.fusion1.dao" />
 	</typeAliases>
 	
 </configuration>

@@ -833,3 +833,17 @@
 0:0:0:0:0:0:0:1 - - [11/Nov/2019:17:30:37 +0900] "GET /boardList.do?pageno=1&pageSize=10 HTTP/1.1" 200 6953
 0:0:0:0:0:0:0:1 - - [11/Nov/2019:17:31:49 +0900] "GET /boardList.do?pageno=1&pageSize=10 HTTP/1.1" 200 7274
 0:0:0:0:0:0:0:1 - - [11/Nov/2019:17:31:54 +0900] "GET /favicon.ico HTTP/1.1" 404 1086
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:03:15 +0900] "GET /boardList.do?pageno=2&pageSize=10 HTTP/1.1" 404 1086
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:03:23 +0900] "GET /boardList.do?pageno=1&pageSize=10 HTTP/1.1" 404 1086
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:03:23 +0900] "GET /favicon.ico HTTP/1.1" 404 1086
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:03:26 +0900] "GET /boardList.do?pageno=5&pageSize=10 HTTP/1.1" 404 1086
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:03:26 +0900] "GET /favicon.ico HTTP/1.1" 404 1086
+127.0.0.1 - - [11/Nov/2019:18:03:48 +0900] "GET / HTTP/1.1" 200 1430
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:03:51 +0900] "GET /boardList.do?pageno=4&pageSize=10 HTTP/1.1" 200 651
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:03:54 +0900] "GET / HTTP/1.1" 200 1430
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:03:57 +0900] "POST /user/userLogin.do HTTP/1.1" 200 661
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:03:58 +0900] "GET /boardList.do?pageno=1&pageSize=10 HTTP/1.1" 200 7824
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:03:58 +0900] "GET /favicon.ico HTTP/1.1" 404 1086
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:04:01 +0900] "GET /board.do?boardno=1 HTTP/1.1" 200 6902
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:04:04 +0900] "GET /boardList.do?pageno=1&pageSize=20 HTTP/1.1" 200 10876
+0:0:0:0:0:0:0:1 - - [11/Nov/2019:18:04:06 +0900] "GET /boardSearch.do?keyword=ddd&pageno=1&pageSize=title HTTP/1.1" 400 1208

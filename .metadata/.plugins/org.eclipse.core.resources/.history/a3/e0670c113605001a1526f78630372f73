@@ -1,0 +1,10 @@
+package com.fusion1.dao;
+
+public interface BoardDAO {
+	
+	public int reInsert(BoardVO boardVO) throws Exception;
+	
+	public int reUpdate(BoardVO boardVO) throws Exception;
+	
+	public int updateReGroup(int board_no) throws Exception;
+}

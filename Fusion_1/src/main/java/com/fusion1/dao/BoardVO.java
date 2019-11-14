@@ -13,6 +13,7 @@ public class BoardVO {
 	private int board_parentsno;
 	private int board_grouporder;
 	private int board_groupdepth;
+	private int board_isnotice;
 	
 	public int getBoard_no() {
 		return board_no;
@@ -102,14 +103,22 @@ public class BoardVO {
 		this.board_groupdepth = board_groupdepth;
 	}
 	
+	public int getBoard_isnotice() {
+		return board_isnotice;
+	}
+
+	public void setBoard_isnotice(int board_isnotice) {
+		this.board_isnotice = board_isnotice;
+	}
+
 	@Override
 	public String toString() {
 		return "BoardVO [board_no=" + board_no + ", board_writer=" + board_writer + ", board_userid=" + board_userid
 				+ ", board_title=" + board_title + ", board_content=" + board_content + ", board_deletecon="
-				+ board_deletecon + ", board_date=" + board_date + ", board_parentsno=" + board_parentsno
-				+ ", board_grouporder=" + board_grouporder + ", board_groupdepth=" + board_groupdepth + "]";
+				+ board_deletecon + ", board_date=" + board_date + ", board_hit=" + board_hit + ", board_parentsno="
+				+ board_parentsno + ", board_grouporder=" + board_grouporder + ", board_groupdepth=" + board_groupdepth
+				+ ", board_isnotice=" + board_isnotice + "]";
 	}
-	
-	
+
 	
 }

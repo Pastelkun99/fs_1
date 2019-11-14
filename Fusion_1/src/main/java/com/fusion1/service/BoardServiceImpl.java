@@ -27,6 +27,11 @@ public class BoardServiceImpl implements BoardService {
 	public BoardVO getBoardOne(int board_no) {
 		return sqlsession.selectOne("boardMapper.getBoardOne", board_no);
 	}
+	
+	@Override
+	public int updateBoardHit(int board_no) {
+		return sqlsession.update("boardMapper.updateBoardHit", board_no);
+	}
 
 	@Override
 	public int getBoardCount() {
@@ -34,9 +39,55 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	@Override
-	public List<BoardVO> getBoardSearch(PagenationVO page) {
+	public List<BoardVO> getBoardSearchList(PagenationVO page) {
 		return sqlsession.selectList("boardMapper.getBoardSearchList", page);
 	}
 
+	@Override
+	public int getBoardSearchCount(PagenationVO page) {
+		return sqlsession.selectOne("boardMapper.getBoardSearchCount", page);
+	}
+
+	@Override
+	public int updateBoardOne(BoardVO boardVO) {
+		return sqlsession.update("boardMapper.updateBoardOne", boardVO);
+	}
+
+	@Override
+	public int deleteBoardOne(BoardVO boardVO) {
+		return sqlsession.update("boardMapper.deleteBoardOne", boardVO);
+	}
+
+	@Override
+	public int insertBoardOne(BoardVO boardVO) {
+		return sqlsession.insert("boardMapper.insertBoardOne", boardVO);
+	}
+
+	@Override
+	public int reWriteBoard(BoardVO boardVO) {
+		return sqlsession.insert("boardMapper.reWriteBoard", boardVO);
+	}
+
+	@Override
+	public int updateBoardParent(int parents_no) {
+		return sqlsession.update("boardMapper.updateBoardParent", parents_no);
+	}
+
+	@Override
+	public int reWriteGroupOrder(BoardVO boardVO) {
+		return sqlsession.update("boardMapper.reWriteGroupOrder", boardVO);
+	}
+
+	@Override
+	public int reWriteGroupingAvailable(BoardVO boardVO) {
+		return sqlsession.selectOne("boardMapper.reWriteGroupingAvailable", boardVO);
+	}
+
+	@Override
+	public List<BoardVO> getBoardNotice(int notice) {
+		return sqlsession.selectList("boardMapper.getBoardNotice", notice);
+	}
+
+	
 	
 }

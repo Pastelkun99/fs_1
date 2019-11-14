@@ -6,6 +6,9 @@ public class PagenationVO {
 	// 페이지 번호
 	private int page_no;
 	
+	// 받아오기 위한 변수 (몇 개씩 보일 것인가?)
+	private int pageSize;
+	
 	// 총 게시물의 수
 	private int totalCount;
 	
@@ -21,11 +24,18 @@ public class PagenationVO {
 	// mysql 수식용
 	private int pageCon;
 	
-	// 검색용
+	// 검색용 검색어
 	private String keyword;
 	
-	// 검색 형태
-	private String searchCon;
+	// 검색 형태 
+	//1 - 제목
+	//2 - 내용
+	//3 - 글쓴이
+	//4 - 전체
+	private int searchCon;
+	
+	// 게시물 번호를 처리하기 위함
+	private int pageBoardNo;
 	
 	
 	public int getPage_no() {
@@ -34,6 +44,14 @@ public class PagenationVO {
 
 	public void setPage_no(int page_no) {
 		this.page_no = page_no;
+	}
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
 	}
 
 	public int getTotalCount() {
@@ -84,20 +102,27 @@ public class PagenationVO {
 		this.pageCon = pageCon;
 	}
 	
-	public String getSearchCon() {
+	public int getSearchCon() {
 		return searchCon;
 	}
 
-	public void setSearchCon(String searchCon) {
+	public void setSearchCon(int searchCon) {
 		this.searchCon = searchCon;
+	}
+	
+	public int getPageBoardNo() {
+		return pageBoardNo;
+	}
+
+	public void setPageBoardNo(int pageBoardNo) {
+		this.pageBoardNo = pageBoardNo;
 	}
 
 	@Override
 	public String toString() {
-		return "PagenationVO [page_no=" + page_no + ", totalCount=" + totalCount + ", pageList=" + pageList
-				+ ", startPage=" + startPage + ", endPage=" + endPage + ", pageCon=" + pageCon + ", keyword=" + keyword
-				+ ", searchCon=" + searchCon + "]";
+		return "PagenationVO [page_no=" + page_no + ", pageSize=" + pageSize + ", totalCount=" + totalCount
+				+ ", pageList=" + pageList + ", startPage=" + startPage + ", endPage=" + endPage + ", pageCon="
+				+ pageCon + ", keyword=" + keyword + ", searchCon=" + searchCon + ", pageBoardNo=" + pageBoardNo + "]";
 	}
 
-	
 }

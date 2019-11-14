@@ -2,20 +2,20 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="apache" key="selection"/>
+		<item value="getCookie" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="apache"/>
-			<item value="replylc"/>
+			<item value="getcookie"/>
 			<item value="form"/>
-			<item value="조건정보"/>
-			<item value="subform"/>
-			<item value="brd"/>
-			<item value="logo"/>
-			<item value="행정안전부"/>
+			<item value="pagecon"/>
+			<item value="log4j"/>
+			<item value="jsp"/>
+			<item value="5.1.31"/>
+			<item value="spring-jdbc"/>
+			<item value="mysql"/>
 		</list>
 		<list key="replacehistory">
 		</list>
