@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fusion1.dao.BoardVO;
 import com.fusion1.dao.PagenationVO;
 import com.fusion1.service.BoardServiceImpl;
-
+import com.nhncorp.lucy.security.xss.XssPreventer;
 
 @Controller
 public class BoardController {
@@ -151,7 +151,8 @@ public class BoardController {
 			BoardVO boardvo = bs.getBoardOne(board_no);
 			
 			// 줄바꿈 처리
-			String convertedContents = boardvo.getBoard_content().replaceAll("\n", "</br>");
+			String convertedContents = boardvo.getBoard_content();
+			convertedContents = XssPreventer.unescape(convertedContents);
 			boardvo.setBoard_content(convertedContents);
 			
 			// 조회수 up
@@ -186,6 +187,12 @@ public class BoardController {
 	public String boardWrite(BoardVO boardVO, Model model, HttpServletRequest request) {
 		
 		// 원글을 등록할 경우, parentsno를 함께 등록하기 위해 insert 및 update 처리를 함께 진행함.
+		String noTagContents = boardVO.getBoard_content();
+		//System.out.println("수정 전 : " + noTagContents);
+		
+		noTagContents = XssPreventer.unescape(noTagContents);
+		//System.out.println("수정 후 : " + noTagContents);
+		boardVO.setBoard_content(noTagContents);
 		int result = bs.insertBoardOne(boardVO);
 		int parents_no = boardVO.getBoard_no();
 		int result2 = bs.updateBoardParent(parents_no);
@@ -295,7 +302,7 @@ public class BoardController {
 	@ResponseBody
 	public String reBoardWrite(BoardVO boardVO) {
 		
-		System.out.println("폼에서 넘어온 vo의 값 : " + boardVO.toString());
+		//System.out.println("폼에서 넘어온 vo의 값 : " + boardVO.toString());
 		
 		// 답글을 달고자 하는 글의 board_grouporder와 board_groupdepth가 필요하다.
 		// 답글이 될 글의 grouporder와 groupdepth를 먼저 +1해준다.

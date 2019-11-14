@@ -11,6 +11,7 @@
 	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
 	crossorigin="anonymous"></script>
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script src="https://cdn.ckeditor.com/4.13.0/standard/ckeditor.js"></script>
 <html>
 <head>
 <title>WebBoard - 게시글 답글달기</title>
@@ -38,7 +39,7 @@
 						</tr>
 						<tr>
 							<th class="table-success">글 내용</th>
-							<td colspan="3"><textarea class="form-control" name="board_content" id="board_content" rows="10" height="500px"></textarea></td>
+							<td colspan="3"><textarea class="ckeditor" name="board_content" id="board_content" rows="10" height="500px"></textarea></td>
 						</tr>
 					</table>
 				</div>
@@ -59,7 +60,7 @@
 				var board_parentsno = document.getElementById('board_parentsno').value;
 				var board_userid = document.getElementById('board_userid').value;
 				var board_title = document.getElementById('board_title').value;
-				var board_content = document.getElementById('board_content').value;
+				var board_content = CKEDITOR.instances['board_content'].getData();
 				var board_writer = document.getElementById('board_writer').value;
 				var board_grouporder = document.getElementById('board_grouporder').value;
 				var board_groupdepth = document.getElementById('board_groupdepth').value;
@@ -86,6 +87,12 @@
 				        }  
 					});
 				}
+			
+			CKEDITOR.replace('board_content', {
+				toolbar : 'Full',
+				enterMode : CKEDITOR.ENTER_BR,
+				shiftEnterMode : CKEDITOR.ENTER_P
+			});
 		</script>
 </body>
 </html>

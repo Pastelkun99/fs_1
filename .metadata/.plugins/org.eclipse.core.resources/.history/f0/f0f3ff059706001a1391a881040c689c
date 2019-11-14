@@ -1,0 +1,14 @@
+package com.fusion1.controller;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Controller;
+
+@Controller
+public class UploadController {
+
+	@Resource(name="uploadPath")
+	String uploadPath;
+	
+	
+}

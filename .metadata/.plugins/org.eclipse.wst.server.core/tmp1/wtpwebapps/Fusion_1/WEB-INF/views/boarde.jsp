@@ -11,6 +11,7 @@
 	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
 	crossorigin="anonymous"></script>
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script src="https://cdn.ckeditor.com/4.13.0/standard/ckeditor.js"></script>
 <html>
 <head>
 <title>WebBoard - 게시글 수정하기</title>
@@ -40,28 +41,36 @@
 						</tr>
 						<tr>
 							<th class="table-success">제목</th>
-							<td colspan="3"><input type="text" name="board_title" class="form-control" value="${board.board_title }"/></td>
+							<td colspan="3"><input type="text" name="board_title" id="board_title" class="form-control" value="${board.board_title }"/></td>
 						</tr>
 						<tr>
 							<th class="table-success">글 내용</th>
-							<td colspan="3"><textarea class="form-control" name="board_content" rows="10" height="500px">${board.board_content }</textarea></td>
+							<td colspan="3"><textarea class="ckeditor" name="board_content" id="board_content" rows="10" height="500px">${board.board_content }</textarea></td>
 						</tr>
 					</table>
 				</div>
-				<input type="hidden" name="board_no" value=${board.board_no }>
+				<input type="hidden" name="board_no" id="board_no" value=${board.board_no }>
 				<button type="button" class="btn btn-primary" onclick="boardUpdate();">수정 완료</button>
 				<button type="button" class="btn btn-danger" onclick="history.back();">돌아가기</button>
-				<input type="hidden" name="board_userid" value="${board.board_userid }"/>
+				<input type="hidden" name="board_userid" id="board_userid" value="${board.board_userid }"/>
 			</div>
 		</div>
 		</form>
 		<script type="text/javascript">
 			function boardUpdate() {
-				var test = $('#boardUpdate').serialize();
+				var board_no = document.getElementById('board_no').value;
+				var board_title = document.getElementById('board_title').value;
+				var board_content = CKEDITOR.instances['board_content'].getData();
+				var board_userid = document.getElementById('board_userid').value;
+				
 				$.ajax({
 					    type : "POST",
 				        url : "/boardedit.do",
-				        data : test,
+				        data : {"board_no" : board_no,
+								"board_title" : board_title,
+								"board_content" : board_content,
+								"board_userid" : board_userid
+				        		},
 				        dataType : "json",
 				        success: function(result){
 				        	alert('수정이 완료되었습니다.');
@@ -75,6 +84,12 @@
 				        }  
 				});
 			}
+			
+			CKEDITOR.replace('board_content', {
+				toolbar : 'Full',
+				enterMode : CKEDITOR.ENTER_BR,
+				shiftEnterMode : CKEDITOR.ENTER_P
+			});
 		</script>
 </body>
 </html>
