@@ -30,11 +30,12 @@ public class ReplyController {
 	@RequestMapping(value="/writeReplyAction")
 	@ResponseBody
 	public String writeReplyAction(@ModelAttribute ReplyVO reply) {
+		// 현재 날짜 정보
 		SimpleDateFormat formatter = new SimpleDateFormat ("yyyy.MM.dd HH:mm:ss", Locale.KOREA);
 		Date currentTime = new Date();
 		String date = formatter.format(currentTime);
 		reply.setReply_date(date);
-		//System.out.println(reply.toString());
+		
 		int result = rs.replyWrite(reply);
 		return String.valueOf(result);
 	}

@@ -15,17 +15,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.w3c.dom.ls.LSInput;
 
 import com.fusion1.dao.BoardVO;
+import com.fusion1.dao.LogVO;
 import com.fusion1.dao.PagenationVO;
 import com.fusion1.service.BoardServiceImpl;
+import com.fusion1.service.LogServiceImpl;
 import com.nhncorp.lucy.security.xss.XssPreventer;
+
+import eu.bitwalker.useragentutils.UserAgent;
 
 @Controller
 public class BoardController {
 	
 	@Autowired
 	BoardServiceImpl bs;
+	
+	@Autowired
+	LogServiceImpl ls;
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(HttpSession session, HttpServletRequest request, Model model) {
@@ -318,6 +326,50 @@ public class BoardController {
 		// 이후 답글을 등록한다.
 		int result = bs.reWriteBoard(boardVO);
 		 
+		return String.valueOf(result);
+	}
+	
+	@RequestMapping(value="/log.do", method=RequestMethod.POST)
+	@ResponseBody
+	public String log(LogVO logVO, HttpServletRequest request) {
+		
+		// Maven에 추가했던 라이브러리를 이용함.
+		UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
+		
+		// 데이터 타입 변환을 위해 String 객체에 올바른 형태로 넣어줌.
+		String osVersion = userAgent.getOperatingSystem().toString();
+		String userBrowser = userAgent.getBrowser().toString();
+		String userBrowserVersion = userAgent.getBrowserVersion().toString();
+		String userIP = request.getRemoteAddr();
+		    
+		logVO.setLog_osversion(osVersion);
+		logVO.setLog_userbrowser(userBrowser);
+		logVO.setLog_bversion(userBrowserVersion);
+		logVO.setLog_userip(userIP);
+		
+		//System.out.println(logVO.toString());
+		
+		int result = ls.logWrite(logVO);
+		
+		return String.valueOf(result);
+	}
+	
+	@RequestMapping(value="/Chart.do")
+	public String chart(Model model) {
+		
+		List<LogVO> logList = ls.getLogList();
+		model.addAttribute("logList", logList);
+		
+		List<LogVO> logNameList;
+		
+		return "chart";
+	}
+	
+	@RequestMapping(value="/logDelete.do")
+	@ResponseBody
+	public String logDelete(LogVO logVO) {
+		
+		int result = ls.logDelete(logVO);
 		return String.valueOf(result);
 	}
 	

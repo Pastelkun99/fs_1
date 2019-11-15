@@ -55,6 +55,9 @@
 					<!-- Button trigger modal -->
 					<button type="button" class="btn btn-dark" data-toggle="modal" id="myModal"
 						data-target="#exampleModalLong">공지사항 보기</button>
+					<c:if test="${sessionScope.userid eq 'admin' }">
+						<button type="button" class="btn btn-light" onClick="location.href='${pageContext.request.contextPath}/Chart.do'">관리자 통계 페이지</button>
+					</c:if>
 					</br>
 					</br>
 					<script>
@@ -264,6 +267,26 @@
 		var keyword = document.getElementById('keyword').value;
 		document.pageSearchfrm.action = "<c:url value='/boardList.do'/>";
 		document.pageSearchfrm.submit();
+  }
+  
+  window.onload = function() {
+	  
+	  var log_userid = '${sessionScope.userid}'; 
+	  var log_userreferrer = document.referrer;
+	  
+	  $.ajax({
+		  type : "POST",
+	  	  url : "/log.do",
+	  	  data : {"log_userid" : log_userid,
+	  		  	  "log_userreferrer" : log_userreferrer},
+		  dataType : "json",
+		  success : function(result) {
+			  alert('데이터 전송 성공');
+		  },
+		  error : function(error) {
+			  alert(error);
+		  }
+	  });
   }
 </script>
 </body>

@@ -26,5 +26,4 @@
 	<update id="updateReplyConfirm" parameterType="com.fusion1.dao.ReplyVO">
 		UPDATE REPLYTBL SET reply_content = #{reply_content} WHERE reply_no = #{reply_no}
 	</update>
-	
 </mapper>

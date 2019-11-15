@@ -1,0 +1,8 @@
+package com.fusion1.service;
+
+import com.fusion1.dao.LogVO;
+
+public interface LogService {
+
+	public int logWrite(LogVO logVO);
+}

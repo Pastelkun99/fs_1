@@ -2,20 +2,20 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="getCookie" key="selection"/>
+		<item value="current_userid" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="getcookie"/>
-			<item value="form"/>
-			<item value="pagecon"/>
-			<item value="log4j"/>
-			<item value="jsp"/>
-			<item value="5.1.31"/>
-			<item value="spring-jdbc"/>
-			<item value="mysql"/>
+			<item value="current_userid"/>
+			<item value="getreplylist"/>
+			<item value="sys"/>
+			<item value="commons"/>
+			<item value="plugin"/>
+			<item value="jetty"/>
+			<item value="totalcnt"/>
+			<item value="totalcount"/>
 		</list>
 		<list key="replacehistory">
 		</list>
