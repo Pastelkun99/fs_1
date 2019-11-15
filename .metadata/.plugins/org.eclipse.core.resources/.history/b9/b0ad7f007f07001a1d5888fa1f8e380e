@@ -10,7 +10,6 @@ public class LogVO {
 	String log_bversion;
 	String log_osversion;
 	String log_userreferrer;
-	int cnt;
 
 	public int getLog_no() {
 		return log_no;
@@ -75,22 +74,13 @@ public class LogVO {
 	public void setLog_userreferrer(String log_userreferrer) {
 		this.log_userreferrer = log_userreferrer;
 	}
-	
-	public int getCnt() {
-		return cnt;
-	}
-
-	public void setCnt(int cnt) {
-		this.cnt = cnt;
-	}
 
 	@Override
 	public String toString() {
 		return "LogVO [log_no=" + log_no + ", log_userid=" + log_userid + ", log_date=" + log_date + ", log_userip="
 				+ log_userip + ", log_userbrowser=" + log_userbrowser + ", log_bversion=" + log_bversion
-				+ ", log_osversion=" + log_osversion + ", log_userreferrer=" + log_userreferrer + ", cnt=" + cnt + "]";
+				+ ", log_osversion=" + log_osversion + ", log_userreferrer=" + log_userreferrer + "]";
 	}
 
-	
 	
 }

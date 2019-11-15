@@ -23,10 +23,10 @@ public class LogServiceImpl implements LogService {
 		return sqlSession.selectList("logMapper.getLogList");
 	}
 	
-//	@Override
-//	public Map<String, Object> getLogNameList() {
-//		return sqlSession.selectList("logMapper.getLogNameList");
-//	}
+	@Override
+	public Map<String, Object> getLogNameList() {
+		return sqlSession.select("logMapper.getLogNameList");
+	}
 	
 	@Override
 	public int logWrite(LogVO logVO) {
@@ -36,11 +36,6 @@ public class LogServiceImpl implements LogService {
 	@Override
 	public int logDelete(LogVO logVO) {
 		return sqlSession.delete("logMapper.logDelete", logVO);
-	}
-
-	@Override
-	public List<LogVO> getTempList() {
-		return sqlSession.selectList("logMapper.tempLogList");
 	}
 
 

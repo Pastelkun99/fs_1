@@ -38,11 +38,6 @@ public class LogServiceImpl implements LogService {
 		return sqlSession.delete("logMapper.logDelete", logVO);
 	}
 
-	@Override
-	public List<LogVO> getTempList() {
-		return sqlSession.selectList("logMapper.tempLogList");
-	}
-
 
 	
 }

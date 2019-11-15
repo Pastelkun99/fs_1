@@ -25,6 +25,10 @@
 								   )
 	</insert>
 	
+	<select id="tempLogList" resultType="com.fusion1.dao.LogVO">
+		SELECT log_userid, COUNT(*) AS CNT FROM LOGTBL GROUP BY log_userid ORDER BY cnt DESC;
+	</select>
+	
 	<delete id="logDelete" parameterType="com.fusion1.dao.LogVO">
 		DELETE FROM LOGTBL WHERE log_no = #{log_no}
 	</delete>

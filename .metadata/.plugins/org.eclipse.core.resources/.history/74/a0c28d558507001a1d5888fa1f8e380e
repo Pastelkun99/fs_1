@@ -361,12 +361,6 @@ public class BoardController {
 		List<LogVO> logList = ls.getLogList();
 		model.addAttribute("logList", logList);
 		
-		List<LogVO> tempLogList = ls.getTempList();
-		Iterator<LogVO> it = tempLogList.iterator();
-		while(it.hasNext()) {
-			System.out.println(it.next().toString());
-		}
-		
 		return "chart";
 	}
 	

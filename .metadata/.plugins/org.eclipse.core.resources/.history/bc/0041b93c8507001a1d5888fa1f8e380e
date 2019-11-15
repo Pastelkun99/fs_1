@@ -40,7 +40,7 @@ public class LogServiceImpl implements LogService {
 
 	@Override
 	public List<LogVO> getTempList() {
-		return sqlSession.selectList("logMapper.tempLogList");
+		return sqlSession.selectList("logMapper.logTempList");
 	}
 
 

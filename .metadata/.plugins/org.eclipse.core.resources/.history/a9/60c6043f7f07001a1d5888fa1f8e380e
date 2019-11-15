@@ -25,7 +25,7 @@
 								   )
 	</insert>
 	
-	<select id="tempLogList" resultType="com.fusion1.dao.LogVO">
+	<select id="tempLogList">
 		SELECT log_userid, COUNT(*) AS CNT FROM LOGTBL GROUP BY log_userid ORDER BY cnt DESC;
 	</select>
 	
