@@ -19,14 +19,39 @@ public class LogServiceImpl implements LogService {
 	private SqlSession sqlSession;
 
 	@Override
-	public List<LogVO> getLogList() {
-		return sqlSession.selectList("logMapper.getLogList");
+	public List<LogVO> getLogList(Map<String, Object> dateMap) {
+		return sqlSession.selectList("logMapper.getLogList", dateMap);
 	}
 	
-//	@Override
-//	public Map<String, Object> getLogNameList() {
-//		return sqlSession.selectList("logMapper.getLogNameList");
-//	}
+	@Override
+	public List<LogVO> getLogNameList(Map<String, Object> dateMap) {
+		return sqlSession.selectList("logMapper.getLogNameList", dateMap);
+	}
+	
+	@Override
+	public List<LogVO> getLogOSList(Map<String, Object> dateMap) {
+		return sqlSession.selectList("logMapper.getLogOSList", dateMap);
+	}
+	
+	@Override
+	public List<LogVO> getBrowserList(Map<String, Object> dateMap) {
+		return sqlSession.selectList("logMapper.getLogBrowserList", dateMap);
+	}
+	
+	@Override
+	public List<LogVO> getTimeList(Map<String, Object> dateMap) {
+		return sqlSession.selectList("logMapper.getTimeList", dateMap);
+	}
+	
+	@Override
+	public List<LogVO> getTimeTotalList() {
+		return sqlSession.selectList("logMapper.getTimeTotalList");
+	}
+	
+	@Override
+	public List<LogVO> getReferrerList(Map<String, Object> dateMap) {
+		return sqlSession.selectList("logMapper.getLogReferList", dateMap);
+	}
 	
 	@Override
 	public int logWrite(LogVO logVO) {
@@ -39,10 +64,9 @@ public class LogServiceImpl implements LogService {
 	}
 
 	@Override
-	public List<LogVO> getTempList() {
-		return sqlSession.selectList("logMapper.tempLogList");
+	public List<LogVO> getLogExcel(Map<String, Object> dateMap) {
+		return sqlSession.selectList("logMapper.getLogExcel", dateMap);
 	}
-
 
 	
 }

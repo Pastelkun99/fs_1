@@ -1,17 +1,32 @@
 package com.fusion1.controller;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +38,9 @@ import com.fusion1.dao.LogVO;
 import com.fusion1.dao.PagenationVO;
 import com.fusion1.service.BoardServiceImpl;
 import com.fusion1.service.LogServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.nhncorp.lucy.security.xss.XssPreventer;
 
 import eu.bitwalker.useragentutils.UserAgent;
@@ -356,17 +374,193 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value="/Chart.do")
-	public String chart(Model model) {
+	public String chart(Model model, HttpServletRequest request, 
+						@RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate,
+						HttpSession session) {
 		
-		List<LogVO> logList = ls.getLogList();
-		model.addAttribute("logList", logList);
-		
-		List<LogVO> tempLogList = ls.getTempList();
-		Iterator<LogVO> it = tempLogList.iterator();
-		while(it.hasNext()) {
-			System.out.println(it.next().toString());
+		String currentUser = (String)session.getAttribute("userid");
+		if(currentUser == null || currentUser.equals("")) {
+			model.addAttribute("msg", "관리자만 접근 가능합니다.");
+			model.addAttribute("href", request.getContextPath() + "/");
+			return "alert";
+		} else if (!currentUser.equals("admin")) {
+			model.addAttribute("msg", "관리자만 접근 가능합니다.");
+			model.addAttribute("href", request.getContextPath() + "/");
+			return "alert";
 		}
 		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Date todayTime = new Date();
+		String today = format.format(todayTime);
+		Map<String, Object> dateMap = new HashMap<String, Object>();
+		
+		if(fromDate == null || fromDate.equals("")) {
+			fromDate = today;
+		}
+		
+		if(toDate == null || toDate.equals("")) {
+			toDate = today;
+		}
+
+		
+		format.setLenient(false);
+		try {
+			format.parse(fromDate);
+			format.parse(toDate);
+		} catch (Exception e) {
+			model.addAttribute("msg", "올바른 날짜 형식이 아닙니다.");
+			model.addAttribute("href", request.getContextPath() + "/Chart.do?fromDate=&toDate=");
+			return "alert";
+		}
+		
+		dateMap.put("fromDate", fromDate + " 00:00:00");
+		dateMap.put("toDate", toDate + " 23:59:59");
+		
+		//System.out.println("들어간 fromdate = " + fromDate + ", 들어간 toDate = " + toDate);
+		
+		// 로그를 테이블에 뿌려주기 위함
+		List<LogVO> logList = ls.getLogList(dateMap);
+		model.addAttribute("logList", logList);
+		
+		List<LogVO> logNameList = ls.getLogNameList(dateMap);
+		
+		List<LogVO> logOSList = ls.getLogOSList(dateMap);
+		
+		List<LogVO> logBrowserList = ls.getBrowserList(dateMap);
+		
+		List<LogVO> logTimeList = ls.getTimeList(dateMap);
+		
+		List<LogVO> logTimeTotalList = ls.getTimeTotalList();
+		
+		List<LogVO> logReferrerList = ls.getReferrerList(dateMap);
+		// 리스트 load 작업 끝
+		
+		
+		// 유저별 접속횟수 로직
+		Gson gson = new Gson();
+		JsonArray jArray = new JsonArray();
+		
+		Iterator<LogVO> it = logNameList.iterator();
+		while(it.hasNext()) {
+			LogVO curVO = it.next();
+			JsonObject object = new JsonObject();
+			String userid = curVO.getLog_userid();
+			int cnt = curVO.getCnt();
+			
+			object.addProperty("ID", userid);
+			object.addProperty("Count", cnt);
+			jArray.add(object);
+		}
+		
+		String json = gson.toJson(jArray);
+		//System.out.println("이름별 제이슨 데이터 정보 : " + json);
+		model.addAttribute("json", json);
+		// 유저별 접속 횟수 로직 끝
+		
+		// 운영제체별 접속 횟수 로직
+		Gson gson2 = new Gson();
+		JsonArray jArrayOS = new JsonArray();
+		
+		Iterator<LogVO> itOS = logOSList.iterator();
+		while(itOS.hasNext()) {
+			LogVO osVO = itOS.next();
+			JsonObject objectOS = new JsonObject();
+			String os = osVO.getLog_osversion();
+			int cnt = osVO.getCnt();
+			
+			objectOS.addProperty("OS", os);
+			objectOS.addProperty("Count", cnt);
+			jArrayOS.add(objectOS);
+		}
+		
+		String jsonOS = gson2.toJson(jArrayOS);
+		//System.out.println("OS별 제이슨 데이터 정보 : " + jsonOS);
+		model.addAttribute("jsonOS", jsonOS);
+		// 운영체제별 접속 횟수 로직 끝
+		
+		// 브라우저별 접속 횟수 로직
+		Gson gson3 = new Gson();
+		JsonArray jArrayBrowser = new JsonArray();
+		
+		Iterator<LogVO> itBrowser = logBrowserList.iterator();
+		while(itBrowser.hasNext()) {
+			LogVO browserVO = itBrowser.next();
+			JsonObject objectBrowser = new JsonObject();
+			String browser = browserVO.getLog_userbrowser();
+			int cnt = browserVO.getCnt();
+			
+			objectBrowser.addProperty("Browser", browser);
+			objectBrowser.addProperty("Count", cnt);
+			jArrayBrowser.add(objectBrowser);
+		}
+
+		String jsonBrowser = gson3.toJson(jArrayBrowser);
+		//System.out.println("브라우저별 제이슨 데이터 정보 : " + jsonBrowser);
+		model.addAttribute("jsonBrowser", jsonBrowser);
+		// 브라우저별 접속 횟수 로직 끝
+		
+		// 접속 시간별 카운트 로직
+		Gson gson4 = new Gson();
+		JsonArray jArrayTime = new JsonArray();
+		
+		Iterator<LogVO> itTime = logTimeList.iterator();
+		while(itTime.hasNext()) {
+			LogVO timeVO = itTime.next();
+			//System.out.println(timeVO.toString());
+			JsonObject objectTime = new JsonObject();
+			String time = timeVO.getTime() + "시";
+			int cnt = timeVO.getCnt();
+			
+			objectTime.addProperty("DateTime", time);
+			objectTime.addProperty("Count", cnt);
+			jArrayTime.add(objectTime);
+		}
+		
+		String jsonTime = gson4.toJson(jArrayTime);
+		//System.out.println("시간 별 접속자 정보 : " + jsonTime);
+		model.addAttribute("jsonTime", jsonTime);
+		// 접속 시간별 카운트 로직 끝
+		
+		// 날짜별 카운트 횟수 추출
+		Gson gson5 = new Gson();
+		JsonArray jArrayDate = new JsonArray();
+		
+		Iterator<LogVO> itDate = logTimeTotalList.iterator();
+		while(itDate.hasNext()) {
+			LogVO dateVO = itDate.next();
+			JsonObject objectDate = new JsonObject();
+			String log_date = dateVO.getLog_date();
+			int cnt = dateVO.getCnt();
+			
+			objectDate.addProperty("Date", log_date);
+			objectDate.addProperty("Count", cnt);
+			jArrayDate.add(objectDate);
+		}
+		
+		String jsonDate = gson5.toJson(jArrayDate);
+		//System.out.println("날짜별 접속자 카운트 : " + jsonDate);
+		model.addAttribute("jsonDate", jsonDate);
+		
+		// 접속 경로별 설정
+		Gson gson6 = new Gson();
+		JsonArray jArrayRefer = new JsonArray();
+		
+		Iterator<LogVO> itRefer = logReferrerList.iterator();
+		while(itRefer.hasNext()) {
+			LogVO referVO = itRefer.next();
+			JsonObject objectRefer = new JsonObject();
+			String refer = referVO.getLog_userreferrer();
+			int cnt = referVO.getCnt();
+			
+			objectRefer.addProperty("Refer", refer);
+			objectRefer.addProperty("Count", cnt);
+			jArrayRefer.add(objectRefer);
+		}
+
+		String jsonRefer = gson6.toJson(jArrayRefer);
+		model.addAttribute("jsonRefer", jsonRefer);
+		// 접속 경로 횟수 로직 끝
+
 		return "chart";
 	}
 	
@@ -376,6 +570,132 @@ public class BoardController {
 		
 		int result = ls.logDelete(logVO);
 		return String.valueOf(result);
+	}
+	
+	@RequestMapping(value="/logExcelDownload.do")
+	public void excelDown(HttpServletResponse response, HttpServletRequest request) throws IOException {
+		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Date todayTime = new Date();
+		String today = format.format(todayTime);
+		
+		HashMap<String, Object> dateMap = new HashMap<String, Object>();
+		String fromDate = (String)request.getParameter("fromDate");
+		String toDate = (String)request.getParameter("toDate");
+		
+		if(fromDate == null || fromDate.equals("")) {
+			fromDate = today;
+		}
+		
+		if(toDate == null || toDate.equals("")) {
+			toDate = today;
+		}
+		
+		dateMap.put("fromDate", fromDate + " 00:00:00");
+		dateMap.put("toDate", toDate + " 23:59:59");
+		
+//		System.out.println("리퀘스트파라미터 fromdate : " + fromDate);
+//		System.out.println("리퀘스트파라미터 todate : " + toDate);
+		
+		// 목록 조회
+		List<LogVO> logList = ls.getLogExcel(dateMap);
+//		Iterator<LogVO> it = logList.iterator();
+//		while(it.hasNext()) {
+//			System.out.println(it.next().toString());
+//		}
+		
+		Workbook wb = new HSSFWorkbook();
+		Sheet sheet = wb.createSheet("로그 목록");
+		Row row = null;
+		Cell cell = null;
+		int rowNo = 0;
+		
+		// 테이블 헤더 용 스타일
+		CellStyle headStyle = wb.createCellStyle();
+		
+		// 가는 경계선
+		headStyle.setBorderTop(BorderStyle.THIN);
+		headStyle.setBorderBottom(BorderStyle.THIN);
+		headStyle.setBorderLeft(BorderStyle.THIN);
+		headStyle.setBorderRight(BorderStyle.THIN);
+		
+		// 배경 스타일
+		headStyle.setFillForegroundColor(HSSFColorPredefined.YELLOW.getIndex());
+		headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		
+		// 데이터 가운데 정렬
+		headStyle.setAlignment(HorizontalAlignment.CENTER);
+		
+		// 데이터용 경계 스타일 테두리만 지정
+		CellStyle bodyStyle = wb.createCellStyle();
+		bodyStyle.setBorderTop(BorderStyle.THIN);
+	    bodyStyle.setBorderBottom(BorderStyle.THIN);
+	    bodyStyle.setBorderLeft(BorderStyle.THIN);
+	    bodyStyle.setBorderRight(BorderStyle.THIN);
+
+	    // 헤더 생성
+		row = sheet.createRow(rowNo++);
+		cell = row.createCell(0);
+		cell.setCellStyle(headStyle);
+		cell.setCellValue("번호");
+		cell = row.createCell(1);
+		cell.setCellStyle(headStyle);
+		cell.setCellValue("아이디");
+		cell = row.createCell(2);
+		cell.setCellStyle(headStyle);
+		cell.setCellValue("날짜");
+		cell = row.createCell(3);
+		cell.setCellStyle(headStyle);
+		cell.setCellValue("IP");
+		cell = row.createCell(4);
+		cell.setCellStyle(headStyle);
+		cell.setCellValue("브라우저");
+		cell = row.createCell(5);
+		cell.setCellStyle(headStyle);
+		cell.setCellValue("브라우저버전");
+		cell = row.createCell(6);
+		cell.setCellStyle(headStyle);
+		cell.setCellValue("운영체제");
+		cell = row.createCell(7);
+		cell.setCellStyle(headStyle);
+		cell.setCellValue("접속 경로");
+
+	    // 데이터 부분 생성
+	    for(LogVO vo : logList) {
+	        row = sheet.createRow(rowNo++);
+	        cell = row.createCell(0);
+	        cell.setCellStyle(bodyStyle);
+	        cell.setCellValue(vo.getLog_no());
+	        cell = row.createCell(1);
+	        cell.setCellStyle(bodyStyle);
+	        cell.setCellValue(vo.getLog_userid());
+	        cell = row.createCell(2);
+	        cell.setCellStyle(bodyStyle);
+	        cell.setCellValue(vo.getLog_date());
+	        cell = row.createCell(3);
+	        cell.setCellStyle(bodyStyle);
+	        cell.setCellValue(vo.getLog_userip());
+	        cell = row.createCell(4);
+	        cell.setCellStyle(bodyStyle);
+	        cell.setCellValue(vo.getLog_userbrowser());
+	        cell = row.createCell(5);
+	        cell.setCellStyle(bodyStyle);
+	        cell.setCellValue(vo.getLog_bversion());
+	        cell = row.createCell(6);
+	        cell.setCellStyle(bodyStyle);
+	        cell.setCellValue(vo.getLog_osversion());
+	        cell = row.createCell(7);
+	        cell.setCellStyle(bodyStyle);
+	        cell.setCellValue(vo.getLog_userreferrer());
+	    }
+	    
+	    // 컨텐츠 타입과 파일명 지정
+	    response.setContentType("ms-vnd/excel");
+	    response.setHeader("Content-Disposition", "attachment;filename=Log.xls");
+
+	    // 엑셀 출력
+	    wb.write(response.getOutputStream());
+	    wb.close();
 	}
 	
 }

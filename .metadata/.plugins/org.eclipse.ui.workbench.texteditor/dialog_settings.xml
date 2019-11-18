@@ -2,12 +2,13 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="current_userid" key="selection"/>
+		<item value="관리자 통계" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
+			<item value="관리자 통계"/>
 			<item value="current_userid"/>
 			<item value="getreplylist"/>
 			<item value="sys"/>
@@ -15,7 +16,6 @@
 			<item value="plugin"/>
 			<item value="jetty"/>
 			<item value="totalcnt"/>
-			<item value="totalcount"/>
 		</list>
 		<list key="replacehistory">
 		</list>

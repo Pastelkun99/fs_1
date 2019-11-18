@@ -4,12 +4,18 @@
 
 <mapper namespace="logMapper">
 
-	<select id="getLogList" resultType="com.fusion1.dao.LogVO">
-		SELECT * FROM LOGTBL
+	<select id="getLogList" parameterType="map" resultType="com.fusion1.dao.LogVO">
+		<![CDATA[
+			SELECT * FROM LOGTBL WHERE log_date >= #{fromDate} AND log_date <= #{toDate} ORDER BY log_date DESC
+		]]>
 	</select>
 	
-	<select id="getLogNameList" resultType="com.fusion1.dao.LogVO">
-		SELECT DISTINCT log_userid FROM LOGTBL
+	<select id="getLogExcel" parameterType="map" resultType="com.fusion1.dao.LogVO">
+		<![CDATA[
+		SELECT *
+		FROM (SELECT * FROM LOGTBL WHERE log_date >= #{fromDate} AND log_date <= #{toDate}) A
+		ORDER BY log_date DESC
+		]]>
 	</select>
 	
 	<insert id="logWrite" parameterType="com.fusion1.dao.LogVO">
@@ -25,8 +31,45 @@
 								   )
 	</insert>
 	
-	<select id="tempLogList" resultType="com.fusion1.dao.LogVO">
-		SELECT log_userid, COUNT(*) AS CNT FROM LOGTBL GROUP BY log_userid ORDER BY cnt DESC;
+	<select id="getLogNameList" parameterType="map" resultType="com.fusion1.dao.LogVO">
+	<![CDATA[
+		SELECT log_userid, COUNT(*) AS CNT FROM (SELECT * FROM LOGTBL WHERE log_date >= #{fromDate} AND log_date <= #{toDate}) A 
+		GROUP BY log_userid ORDER BY cnt DESC;
+	]]>
+	</select>
+	
+	<select id="getLogOSList" parameterType="map" resultType="com.fusion1.dao.LogVO">
+	<![CDATA[
+		SELECT log_osversion, COUNT(*) AS CNT FROM ((SELECT * FROM LOGTBL WHERE log_date >= #{fromDate} AND log_date <= #{toDate}) A) 
+		GROUP BY log_osversion ORDER BY cnt DESC;
+	]]>
+	</select>
+	
+	<select id="getLogBrowserList" parameterType="map" resultType="com.fusion1.dao.LogVO">
+	<![CDATA[
+		SELECT log_userbrowser, COUNT(*) AS CNT FROM (SELECT * FROM LOGTBL WHERE log_date >= #{fromDate} AND log_date <= #{toDate}) A 
+		GROUP BY log_userbrowser ORDER BY cnt DESC;
+	]]>
+	</select>
+	
+	<select id="getLogReferList" parameterType="map" resultType="com.fusion1.dao.LogVO">
+	<![CDATA[
+		SELECT log_userreferrer, COUNT(*) AS CNT FROM (SELECT * FROM LOGTBL WHERE log_date >= #{fromDate} AND log_date <= #{toDate}) A 
+		GROUP BY log_userreferrer ORDER BY cnt DESC;
+	]]>
+	</select>
+	
+	<select id="getTimeTotalList" resultType="com.fusion1.dao.LogVO">
+		SELECT date_format(log_date, '%Y-%m-%d') AS log_date, COUNT(*) AS CNT
+		FROM LOGTBL GROUP BY date_format(log_date, '%Y-%m-%d')
+	</select>
+	
+	<select id="getTimeList" parameterType="map" resultType="com.fusion1.dao.LogVO">
+	<![CDATA[
+		SELECT date_format(log_date, '%H') AS TIME, COUNT(*) AS CNT 
+		FROM (SELECT * FROM LOGTBL WHERE log_date >= #{fromDate} AND log_date <= #{toDate}) A
+		GROUP BY date_format(log_date, '%H')
+	]]>
 	</select>
 	
 	<delete id="logDelete" parameterType="com.fusion1.dao.LogVO">

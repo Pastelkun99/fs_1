@@ -1,0 +1,583 @@
+package com.fusion1.controller;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.w3c.dom.ls.LSInput;
+
+import com.fusion1.dao.BoardVO;
+import com.fusion1.dao.LogVO;
+import com.fusion1.dao.PagenationVO;
+import com.fusion1.service.BoardServiceImpl;
+import com.fusion1.service.LogServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.nhncorp.lucy.security.xss.XssPreventer;
+
+import eu.bitwalker.useragentutils.UserAgent;
+
+@Controller
+public class BoardController {
+	
+	@Autowired
+	BoardServiceImpl bs;
+	
+	@Autowired
+	LogServiceImpl ls;
+	
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String home(HttpSession session, HttpServletRequest request, Model model) {
+		String currentUser = (String)session.getAttribute("userid");
+		if(currentUser == null || currentUser.equals("")) {
+			return "home";
+		} else {
+			model.addAttribute("msg", "이미 로그인 되어 있습니다.");
+			model.addAttribute("href", "/boardList.do?page_no=1&pageSize=10");
+			return "alert";
+		}
+		
+	}
+	
+	@RequestMapping(value="/boardList.do")
+	public String boardList(HttpSession session, Model model, PagenationVO page) {
+		String currentID = (String)session.getAttribute("userid");
+		if(currentID == null || currentID.equals("")) {
+			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
+			model.addAttribute("href", "/");
+			return "alert";
+		} else {
+			if(page.getKeyword() == null || page.getKeyword().equals("")) {
+				
+				// 검색어를 지정하지 않았을 때의 게시글 총 갯수
+				int totalCount = bs.getBoardCount();
+				
+				// 페이지에서 지정한 갯수 (몇 개씩 보여줄 것인가)
+				int getPageSize = page.getPageSize();
+				
+				int getPage_no = page.getPage_no();
+				
+				// 끝 페이지가 될 숫자. 
+				int endPage = totalCount / getPageSize;
+				
+				// 나누어 떨어지지 않으면 1을 추가한다.
+				if(totalCount % getPageSize > 0) {
+					endPage++;
+				}
+				
+				// 보내기 위한 페이지네이션 VO 객체
+				PagenationVO pageVO = new PagenationVO();
+				pageVO.setStartPage(1);
+				pageVO.setEndPage(endPage);
+				pageVO.setPageList(getPageSize);
+				pageVO.setPageSize(getPageSize);
+				pageVO.setTotalCount(totalCount);
+				
+				// page_no = 1 일때 0, 2일때 10, 3일때 20 ...
+				int pageCon = (getPage_no*getPageSize) - getPageSize;
+				pageVO.setPageCon(pageCon);
+				
+				int pageBoardNo = (getPage_no*getPageSize);
+				pageVO.setPageBoardNo(pageBoardNo);
+				
+				// 검색어가 없을때 
+				List<BoardVO> list = bs.getBoardList(pageVO);
+				
+				// 공지사항 리스트
+				List<BoardVO> noticeList = bs.getBoardNotice(1);
+				if(!noticeList.isEmpty()) {
+					BoardVO notice = noticeList.get(0);
+					model.addAttribute("notice", notice);
+				}
+				
+				model.addAttribute("boardlist", list);
+				model.addAttribute("noticeList", noticeList);
+				model.addAttribute("page", pageVO);
+				return "boardList";
+				
+			} else {
+				// 검색어가 있다는 것 외에는 앞의 로직과 같음.
+				int totalCount = bs.getBoardSearchCount(page);
+				int getPageSize = page.getPageSize();
+				int getPage_no = page.getPage_no();
+				int searchCon = page.getSearchCon();
+				int endPage = totalCount / getPageSize;
+				String keyword = page.getKeyword();
+				
+				if(totalCount % page.getPageSize() > 0) {
+					endPage++;
+				}
+				
+				PagenationVO pageSearch = new PagenationVO();
+				pageSearch.setStartPage(1);
+				pageSearch.setEndPage(endPage);
+				pageSearch.setPageList(page.getPageSize());
+				pageSearch.setPageSize(getPageSize);
+				
+				// 페이지 검색 조건과 검색어, 해당 조건에 맞는 게시글 수를 지정해줌.
+				pageSearch.setSearchCon(searchCon);
+				pageSearch.setKeyword(keyword);
+				pageSearch.setTotalCount(totalCount);
+				
+				int pageCon = (getPage_no*getPageSize) - getPageSize;
+				pageSearch.setPageCon(pageCon);
+				
+				List<BoardVO> list = bs.getBoardSearchList(pageSearch);
+				
+				List<BoardVO> noticeList = bs.getBoardNotice(1);
+				if(!noticeList.isEmpty()) {
+					BoardVO notice = noticeList.get(0);
+					model.addAttribute("notice", notice);
+				}
+				model.addAttribute("boardlist", list);
+				model.addAttribute("noticeList", noticeList);
+				model.addAttribute("page", pageSearch);
+				return "boardList";
+			}
+		}
+	}
+	
+	@RequestMapping(value="/board.do", method=RequestMethod.GET)
+	public String board(HttpSession session, @RequestParam("board_no") int board_no, Model model) {
+		String currentID = (String)session.getAttribute("userid");
+		
+		if(currentID == null || currentID.equals("")) {
+			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
+			model.addAttribute("href", "/");
+			return "alert";
+		} else {
+			// 게시글 정보 불러옴
+			BoardVO boardvo = bs.getBoardOne(board_no);
+			
+			// 줄바꿈 처리
+			String convertedContents = boardvo.getBoard_content();
+			convertedContents = XssPreventer.unescape(convertedContents);
+			boardvo.setBoard_content(convertedContents);
+			
+			// 조회수 up
+			bs.updateBoardHit(board_no);
+			
+			model.addAttribute("board", boardvo);
+			return "board";
+		}
+	}
+	
+	@RequestMapping(value="/boardWrite.do", method=RequestMethod.GET)
+	public String boardWrite(Model model, HttpSession session) {
+		String currentUser = (String)session.getAttribute("userid");
+		
+		if(currentUser == null || currentUser.equals("")) {
+			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
+			model.addAttribute("href", "/");
+			return "alert";
+		} else {
+			// 게시글 작성 일자 표시를 위해 전달 (다른 방법 있음)
+			SimpleDateFormat formatter = new SimpleDateFormat ("yyyy.MM.dd HH:mm:ss", Locale.KOREA);
+			Date currentTime = new Date();
+			String date = formatter.format(currentTime);
+			model.addAttribute("date", date);
+			return "boardw";
+		}
+		
+	}
+	
+	@RequestMapping(value="/boardWrite.do", method=RequestMethod.POST)
+	@ResponseBody
+	public String boardWrite(BoardVO boardVO, Model model, HttpServletRequest request) {
+		
+		// 원글을 등록할 경우, parentsno를 함께 등록하기 위해 insert 및 update 처리를 함께 진행함.
+		String noTagContents = boardVO.getBoard_content();
+		//System.out.println("수정 전 : " + noTagContents);
+		
+		noTagContents = XssPreventer.unescape(noTagContents);
+		//System.out.println("수정 후 : " + noTagContents);
+		boardVO.setBoard_content(noTagContents);
+		int result = bs.insertBoardOne(boardVO);
+		int parents_no = boardVO.getBoard_no();
+		int result2 = bs.updateBoardParent(parents_no);
+		
+		return String.valueOf(result);
+	}
+	
+	
+	@RequestMapping(value="/boardedit.do", method=RequestMethod.GET)
+	public String updateBoardOne(@RequestParam("board_no") int board_no, Model model, HttpSession session, HttpServletRequest request) {
+		String currentUser = (String)session.getAttribute("userid");
+		BoardVO board = bs.getBoardOne(board_no);
+		
+		if(currentUser == null || currentUser.equals("")) {
+			model.addAttribute("msg", "권한이 없습니다.");
+			model.addAttribute("href", request.getContextPath() + "/board.do?board_no=" + board_no);
+			return "alert";
+		} else if(currentUser.equals("admin")) {
+			// 관리자의 경우 어떤 글이든 수정 가능하도록 처리
+			model.addAttribute("board", board);
+			return "boarde";
+		} else if(currentUser.equals(board.getBoard_userid())) {
+			// 글 쓴 사람의 아이디와, 해당 글을 작성한 사람의 아이디가 같아야만 글을 수정할 수 있음.
+			model.addAttribute("board", board);
+			return "boarde";
+		} else {
+			model.addAttribute("msg", "권한이 없습니다.");
+			model.addAttribute("href", request.getContextPath() + "/board.do?board_no=" + board_no);
+			return "alert";
+		}
+	}
+
+	@ResponseBody
+	@RequestMapping(value="/boardedit.do", method=RequestMethod.POST)
+	public String updateBoardOne(BoardVO board, Model model, HttpSession session, HttpServletRequest request) {
+		String currentUser = (String)session.getAttribute("userid");
+		
+		// 수정한 글을 보낼 때 한 번 더 로그인 관련 처리를 함.
+		if(currentUser == null || currentUser.equals("")) {
+			model.addAttribute("msg", "권한이 없습니다.");
+			model.addAttribute("href", request.getContextPath() + "/board.do?board_no=" + board.getBoard_no());
+			return "alert";
+		} else if(currentUser.equals("admin")) {
+			// 관리자는 모든 글을 수정 가능함.
+			int result = bs.updateBoardOne(board);
+			return String.valueOf(result);
+		} else if(currentUser.equals(board.getBoard_userid())) {
+			// 글을 작성한 사람의 아이디와 현재 접속자 아이디가 같아야만 수정이 가능함.
+			int result = bs.updateBoardOne(board);
+			return String.valueOf(result);
+		} else {
+			model.addAttribute("msg", "권한이 없습니다.");
+			model.addAttribute("href", request.getContextPath() + "/board.do?board_no=" + board.getBoard_no());
+			return "alert";
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/boardDelete.do", method=RequestMethod.GET)
+	public String deleteBoardOne(BoardVO board, Model model, HttpSession session, HttpServletRequest request) {
+		String currentUser = (String)session.getAttribute("userid");
+		
+		if(currentUser == null || currentUser.equals("")) {
+			model.addAttribute("msg", "권한이 없습니다.");
+			model.addAttribute("href", request.getContextPath() + "/board.do?board_no=" + board.getBoard_no());
+			return "alert";
+		} else if(currentUser.equals("admin")) {
+			// 관리자는 모든 게시물을 삭제할 수 있음.
+			int result = bs.deleteBoardOne(board);
+			return String.valueOf(result);
+		} else if(currentUser.equals(board.getBoard_userid())) {
+			// 게시글을 작성한 사람의 아이디와 현재 접속자 아이디가 일치해야 삭제가 가능함.
+			int result = bs.deleteBoardOne(board);
+			return String.valueOf(result);
+		} else {
+			model.addAttribute("msg", "권한이 없습니다.");
+			model.addAttribute("href", request.getContextPath() + "/board.do?board_no=" + board.getBoard_no());
+			return "alert";
+		}
+	}
+	
+	@RequestMapping(value="/reBoardWrite.do", method=RequestMethod.GET)
+	public String reBoardWrite(@RequestParam("board_no") int board_no, Model model, HttpSession session) {
+		String currentUser = (String)session.getAttribute("userid");
+		
+		if(currentUser == null || currentUser.equals("")) {
+			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
+			model.addAttribute("href", "/");
+			return "alert";
+		} else {
+			// 답글을 달고자 하는 게시글의 정보를 불러와, View페이지에 Re : 를 뿌려주기위함.
+			BoardVO boardVO = bs.getBoardOne(board_no);
+			
+			// 현재 날짜-시간 처리
+			SimpleDateFormat formatter = new SimpleDateFormat ("yyyy.MM.dd HH:mm:ss", Locale.KOREA);
+			Date currentTime = new Date();
+			String date = formatter.format(currentTime);
+			
+			model.addAttribute("date", date);
+			model.addAttribute("board", boardVO);
+			return "reBoard";
+			
+		}
+	}
+	
+	@RequestMapping(value="/reBoardWrite.do", method=RequestMethod.POST)
+	@ResponseBody
+	public String reBoardWrite(BoardVO boardVO) {
+		
+		//System.out.println("폼에서 넘어온 vo의 값 : " + boardVO.toString());
+		
+		// 답글을 달고자 하는 글의 board_grouporder와 board_groupdepth가 필요하다.
+		// 답글이 될 글의 grouporder와 groupdepth를 먼저 +1해준다.
+		boardVO.setBoard_grouporder(boardVO.getBoard_grouporder() + 1);
+		boardVO.setBoard_groupdepth(boardVO.getBoard_groupdepth() + 1);
+		
+		// 답글을 달고자 하는 글의 정보를 불러온다. 
+		BoardVO parentsVO = bs.getBoardOne(boardVO.getBoard_no());
+		
+		// 답글을 달고자 하는 글과 해당 글의 상위 글의 grouporder를 +1하는 쿼리를 실행한다.
+		int result2 = bs.reWriteGroupOrder(parentsVO);
+		
+		// 이후 답글을 등록한다.
+		int result = bs.reWriteBoard(boardVO);
+		 
+		return String.valueOf(result);
+	}
+	
+	@RequestMapping(value="/log.do", method=RequestMethod.POST)
+	@ResponseBody
+	public String log(LogVO logVO, HttpServletRequest request) {
+		
+		// Maven에 추가했던 라이브러리를 이용함.
+		UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
+		
+		// 데이터 타입 변환을 위해 String 객체에 올바른 형태로 넣어줌.
+		String osVersion = userAgent.getOperatingSystem().toString();
+		String userBrowser = userAgent.getBrowser().toString();
+		String userBrowserVersion = userAgent.getBrowserVersion().toString();
+		String userIP = request.getRemoteAddr();
+		    
+		logVO.setLog_osversion(osVersion);
+		logVO.setLog_userbrowser(userBrowser);
+		logVO.setLog_bversion(userBrowserVersion);
+		logVO.setLog_userip(userIP);
+		
+		//System.out.println(logVO.toString());
+		
+		int result = ls.logWrite(logVO);
+		
+		return String.valueOf(result);
+	}
+	
+	@RequestMapping(value="/Chart.do")
+	public String chart(Model model, @RequestParam("date") String fromDate, @RequestParam String toDate) {
+		
+		// 로그를 테이블에 뿌려주기 위함
+		List<LogVO> logList = ls.getLogList();
+		model.addAttribute("logList", logList);
+		
+		List<LogVO> logNameList = ls.getLogNameList();
+		
+		List<LogVO> logOSList = ls.getLogOSList();
+		
+		List<LogVO> logBrowserList = ls.getBrowserList();
+		
+		Map<String, Object> dateMap = new HashMap<String, Object>();
+		
+		List<LogVO> logTimeList = ls.getTimeList(fromDate);
+		
+		List<LogVO> logTimeTotalList = ls.getTimeTotalList();
+		
+		// 리스트 load 작업 끝
+		
+		
+		// 유저별 접속횟수 로직
+		Gson gson = new Gson();
+		JsonArray jArray = new JsonArray();
+		
+		Iterator<LogVO> it = logNameList.iterator();
+		while(it.hasNext()) {
+			LogVO curVO = it.next();
+			JsonObject object = new JsonObject();
+			String userid = curVO.getLog_userid();
+			int cnt = curVO.getCnt();
+			
+			object.addProperty("ID", userid);
+			object.addProperty("Count", cnt);
+			jArray.add(object);
+		}
+		
+		String json = gson.toJson(jArray);
+		System.out.println("이름별 제이슨 데이터 정보 : " + json);
+		model.addAttribute("json", json);
+		// 유저별 접속 횟수 로직 끝
+		
+		// 운영제체별 접속 횟수 로직
+		Gson gson2 = new Gson();
+		JsonArray jArrayOS = new JsonArray();
+		
+		Iterator<LogVO> itOS = logOSList.iterator();
+		while(itOS.hasNext()) {
+			LogVO osVO = itOS.next();
+			JsonObject objectOS = new JsonObject();
+			String os = osVO.getLog_osversion();
+			int cnt = osVO.getCnt();
+			
+			objectOS.addProperty("OS", os);
+			objectOS.addProperty("Count", cnt);
+			jArrayOS.add(objectOS);
+		}
+		
+		String jsonOS = gson2.toJson(jArrayOS);
+		System.out.println("OS별 제이슨 데이터 정보 : " + jsonOS);
+		model.addAttribute("jsonOS", jsonOS);
+		// 운영체제별 접속 횟수 로직 끝
+		
+		// 브라우저별 접속 횟수 로직
+		Gson gson3 = new Gson();
+		JsonArray jArrayBrowser = new JsonArray();
+		
+		Iterator<LogVO> itBrowser = logBrowserList.iterator();
+		while(itBrowser.hasNext()) {
+			LogVO browserVO = itBrowser.next();
+			JsonObject objectBrowser = new JsonObject();
+			String browser = browserVO.getLog_userbrowser();
+			int cnt = browserVO.getCnt();
+			
+			objectBrowser.addProperty("Browser", browser);
+			objectBrowser.addProperty("Count", cnt);
+			jArrayBrowser.add(objectBrowser);
+		}
+
+		String jsonBrowser = gson3.toJson(jArrayBrowser);
+		System.out.println("브라우저별 제이슨 데이터 정보 : " + jsonBrowser);
+		model.addAttribute("jsonBrowser", jsonBrowser);
+		// 브라우저별 접속 횟수 로직 끝
+		
+		// 접속 시간별 카운트 로직
+		Gson gson4 = new Gson();
+		JsonArray jArrayTime = new JsonArray();
+		
+		Iterator<LogVO> itTime = logTimeList.iterator();
+		while(itTime.hasNext()) {
+			LogVO timeVO = itTime.next();
+			JsonObject objectTime = new JsonObject();
+			String time = timeVO.getTime() + "시";
+			int cnt = timeVO.getCnt();
+			
+			objectTime.addProperty("DateTime", time);
+			objectTime.addProperty("Count", cnt);
+			jArrayTime.add(objectTime);
+		}
+		
+		String jsonTime = gson4.toJson(jArrayTime);
+		System.out.println("시간 별 접속자 정보 : " + jsonTime);
+		model.addAttribute("jsonTime", jsonTime);
+		// 접속 시간별 카운트 로직 끝
+		
+		// 날짜별 카운트 횟수 추출
+		Gson gson5 = new Gson();
+		JsonArray jArrayDate = new JsonArray();
+		
+		Iterator<LogVO> itDate = logTimeTotalList.iterator();
+		while(itDate.hasNext()) {
+			LogVO dateVO = itDate.next();
+			System.out.println(dateVO.toString());
+			JsonObject objectDate = new JsonObject();
+			String log_date = dateVO.getLog_date();
+			int cnt = dateVO.getCnt();
+			
+			objectDate.addProperty("Date", log_date);
+			objectDate.addProperty("Count", cnt);
+			jArrayDate.add(objectDate);
+		}
+		
+		String jsonDate = gson5.toJson(jArrayDate);
+		System.out.println("날짜별 접속자 카운트 : " + jsonDate);
+		model.addAttribute("jsonDate", jsonDate);
+		
+		return "chart";
+	}
+	
+	@RequestMapping(value="/logDelete.do")
+	@ResponseBody
+	public String logDelete(LogVO logVO) {
+		
+		int result = ls.logDelete(logVO);
+		return String.valueOf(result);
+	}
+	
+	@RequestMapping(value="/logExcelDownload.do")
+	public void excelDown(HttpServletResponse response) throws IOException {
+		// 목록 조회
+		List<LogVO> logList = ls.getLogList();
+		
+		Workbook wb = new HSSFWorkbook();
+		Sheet sheet = wb.createSheet("로그 목록");
+		Row row = null;
+		Cell cell = null;
+		int rowNo = 0;
+		
+		// 테이블 헤더 용 스타일
+		CellStyle headStyle = wb.createCellStyle();
+		
+		// 가는 경계선
+		headStyle.setBorderTop(BorderStyle.THIN);
+		headStyle.setBorderBottom(BorderStyle.THIN);
+		headStyle.setBorderLeft(BorderStyle.THIN);
+		headStyle.setBorderRight(BorderStyle.THIN);
+		
+		// 배경 스타일
+		headStyle.setFillForegroundColor(HSSFColorPredefined.YELLOW.getIndex());
+		headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		
+		// 데이터 가운데 정렬
+		headStyle.setAlignment(HorizontalAlignment.CENTER);
+		
+		// 데이터용 경계 스타일 테두리만 지정
+		CellStyle bodyStyle = wb.createCellStyle();
+		bodyStyle.setBorderTop(BorderStyle.THIN);
+	    bodyStyle.setBorderBottom(BorderStyle.THIN);
+	    bodyStyle.setBorderLeft(BorderStyle.THIN);
+	    bodyStyle.setBorderRight(BorderStyle.THIN);
+
+	    // 헤더 생성
+		row = sheet.createRow(rowNo++);
+		cell = row.createCell(0);
+		cell.setCellStyle(headStyle);
+		cell.setCellValue("번호");
+		cell = row.createCell(1);
+		cell.setCellStyle(headStyle);
+		cell.setCellValue("이름");
+		cell = row.createCell(2);
+		cell.setCellStyle(headStyle);
+		cell.setCellValue("제목");
+
+	    // 데이터 부분 생성
+	    for(LogVO vo : logList) {
+	        row = sheet.createRow(rowNo++);
+	        cell = row.createCell(0);
+	        cell.setCellStyle(bodyStyle);
+	        cell.setCellValue(vo.getLog_no());
+	        cell = row.createCell(1);
+	        cell.setCellStyle(bodyStyle);
+	        cell.setCellValue(vo.getLog_userbrowser());
+	        cell = row.createCell(2);
+	        cell.setCellStyle(bodyStyle);
+	        cell.setCellValue(vo.getLog_osversion());
+	    }
+	    
+	    // 컨텐츠 타입과 파일명 지정
+	    response.setContentType("ms-vnd/excel");
+	    response.setHeader("Content-Disposition", "attachment;filename=test.xls");
+
+	    // 엑셀 출력
+	    wb.write(response.getOutputStream());
+	    wb.close();
+	}
+	
+}

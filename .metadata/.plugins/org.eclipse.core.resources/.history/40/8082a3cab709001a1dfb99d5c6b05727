@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+					"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="logMapper">
+
+	<select id="getLogList" resultType="com.fusion1.dao.LogVO">
+		SELECT * FROM LOGTBL ORDER BY log_date DESC
+	</select>
+	
+	<insert id="logWrite" parameterType="com.fusion1.dao.LogVO">
+		INSERT INTO 
+					LOGTBL VALUES (0, 
+								   #{log_userid}, 
+								   now(),
+								   #{log_userip}, 
+								   #{log_userbrowser}, 
+								   #{log_bversion}, 
+								   #{log_osversion}, 
+								   #{log_userreferrer}
+								   )
+	</insert>
+	
+	<select id="getLogNameList" resultType="com.fusion1.dao.LogVO">
+		SELECT log_userid, COUNT(*) AS CNT FROM LOGTBL GROUP BY log_userid ORDER BY cnt DESC;
+	</select>
+	
+	<select id="getLogOSList" resultType="com.fusion1.dao.LogVO">
+		SELECT log_osversion, COUNT(*) AS CNT FROM LOGTBL GROUP BY log_osversion ORDER BY cnt DESC;
+	</select>
+	
+	<select id="getLogBrowserList" resultType="com.fusion1.dao.LogVO">
+		SELECT log_userbrowser, COUNT(*) AS CNT FROM LOGTBL GROUP BY log_userbrowser ORDER BY cnt DESC;
+	</select>
+	
+	<select id="getTimeTotalList" resultType="com.fusion1.dao.LogVO">
+		SELECT date_format(log_date, '%Y-%m-%d') AS log_date, COUNT(*) AS CNT
+		FROM LOGTBL GROUP BY date_format(log_date, '%Y-%m-%d')
+	</select>
+	
+	<select id="getTimeList" parameterType="java.lang.String" resultType="com.fusion1.dao.LogVO">
+		SELECT date_format(log_date, '%H') AS TIME, COUNT(*) AS CNT 
+		FROM (SELECT * FROM LOGTBL WHERE log_date LIKE CONCAT(#{date}, '%')) A
+		GROUP BY date_format(log_date, '%H')
+	</select>
+	
+	<delete id="logDelete" parameterType="com.fusion1.dao.LogVO">
+		DELETE FROM LOGTBL WHERE log_no = #{log_no}
+	</delete>
+	
+	
+</mapper>
