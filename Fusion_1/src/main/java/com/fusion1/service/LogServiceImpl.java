@@ -54,6 +54,11 @@ public class LogServiceImpl implements LogService {
 	}
 	
 	@Override
+	public List<LogVO> getWeekOfDaysList(Map<String, Object> dateMap) {
+		return sqlSession.selectList("logMapper.getWeekOfDaysList", dateMap);
+	}
+	
+	@Override
 	public int logWrite(LogVO logVO) {
 		return sqlSession.insert("logMapper.logWrite", logVO);
 	}
@@ -67,6 +72,7 @@ public class LogServiceImpl implements LogService {
 	public List<LogVO> getLogExcel(Map<String, Object> dateMap) {
 		return sqlSession.selectList("logMapper.getLogExcel", dateMap);
 	}
+
 
 	
 }

@@ -6,3 +6,6 @@
 11월 12, 2019 11:32:03.59 NEW SESSION
 11월 12, 2019 11:32:03.59 [10560:4732:1112/113203.593:ERROR:CONSOLE(4753)] "Can only perform operation while paused.", source: devtools://devtools/bundled/shell.js (4753)
 11월 12, 2019 21:22:48.98 [10560:4732:1112/212248.988:ERROR:CONSOLE(4457)] "Uncaught (in promise) TypeError: Cannot read property 'resolveToObject' of null", source: devtools://devtools/bundled/shell.js (4457)
+
+11월 19, 2019 08:20:21.55 NEW SESSION
+11월 19, 2019 08:20:21.55 [13280:1248:1119/082021.555:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118

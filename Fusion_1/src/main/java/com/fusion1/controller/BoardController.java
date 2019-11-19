@@ -359,17 +359,19 @@ public class BoardController {
 		String osVersion = userAgent.getOperatingSystem().toString();
 		String userBrowser = userAgent.getBrowser().toString();
 		String userBrowserVersion = userAgent.getBrowserVersion().toString();
-		String userIP = request.getRemoteAddr();
+		String userIP = request.getRemoteAddr();		
+		
+		String userReferrer = logVO.getLog_userreferrer();
+		if(userReferrer.contains("localhost")) {
+			logVO.setLog_userreferrer("로컬호스트");
+		}
 		    
 		logVO.setLog_osversion(osVersion);
 		logVO.setLog_userbrowser(userBrowser);
 		logVO.setLog_bversion(userBrowserVersion);
 		logVO.setLog_userip(userIP);
 		
-		//System.out.println(logVO.toString());
-		
 		int result = ls.logWrite(logVO);
-		
 		return String.valueOf(result);
 	}
 	
@@ -419,20 +421,18 @@ public class BoardController {
 		//System.out.println("들어간 fromdate = " + fromDate + ", 들어간 toDate = " + toDate);
 		
 		// 로그를 테이블에 뿌려주기 위함
+		
 		List<LogVO> logList = ls.getLogList(dateMap);
 		model.addAttribute("logList", logList);
 		
 		List<LogVO> logNameList = ls.getLogNameList(dateMap);
-		
 		List<LogVO> logOSList = ls.getLogOSList(dateMap);
-		
 		List<LogVO> logBrowserList = ls.getBrowserList(dateMap);
-		
 		List<LogVO> logTimeList = ls.getTimeList(dateMap);
-		
 		List<LogVO> logTimeTotalList = ls.getTimeTotalList();
-		
 		List<LogVO> logReferrerList = ls.getReferrerList(dateMap);
+		List<LogVO> logWeekOfDaysList = ls.getWeekOfDaysList(dateMap);
+		
 		// 리스트 load 작업 끝
 		
 		
@@ -560,6 +560,26 @@ public class BoardController {
 		String jsonRefer = gson6.toJson(jArrayRefer);
 		model.addAttribute("jsonRefer", jsonRefer);
 		// 접속 경로 횟수 로직 끝
+		
+		// 요일별 접속자 수
+		Gson gson7 = new Gson();
+		JsonArray jArrayWeekOfDays = new JsonArray();
+		
+		Iterator<LogVO> itWeek = logWeekOfDaysList.iterator();
+		while(itWeek.hasNext()) {
+			LogVO weekVO = itWeek.next();
+			JsonObject objectWeek = new JsonObject();
+			String weekOfDays = weekVO.getLog_date();
+			int cnt = weekVO.getCnt();
+			
+			objectWeek.addProperty("WeekOfDays", weekOfDays);
+			objectWeek.addProperty("Count", cnt);
+			jArrayWeekOfDays.add(objectWeek);
+		}
+		
+		String jsonWeek = gson7.toJson(jArrayWeekOfDays);
+		model.addAttribute("jsonWeek", jsonWeek);
+		// 요일별 접속자 수 끝
 
 		return "chart";
 	}
@@ -620,7 +640,7 @@ public class BoardController {
 		headStyle.setBorderRight(BorderStyle.THIN);
 		
 		// 배경 스타일
-		headStyle.setFillForegroundColor(HSSFColorPredefined.YELLOW.getIndex());
+		headStyle.setFillForegroundColor(HSSFColorPredefined.CORAL.getIndex());
 		headStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		
 		// 데이터 가운데 정렬

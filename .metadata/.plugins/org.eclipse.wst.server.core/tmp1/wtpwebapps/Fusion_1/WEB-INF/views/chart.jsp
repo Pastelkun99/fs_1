@@ -20,15 +20,18 @@
 	src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
 	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
 	crossorigin="anonymous"></script>
-
+<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.15.0/printThis.js"></script>
 <!-- <script src="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css"></script>
 <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script> -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.css"/>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script> -->
+<script src="resources/chart/Chart.bundle.js"></script>
+<script src="resources/chart/Chart.bundle.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <!DOCTYPE html>
@@ -48,8 +51,8 @@
 			  <h2 class="display-4"><strong>통계 페이지입니다.</strong></h2>
  				 <p class="lead">접속자별 통계, 접속자별 브라우저 통계, 접속자별 운영체제 통계, 접속 시간별 그래프를 조회할 수 있습니다.</p>
   				 <a class="btn btn-danger btn-lg" href="${pageContext.request.contextPath }/boardList.do?page_no=1&pageSize=10" role="button">돌아가기</a>
-  				 <a class="btn btn-dark btn-lg" href="${pageContext.request.contextPath }/logExcelDownload.do?fromDate=${param.fromDate}&toDate=${param.toDate}" role="button">엑셀 출력</a>
-  				 <a class="btn btn-warning btn-lg" role="button" onclick="window.print();">현재 페이지 인쇄</a>
+  				 <a class="btn btn-dark btn-lg" href="${pageContext.request.contextPath }/logExcelDownload.do?fromDate=${param.fromDate}&toDate=${param.toDate}" role="button">엑셀 다운로드</a>
+  				 <button type="button" class="btn btn-warning btn-lg" id="printing">데이터 테이블 인쇄</button>
 		</div>
 		<div class="col-3"></div>
 	</div>
@@ -60,13 +63,15 @@
 				<input type="text" name="fromDate" id="fromDate" placeholder="날짜를 선택해주세요" readonly="readonly" required>
 				<input type="text" name="toDate" id="toDate" placeholder="날짜를 선택해주세요" readonly="readonly" required>
 				<input type="submit" class="btn btn-primary" value="조회"/>
-				<input type="reset" class="btn btn-info" value="초기화"></button>
+				<input type="reset" class="btn btn-info" value="초기화">
 			</form>
 		</div>
 		<p>
+			<button class="btn btn-warning" type="button" onclick="todayButton();">오늘</button>
 			<button class="btn btn-warning" type="button" onclick="yesterdayButton();">어제</button>
 			<button class="btn btn-warning" type="button" onclick="lastWeekButton();">최근 일주일</button>
 			<button class="btn btn-warning" type="button" onclick="lastMonthButton();">최근 한달</button>
+			<button class="btn btn-warning" type="button" onclick="lastYearButton();">최근 일년</button>
 		</p>
 		<div class="col-3"></div>
 	</div>
@@ -81,6 +86,9 @@
 		</button>
 		<button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseTotal" aria-expanded="false" aria-controls="collapseTotal">
     		날짜별 시간대 접속자 수
+		</button>
+		<button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseWeek" aria-expanded="false" aria-controls="collapseWeek">
+    		요일별 접속자 수
 		</button>
 		<button class="btn btn-success" type="button" data-toggle="collapse" data-target="#collapseUser" aria-expanded="false" aria-controls="collapseUser">
     		유저별 그래프
@@ -102,6 +110,7 @@
 	<div class="row">
 		<div class="col-8" style="margin-left:10px">
 			<div class="collapse show" id="collapseTable">
+			<h5 style="text-align:center;">조건에 따른 데이터 테이블</h5>
 			<table id="logTable" class="display" style="width:100%; margin-left:20px;">
 				<thead class="thead-dark">
 					<tr>
@@ -152,32 +161,36 @@
 				});
 			</script>
 			<h5 style="text-align: center;"> 해당 날짜 시간별 접속자 수</h5>
-			<canvas id="logTimeChart" style="width: 700px; height: 300px;"></canvas></br>
+			<canvas id="logTimeChart" style="width: 700px; height: 300px;"></canvas>
+			</div>
+			<div class="collapse show" id="collapseWeek">
+				<h5 style="text-align:center;">요일별 접속자 수</h5>
+				<canvas id="logWeekChart" style="width: 700px; height: 300px;"></canvas>
 			</div>
 		</div>
 		<div class="col-3">
 			<div class="collapse show" id="collapseUser">
   				<div class="card card-body">
 					<h5 style="text-align: center;">유저별 그래프</h5>
-					<canvas id="logNameChart" style="width: 600px; height: 400px;"></canvas></br>
+					<canvas id="logNameChart" style="width: 600px; height: 400px;"></canvas>
   				</div>
 			</div>
 			<div class="collapse show" id="collapseOS">
   				<div class="card card-body">
 					<h5 style="text-align: center;">운영체제별 그래프</h5>
-					<canvas id="logOSChart" style="width: 600px; height: 400px;"></canvas></br>
+					<canvas id="logOSChart" style="width: 600px; height: 400px;"></canvas>
   				</div>
 			</div>
 			<div class="collapse show" id="collapseBrowser">
   				<div class="card card-body">
 					<h5 style="text-align: center;">브라우저별 그래프</h5>
-					<canvas id="logBrowserChart" style="width: 600px; height: 400px;"></canvas></br>
+					<canvas id="logBrowserChart" style="width: 600px; height: 400px;"></canvas>
   				</div>
 			</div>
 			<div class="collapse show" id="collapseRefer">
   				<div class="card card-body">
 					<h5 style="text-align: center;">접속경로별 그래프</h5>
-					<canvas id="logReferChart" style="width: 600px; height: 400px;"></canvas></br>
+					<canvas id="logReferChart" style="width: 600px; height: 400px;"></canvas>
   				</div>
 			</div>
 			<div class="row">
@@ -231,7 +244,7 @@
 			var r = Math.floor(Math.random()*200);
 			var g = Math.floor(Math.random()*200);
 			var b = Math.floor(Math.random()*200);
-			var color = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+			var color = 'rgba(' + r + ', ' + g + ', ' + b + ', 0.7)';
 			return color;
 		}
 		
@@ -409,8 +422,8 @@
 						datasets : [{
 							label : '날짜별 접속자 수',
 							data : valueListDate,
-							borderColor: 'rgba(255, 201, 14, 1)',
-							backgroundColor : 'rgba(255, 201, 14, 0.5)',
+							borderColor: 'rgba(155, 14, 255, 1)',
+							backgroundColor : 'rgba(155, 14, 255, 0.5)',
 							fill : true,
 							lineTension : 0
 						}]
@@ -488,6 +501,48 @@
 		})
 		/* 접속 경로 로직 끝 */
 		
+		/* 요일별 접속 로그 시작 */
+		var jsonDataWeek = ${jsonWeek};
+		var jsonObjectWeek = JSON.stringify(jsonDataWeek);
+		var jDataWeek = JSON.parse(jsonObjectWeek);
+		
+		var labelListWeek = new Array();
+		var valueListWeek = new Array();
+		var colorListWeek = new Array();
+		
+		for(var i = 0; i<jDataWeek.length; i++) {
+			var w = jDataWeek[i];
+			labelListWeek.push(w.WeekOfDays);
+			valueListWeek.push(w.Count);
+			colorListWeek.push(colorize());
+		}
+		
+		var data7 = {
+						labels : labelListWeek,
+						datasets: [{
+							label : '요일별 접속자 수',
+							data : valueListWeek,
+							backgroundColor: colorListWeek
+						}]
+		};
+		
+		var ctx7 = document.getElementById('logWeekChart').getContext('2d');
+		new Chart(ctx7, {
+			type : 'bar',
+			data : data7,
+			options: {
+				scales: {
+					yAxes: [{
+						ticks: {
+							beginAtZero : true
+						}
+					}]
+				}
+			}
+		})
+		/* 요일별 접속 로그 끝 */
+		
+		// 동적 버튼 생성
 		function getDateString(date) {
 			return (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate());
 		}
@@ -495,6 +550,11 @@
 		function today() {
 			var d = new Date();
 			return getDateString(d);
+		}
+		
+		function todayButton() {
+			$('#fromDate').val(today());
+			$('#toDate').val(today());
 		}
 		
 		function yesterday() {
@@ -518,6 +578,13 @@
 			return getDateString(d);
 		}
 		
+		function lastYear() {
+			var y = new Date();
+			var year = y.getFullYear();
+			y.setFullYear(year - 1);
+			return getDateString(y);
+		}
+		
 		function yesterdayButton() {
 			$('#fromDate').val(yesterday());
 			$('#toDate').val(yesterday());
@@ -533,6 +600,14 @@
 			$('#toDate').val(today());
 		}
 		
+		function lastYearButton() {
+			$('#fromDate').val(lastYear());
+			$('#toDate').val(today());
+		}
+		
+		$('#printing').click(function() {
+			$('#logTable').printThis();
+		})
 		</script>
 </body>
 </html>

@@ -31,6 +31,10 @@
 								   )
 	</insert>
 	
+	<update id="logUpdate">
+		UPDATE LOGTBL SET log_userreferrer = '로컬호스트' WHERE log_no = MAX(log_no)
+	</update>
+	
 	<select id="getLogNameList" parameterType="map" resultType="com.fusion1.dao.LogVO">
 	<![CDATA[
 		SELECT log_userid, COUNT(*) AS CNT FROM (SELECT * FROM LOGTBL WHERE log_date >= #{fromDate} AND log_date <= #{toDate}) A 
@@ -70,6 +74,19 @@
 		FROM (SELECT * FROM LOGTBL WHERE log_date >= #{fromDate} AND log_date <= #{toDate}) A
 		GROUP BY date_format(log_date, '%H')
 	]]>
+	</select>
+	
+	<select id="getWeekOfDaysList" parameterType="map" resultType="com.fusion1.dao.LogVO">
+		<![CDATA[
+			select CASE WHEN dayofweek(log_date) = 1 THEN '일'
+			WHEN dayofweek(log_date) = 2 THEN '월'
+            WHEN dayofweek(log_date) = 3 THEN '화'
+            WHEN dayofweek(log_date) = 4 THEN '수'
+            WHEN dayofweek(log_date) = 5 THEN '목'
+            WHEN dayofweek(log_date) = 6 THEN '금'
+            WHEN dayofweek(log_date) = 7 THEN '토'
+            ELSE '오류' END log_date, count(*) as cnt from LOGTBL WHERE log_date between #{fromDate} and #{toDate} group BY dayofweek(log_date);
+		]]>
 	</select>
 	
 	<delete id="logDelete" parameterType="com.fusion1.dao.LogVO">

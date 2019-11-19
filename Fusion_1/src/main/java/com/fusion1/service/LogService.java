@@ -28,6 +28,9 @@ public interface LogService {
 	// 접속 경로별 리스트 추출
 	public List<LogVO> getReferrerList(Map<String, Object> dateMap);
 	
+	// 요일별 히트 수 리스트 추출
+	public List<LogVO> getWeekOfDaysList(Map<String, Object> dateMap);
+	
 	// 로그 입력
 	public int logWrite(LogVO logVO);
 	
