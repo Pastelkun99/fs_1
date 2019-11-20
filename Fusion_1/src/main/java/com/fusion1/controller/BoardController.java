@@ -1,6 +1,10 @@
 package com.fusion1.controller;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,11 +12,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -26,12 +32,12 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.w3c.dom.ls.LSInput;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fusion1.dao.BoardVO;
 import com.fusion1.dao.LogVO;
@@ -227,6 +233,58 @@ public class BoardController {
 		return String.valueOf(result);
 	}
 	
+	@RequestMapping(value="/imageUpload.do", method=RequestMethod.POST)
+	@ResponseBody
+	public String imageUpload(HttpServletRequest req, HttpServletResponse resp, MultipartHttpServletRequest multiFile) throws Exception{
+		JsonObject json = new JsonObject();
+		PrintWriter printWriter = null;
+		OutputStream out = null;
+		MultipartFile file = multiFile.getFile("upload");
+		if(file != null){
+			if(file.getSize() > 0 && StringUtils.isNotBlank(file.getName())){
+				if(file.getContentType().toLowerCase().startsWith("image/")){
+					try{
+						String fileName = file.getName();
+						byte[] bytes = file.getBytes();
+						String uploadPath = req.getServletContext().getRealPath("/img");
+						System.out.println("이거 안나옴 : " + req.getServletContext().getRealPath("/img"));
+						File uploadFile = new File(uploadPath);
+						if(!uploadFile.exists()){
+							uploadFile.mkdirs();
+						}
+						fileName = UUID.randomUUID().toString();
+						uploadPath = uploadPath + "/" + fileName;
+						out = new FileOutputStream(new File(uploadPath));
+                        out.write(bytes);
+                        
+                        printWriter = resp.getWriter();
+                        resp.setContentType("text/html");
+                        String fileUrl = req.getContextPath() + "/img/" + fileName;
+                        
+                        // json 데이터로 등록
+                        // {"uploaded" : 1, "fileName" : "test.jpg", "url" : "/img/test.jpg"}
+                        // 이런 형태로 리턴이 나가야함.
+                        json.addProperty("uploaded", 1);
+                        json.addProperty("fileName", fileName);
+                        json.addProperty("url", fileUrl);
+                        
+                        printWriter.println(json);
+                    }catch(IOException e){
+                        e.printStackTrace();
+                    }finally{
+                        if(out != null){
+                            out.close();
+                        }
+                        if(printWriter != null){
+                            printWriter.close();
+                        }		
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
 	
 	@RequestMapping(value="/boardedit.do", method=RequestMethod.GET)
 	public String updateBoardOne(@RequestParam("board_no") int board_no, Model model, HttpSession session, HttpServletRequest request) {
@@ -380,6 +438,7 @@ public class BoardController {
 						@RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate,
 						HttpSession session) {
 		
+		// 차트 페이지를 띄우기 이전에 먼저 로그인 여부와 관리자 여부를 체크
 		String currentUser = (String)session.getAttribute("userid");
 		if(currentUser == null || currentUser.equals("")) {
 			model.addAttribute("msg", "관리자만 접근 가능합니다.");
@@ -391,11 +450,13 @@ public class BoardController {
 			return "alert";
 		}
 		
+		// 임의적으로 이상한 값을 입력하는 것을 방지하기 위해 format 형식에 맞는지 아닌지 점검
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		Date todayTime = new Date();
 		String today = format.format(todayTime);
 		Map<String, Object> dateMap = new HashMap<String, Object>();
 		
+		// 날짜값이 입력되지 않았을 경우 모두 오늘 날짜로 치환함.
 		if(fromDate == null || fromDate.equals("")) {
 			fromDate = today;
 		}
@@ -403,40 +464,53 @@ public class BoardController {
 		if(toDate == null || toDate.equals("")) {
 			toDate = today;
 		}
-
-		
 		format.setLenient(false);
+		
 		try {
 			format.parse(fromDate);
 			format.parse(toDate);
 		} catch (Exception e) {
+			// 오류가 발생하였을 경우(올바른 날짜값이 아닌 경우) 접속 불가. 원래 default 페이지로 돌아감.
 			model.addAttribute("msg", "올바른 날짜 형식이 아닙니다.");
 			model.addAttribute("href", request.getContextPath() + "/Chart.do?fromDate=&toDate=");
 			return "alert";
 		}
 		
+		// sql 검색을 위해 fromDate ~ toDate에 시간 데이터 입력
 		dateMap.put("fromDate", fromDate + " 00:00:00");
 		dateMap.put("toDate", toDate + " 23:59:59");
 		
-		//System.out.println("들어간 fromdate = " + fromDate + ", 들어간 toDate = " + toDate);
 		
-		// 로그를 테이블에 뿌려주기 위함
-		
+		// 해당 dateMap을 통해 로그를 테이블에 뿌려주기 위함
+		// ***** 리스트 로드 작업 시작 *****
 		List<LogVO> logList = ls.getLogList(dateMap);
 		model.addAttribute("logList", logList);
 		
+		// 유저 아이디별 리스트
 		List<LogVO> logNameList = ls.getLogNameList(dateMap);
+		
+		// 운영체제별 리스트
 		List<LogVO> logOSList = ls.getLogOSList(dateMap);
+		
+		// 브라우저별 리스트
 		List<LogVO> logBrowserList = ls.getBrowserList(dateMap);
+		
+		// 접속 시간별 리스트
 		List<LogVO> logTimeList = ls.getTimeList(dateMap);
+		
+		// 시간별 리스트 토탈
 		List<LogVO> logTimeTotalList = ls.getTimeTotalList();
+		
+		// 접속경로별 리스트
 		List<LogVO> logReferrerList = ls.getReferrerList(dateMap);
+		
+		// 요일별 리스트
 		List<LogVO> logWeekOfDaysList = ls.getWeekOfDaysList(dateMap);
 		
-		// 리스트 load 작업 끝
+		// ***** 리스트 load 작업 끝 *****
 		
 		
-		// 유저별 접속횟수 로직
+		// 이름별 접속횟수 로직
 		Gson gson = new Gson();
 		JsonArray jArray = new JsonArray();
 		
@@ -453,7 +527,6 @@ public class BoardController {
 		}
 		
 		String json = gson.toJson(jArray);
-		//System.out.println("이름별 제이슨 데이터 정보 : " + json);
 		model.addAttribute("json", json);
 		// 유저별 접속 횟수 로직 끝
 		

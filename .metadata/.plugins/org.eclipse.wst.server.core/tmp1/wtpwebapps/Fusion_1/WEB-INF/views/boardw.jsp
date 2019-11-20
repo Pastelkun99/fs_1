@@ -10,8 +10,19 @@
 	src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
 	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
 	crossorigin="anonymous"></script>
-	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-<script src="https://cdn.ckeditor.com/4.13.0/standard/ckeditor.js"></script>
+	
+<!-- include libraries(jQuery, bootstrap) -->
+<link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script> 
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script> 
+
+<!-- include summernote css/js -->
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.js"></script>
+	
+<!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> -->
+<!-- <script type="text/javascript" src="resources/ckeditor/ckeditor.js"></script> -->
+<!-- <script src="https://cdn.ckeditor.com/4.13.0/standard/ckeditor.js"></script> -->
 <html>
 <head>
 <title>WebBoard - 게시글 쓰기</title>
@@ -20,8 +31,8 @@
 	</br>
 	</br>
 	<div class="row">
-		<div class="col-xs-2 col-md-2"></div>
-		<div class="col-xs-8 col-md-8">
+		<div class="col-xs-1 col-md-1"></div>
+		<div class="col-xs-10 col-md-10">
 			<h2 class="text-center">게시글 쓰기</h2>
 			<p>&nbsp;</p>
 		<form action="${pageContext.request.contextPath }/boardWrite.do" id="boardWrite" method="post">
@@ -49,24 +60,24 @@
 						</tr>
 						<tr>
 							<th class="table-success">글 내용</th>
-							<td colspan="3"><textarea class="ckeditor" name="board_content" id="board_content" rows="10" height="500px"></textarea></td>
+							<td colspan="3"><textarea class="summernote" name="board_content" id="board_content" rows="10" height="500px"></textarea></td>
 						</tr>
 					</table>
 				</div>
 				<input type="hidden" name="board_no"/>
 				<input type="hidden" name="board_writer" id="board_writer" value="${sessionScope.username }"/>
-				<input type="hidden" id="board_content" value="">
+				<!-- <input type="hidden" id="board_content" value=""> -->
 				<button type="button" class="btn btn-primary" onclick="boardWrite();">작성 완료</button>
 				<button type="button" class="btn btn-danger" onclick="self.close();">돌아가기</button>
 				<input type="hidden" name="board_userid" id="board_userid" value="${sessionScope.userid }"/>
 			</div>
 		</div>
 		</form>
-		<script>
-			CKEDITOR.replace('board_content', {
-				toolbar : 'Full',
-				enterMode : CKEDITOR.ENTER_BR,
-				shiftEnterMode : CKEDITOR.ENTER_P
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('#board_content').summernote({
+					height:400
+				});
 			});
 		</script>
 		<script type="text/javascript">
@@ -74,7 +85,7 @@
 			var board_writer = document.getElementById('board_writer').value;
 			var board_userid = document.getElementById('board_userid').value;
 			var board_title = document.getElementById('board_title').value;
-			var board_content = CKEDITOR.instances['board_content'].getData();
+			var board_content = document.getElementById('board_content').value;
 			var board_isnotice = document.getElementById('board_isnotice').value;
 			$.ajax({
 				    type : "POST",

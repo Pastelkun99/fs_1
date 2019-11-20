@@ -10,8 +10,15 @@
 	src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
 	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
 	crossorigin="anonymous"></script>
-	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-	<script src="https://cdn.ckeditor.com/4.13.0/standard/ckeditor.js"></script>
+
+<!-- include libraries(jQuery, bootstrap) -->
+<link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script> 
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script> 
+
+<!-- include summernote css/js -->
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.js"></script>
 <html>
 <head>
 <title>WebBoard - 게시글 수정하기</title>
@@ -45,7 +52,7 @@
 						</tr>
 						<tr>
 							<th class="table-success">글 내용</th>
-							<td colspan="3"><textarea class="ckeditor" name="board_content" id="board_content" rows="10" height="500px">${board.board_content }</textarea></td>
+							<td colspan="3"><textarea class="summernote" name="board_content" id="board_content" rows="10" height="500px">${board.board_content }</textarea></td>
 						</tr>
 					</table>
 				</div>
@@ -60,7 +67,7 @@
 			function boardUpdate() {
 				var board_no = document.getElementById('board_no').value;
 				var board_title = document.getElementById('board_title').value;
-				var board_content = CKEDITOR.instances['board_content'].getData();
+				var board_content = document.getElementById('board_content').value;
 				var board_userid = document.getElementById('board_userid').value;
 				
 				$.ajax({
@@ -85,10 +92,10 @@
 				});
 			}
 			
-			CKEDITOR.replace('board_content', {
-				toolbar : 'Full',
-				enterMode : CKEDITOR.ENTER_BR,
-				shiftEnterMode : CKEDITOR.ENTER_P
+			$(document).ready(function() {
+				$('#board_content').summernote({
+					height:400
+				});
 			});
 		</script>
 </body>
