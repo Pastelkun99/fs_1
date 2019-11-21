@@ -39,9 +39,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.fusion1.dao.AnalysisDAO;
 import com.fusion1.dao.BoardVO;
+import com.fusion1.dao.InfoVO;
 import com.fusion1.dao.LogVO;
 import com.fusion1.dao.PagenationVO;
+import com.fusion1.service.AnalysisServiceImpl;
 import com.fusion1.service.BoardServiceImpl;
 import com.fusion1.service.LogServiceImpl;
 import com.google.gson.Gson;
@@ -232,59 +235,6 @@ public class BoardController {
 		
 		return String.valueOf(result);
 	}
-	
-	@RequestMapping(value="/imageUpload.do", method=RequestMethod.POST)
-	@ResponseBody
-	public String imageUpload(HttpServletRequest req, HttpServletResponse resp, MultipartHttpServletRequest multiFile) throws Exception{
-		JsonObject json = new JsonObject();
-		PrintWriter printWriter = null;
-		OutputStream out = null;
-		MultipartFile file = multiFile.getFile("upload");
-		if(file != null){
-			if(file.getSize() > 0 && StringUtils.isNotBlank(file.getName())){
-				if(file.getContentType().toLowerCase().startsWith("image/")){
-					try{
-						String fileName = file.getName();
-						byte[] bytes = file.getBytes();
-						String uploadPath = req.getServletContext().getRealPath("/img");
-						System.out.println("이거 안나옴 : " + req.getServletContext().getRealPath("/img"));
-						File uploadFile = new File(uploadPath);
-						if(!uploadFile.exists()){
-							uploadFile.mkdirs();
-						}
-						fileName = UUID.randomUUID().toString();
-						uploadPath = uploadPath + "/" + fileName;
-						out = new FileOutputStream(new File(uploadPath));
-                        out.write(bytes);
-                        
-                        printWriter = resp.getWriter();
-                        resp.setContentType("text/html");
-                        String fileUrl = req.getContextPath() + "/img/" + fileName;
-                        
-                        // json 데이터로 등록
-                        // {"uploaded" : 1, "fileName" : "test.jpg", "url" : "/img/test.jpg"}
-                        // 이런 형태로 리턴이 나가야함.
-                        json.addProperty("uploaded", 1);
-                        json.addProperty("fileName", fileName);
-                        json.addProperty("url", fileUrl);
-                        
-                        printWriter.println(json);
-                    }catch(IOException e){
-                        e.printStackTrace();
-                    }finally{
-                        if(out != null){
-                            out.close();
-                        }
-                        if(printWriter != null){
-                            printWriter.close();
-                        }		
-					}
-				}
-			}
-		}
-		return null;
-	}
-	
 	
 	@RequestMapping(value="/boardedit.do", method=RequestMethod.GET)
 	public String updateBoardOne(@RequestParam("board_no") int board_no, Model model, HttpSession session, HttpServletRequest request) {
@@ -789,6 +739,39 @@ public class BoardController {
 	    // 엑셀 출력
 	    wb.write(response.getOutputStream());
 	    wb.close();
+	}
+	
+	@Autowired
+	AnalysisServiceImpl as;
+	
+	@RequestMapping(value="/analysis.do")
+	public String analysis(Model model) {
+		
+		InfoVO infoList = as.getAnalysisInfo(1);
+		model.addAttribute("infoList", infoList);
+		
+		return "suzip";
+	}
+	
+	@RequestMapping(value="/analysisList.do")
+	public String analysisList(Model model, HttpSession session, @RequestParam("page") int page) {
+		
+		String curUserId = (String)session.getAttribute("userid");
+		
+		List<AnalysisDAO> analList = as.getAnalysisQuestionList();
+		List<AnalysisDAO> selectList = as.getAnalysisSelectList();
+		List<AnalysisDAO> answerList = as.getAnalysisAnswerList(curUserId);
+		
+		Iterator<AnalysisDAO> it = analList.iterator();
+		while(it.hasNext()) {
+			System.out.println(it.next().toString());
+		}
+		
+		model.addAttribute("questionList", analList);
+		model.addAttribute("selectList", selectList);
+		
+		return "analysisList";
+		
 	}
 	
 }

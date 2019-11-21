@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.GotoLineAction$GotoLineDialog_dialogBounds">
+		<item value="729" key="DIALOG_X_ORIGIN"/>
+		<item value="403" key="DIALOG_Y_ORIGIN"/>
+	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
 		<item value="logNameChart" key="selection"/>
@@ -8,6 +12,7 @@
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
+			<item value="image"/>
 			<item value="commons-io"/>
 			<item value="logNameChart"/>
 			<item value="gson"/>
@@ -15,7 +20,6 @@
 			<item value="경로"/>
 			<item value="form"/>
 			<item value="관리자 통계"/>
-			<item value="current_userid"/>
 		</list>
 		<list key="replacehistory">
 		</list>

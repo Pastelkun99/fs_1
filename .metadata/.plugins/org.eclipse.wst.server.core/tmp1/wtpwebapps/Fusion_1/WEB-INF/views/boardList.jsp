@@ -58,6 +58,7 @@
 					<c:if test="${sessionScope.userid eq 'admin' }">
 						<button type="button" class="btn btn-light" onClick="location.href='${pageContext.request.contextPath}/Chart.do?fromDate=&toDate='">관리자 통계 페이지</button>
 					</c:if>
+					<button type="button" class="btn btn-warning" onClick="location.href='${pageContext.request.contextPath}/analysis.do'">설문조사 참여</button>
 					</br>
 					</br>
 					<script>

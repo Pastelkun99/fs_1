@@ -2,7 +2,6 @@ package com.fusion1.dao;
 
 public class PagenationVO {
 
-	
 	// 페이지 번호
 	private int page_no;
 	

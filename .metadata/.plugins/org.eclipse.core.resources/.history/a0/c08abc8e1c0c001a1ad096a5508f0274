@@ -1,0 +1,12 @@
+package com.fusion1.service;
+
+import java.util.List;
+
+import com.fusion1.dao.InfoVO;
+
+public interface AnalysisService {
+
+	// 설문조사 정보를 불러온다.
+	public InfoVO getAnalysisInfo(int no);
+	
+}
