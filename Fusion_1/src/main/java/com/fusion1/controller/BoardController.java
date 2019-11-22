@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fusion1.dao.AnalysisDAO;
+import com.fusion1.dao.AnswerVO;
 import com.fusion1.dao.BoardVO;
 import com.fusion1.dao.InfoVO;
 import com.fusion1.dao.LogVO;
@@ -758,20 +760,59 @@ public class BoardController {
 		
 		String curUserId = (String)session.getAttribute("userid");
 		
-		List<AnalysisDAO> analList = as.getAnalysisQuestionList();
-		List<AnalysisDAO> selectList = as.getAnalysisSelectList();
-		List<AnalysisDAO> answerList = as.getAnalysisAnswerList(curUserId);
-		
-		Iterator<AnalysisDAO> it = analList.iterator();
-		while(it.hasNext()) {
-			System.out.println(it.next().toString());
+		if(curUserId == null || curUserId.equals("")) {
+			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
+			model.addAttribute("href", "/");
+			return "alert";
+		} else {
+			List<AnalysisDAO> analList = as.getAnalysisQuestionList();
+			List<AnalysisDAO> selectList = as.getAnalysisSelectList();
+			List<AnswerVO> answerList = as.getAnalysisAnswerList(curUserId);
+			
+			Iterator<AnswerVO> it = answerList.iterator();
+			while(it.hasNext()) {
+				System.out.println(it.next().toString());
+			}
+			
+			model.addAttribute("questionList", analList);
+			model.addAttribute("selectList", selectList);
+			model.addAttribute("answerList", answerList);
+			
+			return "analysisList";
 		}
-		
-		model.addAttribute("questionList", analList);
-		model.addAttribute("selectList", selectList);
-		
-		return "analysisList";
-		
+	}
+	
+	@RequestMapping(value="/analysisUpdate.do")
+	@ResponseBody
+	public String analysisUpdate(AnswerVO answerVO) {
+		System.out.println(answerVO.toString());
+		List<AnswerVO> check = as.getAnalysisAnswer(answerVO);
+		int result = 0;
+		if(check.size() > 0) {
+			result = as.inputAnalysisUpdate(answerVO);
+		} else {
+			result = as.inputAnalysisAnswer(answerVO);
+		}
+		return String.valueOf(result);
+	}
+	
+	@RequestMapping(value="/analysisUpdateMulti.do")
+	@ResponseBody
+	public String analysisUpdateMulti(AnswerVO answerVO) {
+		System.out.println(answerVO.toString());
+		List<AnswerVO> check = as.getAnalysisAnswer(answerVO);
+		String confilcted = answerVO.getQ_value();
+		String[] converted = confilcted.split(",");
+		int result = 0;
+		if(check.size() > 0) {
+			
+		}
+		for(int i = 0; i<converted.length; i++) {
+			System.out.println(converted[i]);
+			answerVO.setQ_value(converted[i]);
+			result = as.inputAnalysisAnswer(answerVO);
+		}
+		return "1";
 	}
 	
 }

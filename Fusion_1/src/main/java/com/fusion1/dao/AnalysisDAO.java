@@ -11,6 +11,8 @@ public class AnalysisDAO {
 	String q_svalue;
 	String q_order;
 	String q_id;
+	int q_parentno;
+	int q_depth;
 
 	public int getQ_no() {
 		return q_no;
@@ -84,11 +86,29 @@ public class AnalysisDAO {
 		this.q_id = q_id;
 	}
 
+	public int getQ_parentno() {
+		return q_parentno;
+	}
+
+	public void setQ_parentno(int q_parentno) {
+		this.q_parentno = q_parentno;
+	}
+
+	public int getQ_depth() {
+		return q_depth;
+	}
+
+	public void setQ_depth(int q_depth) {
+		this.q_depth = q_depth;
+	}
+
 	@Override
 	public String toString() {
 		return "AnalysisDAO [q_no=" + q_no + ", q_subject=" + q_subject + ", q_value=" + q_value + ", q_type=" + q_type
 				+ ", q_selection=" + q_selection + ", q_page=" + q_page + ", q_svalue=" + q_svalue + ", q_order="
-				+ q_order + ", q_id=" + q_id + "]";
+				+ q_order + ", q_id=" + q_id + ", q_parentno=" + q_parentno + ", q_depth=" + q_depth + "]";
 	}
+
+	
 
 }

@@ -3,6 +3,7 @@ package com.fusion1.service;
 import java.util.List;
 
 import com.fusion1.dao.AnalysisDAO;
+import com.fusion1.dao.AnswerVO;
 import com.fusion1.dao.InfoVO;
 
 public interface AnalysisService {
@@ -17,6 +18,15 @@ public interface AnalysisService {
 	public List<AnalysisDAO> getAnalysisSelectList();
 	
 	// 미리 체크한 정답 리스트를 갖고 온다.
-	public List<AnalysisDAO> getAnalysisAnswerList(String userid);
+	public List<AnswerVO> getAnalysisAnswerList(String userid);
+	
+	// 정답을 체크하면 그 값을 데이터베이스에 삽입한다.
+	public int inputAnalysisAnswer(AnswerVO answerVO);
+	
+	// 정답을 삽입하기 전, 해당 문항에 체크한 답안이 있는지 불러온다.
+	public List<AnswerVO> getAnalysisAnswer(AnswerVO answerVO);
+	
+	// 미리 체크한 답안이 있다면, 다시 클릭했을때 업데이트로 처리한다.
+	public int inputAnalysisUpdate(AnswerVO answerVO);
 	
 }

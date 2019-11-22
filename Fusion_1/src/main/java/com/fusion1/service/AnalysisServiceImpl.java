@@ -9,13 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fusion1.dao.AnalysisDAO;
+import com.fusion1.dao.AnswerVO;
 import com.fusion1.dao.InfoVO;
 
 @Service
-public class AnalysisServiceImpl implements AnalysisService{
-	
+public class AnalysisServiceImpl implements AnalysisService {
+
 	@Autowired
-	@Resource(name="sqlSession")
+	@Resource(name = "sqlSession")
 	SqlSession sqlSession;
 
 	@Override
@@ -34,8 +35,23 @@ public class AnalysisServiceImpl implements AnalysisService{
 	}
 
 	@Override
-	public List<AnalysisDAO> getAnalysisAnswerList(String userid) {
+	public List<AnswerVO> getAnalysisAnswerList(String userid) {
 		return sqlSession.selectList("analysisMapper.getAnalysisAnswerList", userid);
 	}
-	
+
+	@Override
+	public List<AnswerVO> getAnalysisAnswer(AnswerVO answerVO) {
+		return sqlSession.selectList("analysisMapper.getAnalysisAnswer", answerVO);
+	}
+
+	@Override
+	public int inputAnalysisAnswer(AnswerVO answerVO) {
+		return sqlSession.insert("analysisMapper.inputAnalysisAnswer", answerVO);
+	}
+
+	@Override
+	public int inputAnalysisUpdate(AnswerVO answerVO) {
+		return sqlSession.update("analysisMapper.inputAnalysisUpdate", answerVO);
+	}
+
 }

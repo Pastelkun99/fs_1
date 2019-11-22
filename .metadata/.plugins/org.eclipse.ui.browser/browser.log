@@ -24,3 +24,16 @@
 11월 21, 2019 12:57:24.53 [7296:7184:1121/125724.531:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -7
 11월 21, 2019 12:57:24.53 [7296:8648:1121/125724.533:ERROR:gcm_channel_status_request.cc(145)] GCM channel request failed.
 11월 21, 2019 12:57:55.06 [7296:7184:1121/125755.062:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
+
+11월 22, 2019 08:40:28.24 NEW SESSION
+11월 22, 2019 08:40:28.24 [2796:9504:1122/084028.240:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
+11월 22, 2019 12:31:17.70 [2796:9504:1122/123117.699:ERROR:socket_stream.cc(218)] Closing stream with result -2
+11월 22, 2019 13:06:51.52 [2796:9504:1122/130651.524:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -7
+11월 22, 2019 13:06:58.05 [2796:9504:1122/130658.054:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -21
+11월 22, 2019 13:07:22.35 [2796:9504:1122/130722.355:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
+11월 22, 2019 14:01:19.88 [2796:9504:1122/140119.880:ERROR:socket_stream.cc(218)] Closing stream with result -2
+11월 22, 2019 15:18:24.80 [2796:9504:1122/151824.748:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -7
+11월 22, 2019 15:18:25.86 [2796:11356:1122/151825.868:ERROR:gcm_channel_status_request.cc(145)] GCM channel request failed.
+11월 22, 2019 15:18:55.06 [2796:9504:1122/151855.066:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
+11월 22, 2019 15:51:32.77 [2796:11356:1122/155132.775:ERROR:CONSOLE(7049)] "Uncaught (in promise) TypeError: Cannot read property 'requestContent' of undefined", source: devtools://devtools/bundled/shell.js (7049)
+11월 22, 2019 18:11:11.63 [2796:11356:1122/181111.639:ERROR:CONSOLE(7049)] "Uncaught (in promise) TypeError: Cannot read property 'requestContent' of undefined", source: devtools://devtools/bundled/shell.js (7049)

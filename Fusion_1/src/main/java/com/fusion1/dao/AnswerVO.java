@@ -5,7 +5,7 @@ public class AnswerVO {
 	int a_number;
 	int q_no;
 	String q_id;
-	String q_type;
+	String q_selection;
 	String q_value;
 
 	public int getA_number() {
@@ -32,12 +32,12 @@ public class AnswerVO {
 		this.q_id = q_id;
 	}
 
-	public String getQ_type() {
-		return q_type;
+	public String getQ_selection() {
+		return q_selection;
 	}
 
-	public void setQ_type(String q_type) {
-		this.q_type = q_type;
+	public void setQ_selection(String q_selection) {
+		this.q_selection = q_selection;
 	}
 
 	public String getQ_value() {
@@ -50,8 +50,10 @@ public class AnswerVO {
 
 	@Override
 	public String toString() {
-		return "AnswerVO [a_number=" + a_number + ", q_no=" + q_no + ", q_id=" + q_id + ", q_type=" + q_type
+		return "AnswerVO [a_number=" + a_number + ", q_no=" + q_no + ", q_id=" + q_id + ", q_selection=" + q_selection
 				+ ", q_value=" + q_value + "]";
 	}
+
+	
 
 }
