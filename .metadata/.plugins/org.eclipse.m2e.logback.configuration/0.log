@@ -19307,3 +19307,4 @@ Caused by: org.eclipse.aether.transfer.ArtifactNotFoundException: Could not find
 2019-11-25 18:19:19,277 [Worker-301] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
 2019-11-25 18:19:19,279 [Worker-301] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
 2019-11-25 18:19:19,280 [Worker-301] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2019-11-25 18:19:19,281 [Worker-301] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
