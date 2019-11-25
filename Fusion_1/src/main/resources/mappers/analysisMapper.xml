@@ -23,15 +23,31 @@
 	</select>
 	
 	<select id="getAnalysisAnswer" parameterType="com.fusion1.dao.AnswerVO" resultType="com.fusion1.dao.AnswerVO">
-		SELECT * FROM ANSWERTBL WHERE q_no = #{q_no}
+		SELECT * FROM ANSWERTBL WHERE q_no = #{q_no} AND a_isetc = #{a_isetc} AND q_id=#{q_id}
+	</select>
+	
+	<select id="getAnalysisAnswerMulti" parameterType="String" resultType="com.fusion1.dao.AnswerVO">
+		SELECT * FROM ANSWERTBL WHERE q_id = #{q_id} ORDER BY a_number DESC limit 2
 	</select>
 	
 	<insert id="inputAnalysisAnswer" parameterType="com.fusion1.dao.AnswerVO" >
-		INSERT INTO ANSWERTBL VALUES (0, #{q_no}, #{q_id}, #{q_selection}, #{q_value})
+		INSERT INTO ANSWERTBL VALUES (0, #{q_no}, #{q_id}, #{q_selection}, #{q_value}, #{a_order}, #{a_value}, #{a_isetc})
 	</insert>
 	
 	<update id="inputAnalysisUpdate" parameterType="com.fusion1.dao.AnswerVO">
-		UPDATE ANSWERTBL SET q_value = #{q_value} WHERE q_no = #{q_no}
+		UPDATE ANSWERTBL SET q_value = #{q_value}, a_value = #{a_value} WHERE q_no = #{q_no} AND a_order = #{a_order}
 	</update>
+	
+	<delete id="deleteAnswer" parameterType="com.fusion1.dao.AnswerVO">
+		DELETE FROM ANSWERTBL WHERE q_no = #{q_no} AND a_isetc = #{a_isetc}
+	</delete>
+	
+	<insert id="userAnalysisComplete" parameterType="com.fusion1.dao.AnswerVO">
+		INSERT INTO ANALYSISTBL VALUES (0, 1, #{q_id}, 1)
+	</insert>
+	
+	<select id="userAnalysisConfirm" parameterType="com.fusion1.dao.AnswerVO" resultType="com.fusion1.dao.AnswerVO">
+		SELECT * FROM ANALYSISTBL WHERE q_id = #{q_id}
+	</select>
 
 </mapper>

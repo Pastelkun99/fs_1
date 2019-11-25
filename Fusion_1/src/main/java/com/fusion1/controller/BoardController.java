@@ -747,36 +747,58 @@ public class BoardController {
 	AnalysisServiceImpl as;
 	
 	@RequestMapping(value="/analysis.do")
-	public String analysis(Model model) {
+	public String analysis(Model model, HttpSession session) {
 		
-		InfoVO infoList = as.getAnalysisInfo(1);
-		model.addAttribute("infoList", infoList);
+		String curId = (String)session.getAttribute("userid");
+		if(curId == null || curId.equals("")) {
+			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
+			model.addAttribute("href", "/");
+			return "alert";
+		} else {
+			InfoVO infoList = as.getAnalysisInfo(1);
+			model.addAttribute("infoList", infoList);
+			
+			List<AnswerVO> answerList = as.getAnalysisAnswerList(curId);
+			int answerListSize = answerList.size();
+			model.addAttribute("answerListSize", answerListSize);
+			
+			return "suzip";
+		}
 		
-		return "suzip";
 	}
 	
 	@RequestMapping(value="/analysisList.do")
 	public String analysisList(Model model, HttpSession session, @RequestParam("page") int page) {
 		
 		String curUserId = (String)session.getAttribute("userid");
+		System.out.println("현재 아이디 : " + curUserId);
 		
 		if(curUserId == null || curUserId.equals("")) {
 			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
 			model.addAttribute("href", "/");
 			return "alert";
 		} else {
+			
+			List<AnswerVO> answerList = as.getAnalysisAnswerList(curUserId);
+			int answerListSize = answerList.size();
+			
 			List<AnalysisDAO> analList = as.getAnalysisQuestionList();
 			List<AnalysisDAO> selectList = as.getAnalysisSelectList();
-			List<AnswerVO> answerList = as.getAnalysisAnswerList(curUserId);
+			
+			AnswerVO temp = new AnswerVO();
+			temp.setQ_id(curUserId);
+			List<AnswerVO> answerListMulti = as.getAnalysisAnswerMulti(temp);
 			
 			Iterator<AnswerVO> it = answerList.iterator();
 			while(it.hasNext()) {
-				System.out.println(it.next().toString());
+				System.out.println("정보 : " + it.next().toString());
 			}
 			
 			model.addAttribute("questionList", analList);
 			model.addAttribute("selectList", selectList);
 			model.addAttribute("answerList", answerList);
+			model.addAttribute("answerListMulti", answerListMulti);
+			model.addAttribute("answerListSize", answerListSize);
 			
 			return "analysisList";
 		}
@@ -789,8 +811,16 @@ public class BoardController {
 		List<AnswerVO> check = as.getAnalysisAnswer(answerVO);
 		int result = 0;
 		if(check.size() > 0) {
+			AnswerVO vo = new AnswerVO();
+			vo.setQ_no(answerVO.getQ_no());
+			vo.setA_isetc(1);
+			result = as.deleteAnswer(vo);
 			result = as.inputAnalysisUpdate(answerVO);
 		} else {
+			AnswerVO vo = new AnswerVO();
+			vo.setQ_no(answerVO.getQ_no());
+			vo.setA_isetc(1);
+			result = as.deleteAnswer(vo);
 			result = as.inputAnalysisAnswer(answerVO);
 		}
 		return String.valueOf(result);
@@ -801,18 +831,112 @@ public class BoardController {
 	public String analysisUpdateMulti(AnswerVO answerVO) {
 		System.out.println(answerVO.toString());
 		List<AnswerVO> check = as.getAnalysisAnswer(answerVO);
-		String confilcted = answerVO.getQ_value();
-		String[] converted = confilcted.split(",");
+		Iterator<AnswerVO> it = check.iterator();
+		while(it.hasNext()) {
+			AnswerVO vo = it.next();
+			int etc = vo.getA_isetc();
+			System.out.println("isetc 있냐 : " + vo.toString());
+			if(etc == 1) {
+				as.deleteAnswer(answerVO);
+			}
+		}
+		
+		String conflictedValue = answerVO.getQ_value();
+		String conflictedAnswer = answerVO.getA_value();
+		String[] converted = conflictedValue.split("/");
+		String[] convertedAnswer = conflictedAnswer.split("/");
+		
+		if(check.size() == 1) {
+			as.deleteAnswer(answerVO);
+		}
+		
 		int result = 0;
-		if(check.size() > 0) {
-			
+		if(check.size() > 1) {
+			for(int i = 0; i<converted.length; i++) {
+				AnswerVO vo = new AnswerVO();
+				vo.setQ_no(answerVO.getQ_no());
+				vo.setA_isetc(1);
+				as.deleteAnswer(vo);
+				
+				answerVO.setQ_value(converted[i]);
+				answerVO.setA_value(convertedAnswer[i]);
+				answerVO.setA_order(i);
+				result = as.inputAnalysisUpdate(answerVO);
+			}
+		} else {
+			if(converted.length == 2) {
+				for(int i = 0; i<converted.length; i++) {
+					AnswerVO vo = new AnswerVO();
+					vo.setQ_no(answerVO.getQ_no());
+					vo.setA_isetc(1);
+					as.deleteAnswer(vo);
+					
+					answerVO.setQ_value(converted[i]);
+					answerVO.setA_value(convertedAnswer[i]);
+					answerVO.setA_order(i);
+					result = as.inputAnalysisAnswer(answerVO);
+				}
+			}
 		}
-		for(int i = 0; i<converted.length; i++) {
-			System.out.println(converted[i]);
-			answerVO.setQ_value(converted[i]);
-			result = as.inputAnalysisAnswer(answerVO);
+		
+		if(conflictedAnswer.contains("없음")) {
+			as.deleteAnswer(answerVO);
+			answerVO.setQ_value(converted[0]);
+			answerVO.setA_value(convertedAnswer[0]);
+			as.inputAnalysisAnswer(answerVO);
 		}
-		return "1";
+		
+		return String.valueOf(result);
 	}
 	
+	@RequestMapping(value="/etcInput.do")
+	@ResponseBody
+	public String etcInput(AnswerVO answerVO) {
+		System.out.println(answerVO.toString());
+		List<AnswerVO> checkTemp = as.getAnalysisAnswer(answerVO);
+		int result = 0;
+		if(checkTemp.size() >= 1) {
+			result = as.inputAnalysisUpdate(answerVO);
+		} else {
+			result = as.inputAnalysisAnswer(answerVO);
+		}
+		return String.valueOf(result);
+	}
+	
+	@RequestMapping(value="/subjectInput.do")
+	@ResponseBody
+	public String subjectInput(AnswerVO answerVO) {
+		System.out.println(answerVO.toString());
+		List<AnswerVO> check = as.getAnalysisAnswer(answerVO);
+		int result = 0;
+		if(check.size() >= 1) {
+			result = as.inputAnalysisUpdate(answerVO);
+		} else {
+			result = as.inputAnalysisAnswer(answerVO);
+		}
+		return String.valueOf(result);
+	}
+	
+	@RequestMapping(value="/analysisComplete.do")
+	public String analysisComplete(Model model, HttpServletRequest request, HttpSession session) {
+		String curId = (String)session.getAttribute("userid");
+		
+		AnswerVO comVO = new AnswerVO();
+		comVO.setQ_id(curId);
+		
+		as.userAnalysisComplete(comVO);
+		/*int result = as.deleteAnswerRefined();
+		if(result == 1) {
+			model.addAttribute("msg", "설문조사가 완료되었습니다.");
+			model.addAttribute("href", request.getContextPath() + "/boardList.do?page_no=1&pageSize=10");
+			return "alert";
+		} else {
+			model.addAttribute("msg", "무언가 문제가 발생했습니다.");
+			model.addAttribute("href", request.getContextPath() + "/analysis.do");
+			return "alert";
+		}*/
+		model.addAttribute("msg", "설문조사가 완료되었습니다.");
+		model.addAttribute("href", request.getContextPath() + "/boardList.do?page_no=1&pageSize=10");
+		return "alert";
+	}
 }

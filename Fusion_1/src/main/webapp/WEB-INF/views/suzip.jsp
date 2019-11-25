@@ -47,6 +47,21 @@
 	</div>
   	<div class="col-3"></div>
 </div>
-
 </body>
+<script type="text/javascript">
+
+var size = '${answerListSize}';
+if(size >= 21) {
+	var result = confirm('진행중인 설문이 있습니다. 설문조사를 수정하시겠습니까?');
+	if(result) {
+		alert('설문조사를 수정합니다. 주관식 값을 수정했을때는 반드시 저장을 눌러주십시오.');
+	} else {
+		alert('설문조사를 수정하지 않습니다. 이전 화면으로 돌아갑니다.');
+		history.back();
+	}
+	
+} else if(size < 21) {
+	alert('진행중인 설문이 있습니다. 입장하셔서 계속 진행해 주십시오.');
+}
+</script>
 </html>

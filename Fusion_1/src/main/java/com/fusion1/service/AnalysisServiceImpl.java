@@ -54,4 +54,26 @@ public class AnalysisServiceImpl implements AnalysisService {
 		return sqlSession.update("analysisMapper.inputAnalysisUpdate", answerVO);
 	}
 
+	@Override
+	public List<AnswerVO> getAnalysisAnswerMulti(AnswerVO answerVO) {
+		return sqlSession.selectList("analysisMapper.getAnalysisAnswerMulti", answerVO);
+	}
+
+	@Override
+	public int deleteAnswer(AnswerVO answerVO) {
+		return sqlSession.delete("analysisMapper.deleteAnswer", answerVO);
+	}
+
+	@Override
+	public int userAnalysisComplete(AnswerVO answerVO) {
+		return sqlSession.delete("analysisMapper.userAnalysisComplete", answerVO);
+	}
+
+	@Override
+	public List<AnswerVO> userAnalysisConfirm(AnswerVO answerVO) {
+		return sqlSession.selectList("analysisMapper.userAnalysisConfirm", answerVO);
+	}
+
+	
+
 }
