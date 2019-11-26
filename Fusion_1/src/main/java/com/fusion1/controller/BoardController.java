@@ -1,25 +1,19 @@
 package com.fusion1.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -37,8 +31,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fusion1.dao.AnalysisDAO;
 import com.fusion1.dao.AnswerVO;
@@ -743,35 +735,62 @@ public class BoardController {
 	    wb.close();
 	}
 	
+	
+	
 	@Autowired
 	AnalysisServiceImpl as;
 	
+	// 설문조사 입장 페이지
 	@RequestMapping(value="/analysis.do")
 	public String analysis(Model model, HttpSession session) {
 		
 		String curId = (String)session.getAttribute("userid");
+		
+		// 로그인 하지 않은 유저는 설문조사에 참여할 수 없음.
 		if(curId == null || curId.equals("")) {
 			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
 			model.addAttribute("href", "/");
 			return "alert";
 		} else {
+			// 현재 진행중인 설문의 정보를 불러온다.
 			InfoVO infoList = as.getAnalysisInfo(1);
 			model.addAttribute("infoList", infoList);
 			
+			// 현재 접속한 사람이 이미 설문을 진행한 결과가 있는지 갖고 온다.
 			List<AnswerVO> answerList = as.getAnalysisAnswerList(curId);
 			int answerListSize = answerList.size();
+			//System.out.println("사이즈 " + answerListSize);
 			model.addAttribute("answerListSize", answerListSize);
 			
 			return "suzip";
 		}
-		
 	}
 	
+	// 설문조사 리스트 페이지
 	@RequestMapping(value="/analysisList.do")
-	public String analysisList(Model model, HttpSession session, @RequestParam("page") int page) {
+	public String analysisList(Model model, HttpSession session, HttpServletRequest request, @RequestParam("page") int page) throws ParseException {
 		
+		// 현재 진행중인 설문을 불러온다.
+		InfoVO info = as.getAnalysisInfo(1);
+		
+		// 현재 진행중인 설문의 시작 날짜와 끝 날짜를 받아 처리함.
+		// 조건에 부합하지 않는 경우 설문을 진행할 수 없음.
+		SimpleDateFormat sm = new SimpleDateFormat("yyyy-mm-dd");
+		Date fromDate = sm.parse(info.getA_fromdate());
+		Date toDate = sm.parse(info.getA_todate());
+		
+		Date today = new Date();
+		Date nowDate = sm.parse(sm.format(today).toString());
+		
+		if(fromDate.getTime() >= nowDate.getTime()|| toDate.getTime() <= nowDate.getTime()) {
+			model.addAttribute("msg", "설문조사 기간이 아닙니다.");
+			model.addAttribute("href", request.getContextPath() + "/analysis.do");
+			return "alert";
+		}
+		
+		// 날짜 조건을 통과하면, 로그인 여부를 체크한다.
 		String curUserId = (String)session.getAttribute("userid");
-		System.out.println("현재 아이디 : " + curUserId);
+		//System.out.println("현재 아이디 : " + curUserId);
 		
 		if(curUserId == null || curUserId.equals("")) {
 			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
@@ -779,20 +798,23 @@ public class BoardController {
 			return "alert";
 		} else {
 			
+			// 현재 접속한 사람이 설문조사에 참여한 이력이 있는지 조사한다.
 			List<AnswerVO> answerList = as.getAnalysisAnswerList(curUserId);
 			int answerListSize = answerList.size();
 			
+			// 또한 문항 정보와 문제에 따른 문항 정보를 가져온다.
 			List<AnalysisDAO> analList = as.getAnalysisQuestionList();
 			List<AnalysisDAO> selectList = as.getAnalysisSelectList();
 			
+			// 접속중인 유저가 응답한 복수 문항 처리
 			AnswerVO temp = new AnswerVO();
 			temp.setQ_id(curUserId);
 			List<AnswerVO> answerListMulti = as.getAnalysisAnswerMulti(temp);
 			
-			Iterator<AnswerVO> it = answerList.iterator();
+			/*Iterator<AnswerVO> it = answerList.iterator();
 			while(it.hasNext()) {
 				System.out.println("정보 : " + it.next().toString());
-			}
+			}*/
 			
 			model.addAttribute("questionList", analList);
 			model.addAttribute("selectList", selectList);
@@ -804,43 +826,51 @@ public class BoardController {
 		}
 	}
 	
+	// 사용자가 단수 응답 문제에 응답했을때, ajax 통신을 처리한다.
 	@RequestMapping(value="/analysisUpdate.do")
 	@ResponseBody
 	public String analysisUpdate(AnswerVO answerVO) {
-		System.out.println(answerVO.toString());
+		//System.out.println(answerVO.toString());
 		List<AnswerVO> check = as.getAnalysisAnswer(answerVO);
 		int result = 0;
 		if(check.size() > 0) {
+			// 문항에 이미 체크했다면, 이미 체크된 값을 update 처리한다.
 			AnswerVO vo = new AnswerVO();
 			vo.setQ_no(answerVO.getQ_no());
 			vo.setA_isetc(1);
 			result = as.deleteAnswer(vo);
 			result = as.inputAnalysisUpdate(answerVO);
 		} else {
+			// 해당 문제에 응답한 적이 없다면, insert로 처리한다.
 			AnswerVO vo = new AnswerVO();
 			vo.setQ_no(answerVO.getQ_no());
 			vo.setA_isetc(1);
 			result = as.deleteAnswer(vo);
 			result = as.inputAnalysisAnswer(answerVO);
 		}
+		// 쿼리 결과가 올바르지 않으면 error 발생.
 		return String.valueOf(result);
 	}
 	
+	// 사용자가 복수 문항에 응답했을때 처리되는 로직
 	@RequestMapping(value="/analysisUpdateMulti.do")
 	@ResponseBody
 	public String analysisUpdateMulti(AnswerVO answerVO) {
-		System.out.println(answerVO.toString());
+		//System.out.println(answerVO.toString());
+		
+		// 기타 문항에 여러번 체크했을 경우, 이전에 입력했던 값은 삭제한다.
 		List<AnswerVO> check = as.getAnalysisAnswer(answerVO);
 		Iterator<AnswerVO> it = check.iterator();
 		while(it.hasNext()) {
 			AnswerVO vo = it.next();
 			int etc = vo.getA_isetc();
-			System.out.println("isetc 있냐 : " + vo.toString());
+			//System.out.println("isetc 있냐 : " + vo.toString());
 			if(etc == 1) {
 				as.deleteAnswer(answerVO);
 			}
 		}
 		
+		// 복수문항은 '/' separator를 통해 추가되어 전송되므로, 해당 값을 분리하는 작업을 한다.
 		String conflictedValue = answerVO.getQ_value();
 		String conflictedAnswer = answerVO.getA_value();
 		String[] converted = conflictedValue.split("/");
@@ -851,6 +881,8 @@ public class BoardController {
 		}
 		
 		int result = 0;
+		// 그 외에 복수문항에 체크한 이력이 있을 경우, 경우에 따라 update로 처리하거나,
+		// 그렇지 않은 경우 insert로 처리한다.
 		if(check.size() > 1) {
 			for(int i = 0; i<converted.length; i++) {
 				AnswerVO vo = new AnswerVO();
@@ -879,6 +911,7 @@ public class BoardController {
 			}
 		}
 		
+		// 만약 사용자가 없음에 체크했을 경우 원래 값을 삭제한다.
 		if(conflictedAnswer.contains("없음")) {
 			as.deleteAnswer(answerVO);
 			answerVO.setQ_value(converted[0]);
@@ -889,10 +922,13 @@ public class BoardController {
 		return String.valueOf(result);
 	}
 	
+	// 사용자가 기타에 값을 입력했을때 처리하는 로직.
 	@RequestMapping(value="/etcInput.do")
 	@ResponseBody
 	public String etcInput(AnswerVO answerVO) {
-		System.out.println(answerVO.toString());
+		//System.out.println(answerVO.toString());
+		
+		// 기타에 체크한 값이 있을 경우, 경우에 따라 update 혹은 insert로 처리한다.
 		List<AnswerVO> checkTemp = as.getAnalysisAnswer(answerVO);
 		int result = 0;
 		if(checkTemp.size() >= 1) {
@@ -903,12 +939,15 @@ public class BoardController {
 		return String.valueOf(result);
 	}
 	
+	// 주관식 문제에 응답했을 경우 처리하는 로직.
 	@RequestMapping(value="/subjectInput.do")
 	@ResponseBody
 	public String subjectInput(AnswerVO answerVO) {
 		System.out.println(answerVO.toString());
 		List<AnswerVO> check = as.getAnalysisAnswer(answerVO);
 		int result = 0;
+		
+		// 경우에 맞게 insert 또는 update로 처리한다.
 		if(check.size() >= 1) {
 			result = as.inputAnalysisUpdate(answerVO);
 		} else {
@@ -917,24 +956,16 @@ public class BoardController {
 		return String.valueOf(result);
 	}
 	
+	// 설문을 완료했을 경우
 	@RequestMapping(value="/analysisComplete.do")
 	public String analysisComplete(Model model, HttpServletRequest request, HttpSession session) {
-		String curId = (String)session.getAttribute("userid");
 		
+		String curId = (String)session.getAttribute("userid");
 		AnswerVO comVO = new AnswerVO();
 		comVO.setQ_id(curId);
 		
+		// 설문조사 완료 테이블에 해당 정보를 입력하고, 원래 게시판 페이지로 이동시킨다.
 		as.userAnalysisComplete(comVO);
-		/*int result = as.deleteAnswerRefined();
-		if(result == 1) {
-			model.addAttribute("msg", "설문조사가 완료되었습니다.");
-			model.addAttribute("href", request.getContextPath() + "/boardList.do?page_no=1&pageSize=10");
-			return "alert";
-		} else {
-			model.addAttribute("msg", "무언가 문제가 발생했습니다.");
-			model.addAttribute("href", request.getContextPath() + "/analysis.do");
-			return "alert";
-		}*/
 		model.addAttribute("msg", "설문조사가 완료되었습니다.");
 		model.addAttribute("href", request.getContextPath() + "/boardList.do?page_no=1&pageSize=10");
 		return "alert";

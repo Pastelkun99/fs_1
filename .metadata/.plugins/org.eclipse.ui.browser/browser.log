@@ -37,3 +37,11 @@
 11월 22, 2019 15:18:55.06 [2796:9504:1122/151855.066:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
 11월 22, 2019 15:51:32.77 [2796:11356:1122/155132.775:ERROR:CONSOLE(7049)] "Uncaught (in promise) TypeError: Cannot read property 'requestContent' of undefined", source: devtools://devtools/bundled/shell.js (7049)
 11월 22, 2019 18:11:11.63 [2796:11356:1122/181111.639:ERROR:CONSOLE(7049)] "Uncaught (in promise) TypeError: Cannot read property 'requestContent' of undefined", source: devtools://devtools/bundled/shell.js (7049)
+
+11월 26, 2019 08:26:35.22 NEW SESSION
+11월 26, 2019 08:26:35.22 [10716:5012:1126/082635.216:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
+11월 26, 2019 09:49:25.42 [10716:5012:1126/094925.419:ERROR:socket_stream.cc(218)] Closing stream with result -2
+11월 26, 2019 09:51:06.55 [10716:5012:1126/095106.553:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
+11월 26, 2019 12:31:45.61 [10716:5012:1126/123145.617:ERROR:socket_stream.cc(218)] Closing stream with result -2
+11월 26, 2019 12:44:55.53 [10716:5012:1126/124455.530:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -7
+11월 26, 2019 12:45:26.18 [10716:5012:1126/124526.186:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118

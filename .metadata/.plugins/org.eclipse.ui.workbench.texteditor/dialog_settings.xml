@@ -6,20 +6,20 @@
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="data-code2" key="selection"/>
+		<item value="들어옴" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="data-code2"/>
-			<item value="data-codedata-code22"/>
+			<item value="들어옴"/>
+			<item value="analysis"/>
+			<item value="q_selection"/>
+			<item value="etcinput"/>
+			<item value="commitCheckMulti"/>
 			<item value="commitCheck"/>
-			<item value="question"/>
-			<item value="questionList"/>
-			<item value="selectGroup1"/>
-			<item value="session"/>
-			<item value="image"/>
+			<item value="list-group-item"/>
+			<item value="status"/>
 		</list>
 		<list key="replacehistory">
 		</list>

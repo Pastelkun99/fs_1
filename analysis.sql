@@ -4,6 +4,9 @@ DROP TABLE ANSWERTBL;
 DROP TABLE INFOTBL;
 DROP TABLE ANALYSISTBL;
 
+-- 테이블을 생성하는 부분
+
+-- 설문조사 정보가 저장될 테이블을 선택한다.
 CREATE TABLE INFOTBL(a_no int auto_increment primary key,
 					 a_name varchar(400) not null,
                      a_collector varchar(100) not null,
@@ -12,9 +15,8 @@ CREATE TABLE INFOTBL(a_no int auto_increment primary key,
                      a_todate date not null,
                      a_deploydate date not null
                      );
-                     
-insert into infotbl values(0, '퓨전소프트 만족도 조사', '퓨전소프트', '회원', '2019-11-21', '2019-11-25', '2019-11-29');
 
+-- 문제가 저장될 테이블을 만든다.
 CREATE TABLE QUESTIONTBL (q_no INT auto_increment primary key,
 						  a_no INT not null,
 						  q_subject varchar(100) not null,
@@ -26,12 +28,14 @@ CREATE TABLE QUESTIONTBL (q_no INT auto_increment primary key,
                           q_depth int
                           );
                           
+-- 문항이 저장될 테이블을 만든다.                          
 CREATE TABLE SELECTTBL (select_no int auto_increment,
 						q_type varchar(10) not null,
 						q_selection varchar(10) not null,
 						q_svalue varchar(300) not null,
                         q_order int not null);
                         
+-- 답안이 저장될 테이블을 만든다.                        
 CREATE TABLE ANSWERTBL (a_number int auto_increment primary key,
 						q_no int,
                         q_id varchar(300),
@@ -42,32 +46,31 @@ CREATE TABLE ANSWERTBL (a_number int auto_increment primary key,
                         a_isetc int
                         );
                         
+-- 사용자가 설문을 완료하면 사용할 테이블을 만든다.            
 CREATE TABLE ANALYSISTBL(user_no int auto_increment primary key,
 						 a_no int,
 						 q_id varchar(100) not null,
                          user_complete int
                          );
 
+
+
 SELECT * FROM ANALYSISTBL;
-
 SELECT * FROM INFOTBL;                        
-truncate answertbl;
 SELECT * FROM ANSWERTBL ORDER BY q_no;
-
 
 SELECT * FROM ANSWERTBL WHERE q_no = 17 ORDER BY a_number DESC limit 2;
 DELETE from answertbl where a_value = '기타';
 
 set sql_safe_updates = 0;
 
+SELECT * FROM ANALYSISTBL;
 SELECT * FROM QUESTIONTBL;
 SELECT * FROM SELECTTBL;
 SELECT * FROM ANSWERTBL;
 SELECT count(*) FROM ANSWERTBL;
 SELECT * FROM INFOTBL;
 select * from infotbl where a_no = 1;
-
-
 
 SELECT * FROM ANSWERTBL WHERE q_no =19 AND a_isetc = 1;  
 
@@ -76,13 +79,6 @@ update questiontbl set q_type = '000' where q_no = 16;
 SELECT * FROM ANSWERTBL where q_id = 'admin';
 
 update infotbl set a_submitter = '퓨전소프트 회원' Where a_no = 1;
-
-insert answertbl values (0, 1, 'abcde', '1111', '1');
-insert answertbl values (0, 2, 'admin', '1111', '4');
-insert answertbl values (0, 3, 'admin', '1111', '2');
-insert answertbl values (0, 4, 'admin', '1111', '3');
-insert answertbl values (0, 5, 'admin', '1111', '5');
-insert answertbl values (0, 6, 'admin', '1112', '주관식을 입력했습니다.');
 
 SELECT * FROM QUESTIONTBL LEFT JOIN ANSWERTBL ON QUESTIONTBL.q_no = ANSWERTBL.q_no;
 SELECT * FROM QUESTIONTBL LEFT JOIN ANSWERTBL ON QUESTIONTBL.q_no = ANSWERTBL.q_no WHERE ANSWERTBL.q_id = 'admin';
