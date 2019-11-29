@@ -1,0 +1,219 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ page session="true"%>
+<meta charset="UTF-8">
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+	crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+	integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+	crossorigin="anonymous"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+	integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+	crossorigin="anonymous"></script>
+<script
+	src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+	crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.css"/>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.js"></script>
+
+<html>
+<head>
+<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+<title>관리자 페이지</title>
+</head>
+<body>
+<script type="text/javascript">
+	$(document).ready(function() {
+	    $('#questionTable').DataTable();
+	    $('#selectTable').DataTable();
+	} );
+</script>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom: 100px;">
+		<a class="navbar-brand">관리자 페이지</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse"
+			data-target="#navbarNav" aria-controls="navbarNav"
+			aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav">
+				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=user">유저 관리</a></li>
+				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=analysis&a_no=1&q_selection=1111">설문 관리</a></li>
+				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=popup&pop_id=1">팝업 관리</a></li>
+				<li class="nav-item"><button type="button" class="btn btn-danger" onClick="logoutLogic();">로그아웃</button></li>
+			</ul>
+		</div>
+	</nav>
+	<div class="row">
+		<div class="col-md-1" style="text-align:center;">
+		</div>
+		<div class="col-md-3" style="margin-bottom: 3rem;">
+			<h2>설문 이름</h2>
+			<select name="a_no" id="a_no" class="form-control" style="text-align: center;">
+				<c:forEach items="${infoList }" var="info">
+					<option value="${info.a_no }" <c:if test="${info.a_no eq param.a_no }">selected</c:if>>${info.a_name }</option>
+				</c:forEach>
+			</select>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-10">
+			<table id="selectTable" class="display" style="width:100%;">
+				<thead class="thead-dark">
+					<tr>
+						<th scope="col">문제번호</th>
+						<th scope="col">구분</th>
+						<th scope="col">문제</th>
+						<th scope="col">형식</th>
+						<th scope="col">매칭 문항</th>
+						<th scope="col">보여줄 페이지</th>
+						<th scope="col">Mode</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="question" items="${questionList}" varStatus="status">
+						<tr>
+							<th scope="row">${status.index + 1 }</th>
+							<td style="width: 140px;"><strong>${question.q_subject}</strong></td>
+							<td>${question.q_value }</td>
+							<td>${question.q_type }</td>
+							<td style="width:90px;">${question.q_selection }</td>
+							<td style="width:30px;">${question.q_page }</td>
+							<td>
+								<button class="btn btn-sm btn-info" id="updateQuestion(${question.q_no });" onclick="updateQuestion(${question.q_no });">수정</button>
+								<button class="btn btn-sm btn-danger" id="deleteQuestion(${question.q_no });"onclick="deleteQuestion(${question.q_no });">삭제</button>
+							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</div>
+		<div class="col-md-1"></div>
+	</div>
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-10" style="text-align:right; margin-top: 3rem;">
+			<button class="btn btn-lg btn-primary" onclick="createQuestion();">등록</button>
+		</div>
+		<div class="col-md-1"></div>
+	</div>
+	<div class="row">
+		<div class="col-md-1" style="text-align:center;">
+		</div>
+		<div class="col-md-3" style="margin-bottom: 3rem;">
+			<h2>문항 정보</h2>
+			<select name="q_selection" id="q_selection" class="form-control" style="text-align: center;">
+				<c:forEach items="${selectionList }" var="selection">
+					<option value="${selection.q_selection }"<c:if test="${selection.q_selection eq param.q_selection }">selected</c:if>>${selection.q_selection }</option>
+				</c:forEach>
+			</select>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-10">
+			<table id="questionTable" class="display" style="width:100%;">
+				<thead class="thead-dark">
+					<tr>
+						<th scope="col">No</th>
+						<th scope="col">구분</th>
+						<th scope="col">문항</th>
+						<th scope="col">Mode</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="selection" items="${selectionInfoList}" varStatus="status">
+						<tr>
+							<th scope="row">${status.index + 1 }</th>
+							<c:if test="${selection.q_selection gt 1110 && selection.q_selection lt 3001 }">
+								<td>객관식 단수 문항</td>
+							</c:if>
+							<c:if test="${selection.q_selection gt 3001 && selection.q_selection lt 5001 }">
+								<td>객관식 복수 문항</td>
+							</c:if>
+							<c:if test="${selection.q_selection eq 5000 }">
+								<td>주관식 문항</td>
+							</c:if>
+							<td>${selection.q_svalue }</td>
+							<td>
+								<button class="btn btn-sm btn-info" id="updateSelection(${question.q_no });" onclick="updateSelection(${question.q_no });">수정</button>
+								<button class="btn btn-sm btn-danger" id="deleteSelection(${question.q_no });"onclick="deleteSelection(${question.q_no });">삭제</button>
+							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</div>
+		<div class="col-md-1"></div>
+		<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-10" style="text-align:right; margin-top: 3rem;">
+			<button class="btn btn-lg btn-primary" onclick="">등록</button>
+		</div>
+		<div class="col-md-1"></div>
+	</div>
+	</div>
+<script>
+$(function () {
+	$('#a_no').change(function() {
+		var url = '${pageContext.request.contextPath}';
+		var value = this.value;
+		var selection = $('#q_selection').val();
+		location.href = url + '/mng/adminManagement.do?mode=analysis&a_no=' + value + '&q_selection=' + selection;
+	})
+})
+
+$(function () {
+	$('#q_selection').change(function() {
+		var url = '${pageContext.request.contextPath}';
+		var value = this.value;
+		var a_no = $('#a_no').val();
+		location.href = url + '/mng/adminManagement.do?mode=analysis&a_no=' + a_no + '&q_selection=' + value;
+	})
+})
+
+function updateQuestion(q_no) {
+	var a_no = '${param.a_no}';
+	var url = '${pageContext.request.contextPath}';
+	window.open(url + "/mng/questionInfo.do?a_no=" + a_no + "&q_no=" + q_no, "문제 정보", "width=700, height=820");
+}
+
+function deleteQuestion(q_no) {
+	var a_no = '${param.a_no}';
+	var url = '${pageContext.request.contextPath}';
+	
+	$.ajax({
+		type:"post",
+		url:"/mng/questionDelete.do",
+		data:{"q_no" : q_no,
+		      "a_no" : a_no,
+		      },
+		dataType:"json",
+		success : function(result) {
+			alert('성공');
+			location.reload();
+		},
+		error : function(error) {
+			alert('실패');
+		}
+	});
+}
+
+function createQuestion() {
+	var a_no = '${param.a_no}';
+	var url = '${pageContext.request.contextPath}';
+	window.open(url + "/mng/questionAppend.do?a_no=" + a_no, "문제 등록", "width=700, height=820");
+}
+</script>
+</body>
+</html>

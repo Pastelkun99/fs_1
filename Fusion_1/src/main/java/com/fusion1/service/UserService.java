@@ -15,4 +15,16 @@ public interface UserService {
 	// 유저 아이디 확인
 	public UserVO userIdCheck(String inputId);
 	
+	// 관리자 재 확인
+	public UserVO adminCheck(UserVO userVO);
+	
+	// 유저 1건의 정보 불러오기
+	public UserVO getUserInfo(String userid); 
+	
+	// 유저리스트 불러오기
+	public List<UserVO> getUserList();
+	
+	// 유저 정보 업데이트
+	public int userInfoUpdate(UserVO userVO);
+	
 }

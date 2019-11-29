@@ -3,10 +3,11 @@ package com.fusion1.dao;
 public class AnalysisDAO {
 
 	int q_no;
+	int a_no;
 	String q_subject;
 	String q_value;
 	String q_type;
-	String q_selection;
+	int q_selection;
 	int q_page;
 	String q_svalue;
 	String q_order;
@@ -20,6 +21,14 @@ public class AnalysisDAO {
 
 	public void setQ_no(int q_no) {
 		this.q_no = q_no;
+	}
+
+	public int getA_no() {
+		return a_no;
+	}
+
+	public void setA_no(int a_no) {
+		this.a_no = a_no;
 	}
 
 	public String getQ_subject() {
@@ -46,11 +55,11 @@ public class AnalysisDAO {
 		this.q_type = q_type;
 	}
 
-	public String getQ_selection() {
+	public int getQ_selection() {
 		return q_selection;
 	}
 
-	public void setQ_selection(String q_selection) {
+	public void setQ_selection(int q_selection) {
 		this.q_selection = q_selection;
 	}
 
@@ -104,11 +113,10 @@ public class AnalysisDAO {
 
 	@Override
 	public String toString() {
-		return "AnalysisDAO [q_no=" + q_no + ", q_subject=" + q_subject + ", q_value=" + q_value + ", q_type=" + q_type
-				+ ", q_selection=" + q_selection + ", q_page=" + q_page + ", q_svalue=" + q_svalue + ", q_order="
-				+ q_order + ", q_id=" + q_id + ", q_parentno=" + q_parentno + ", q_depth=" + q_depth + "]";
+		return "AnalysisDAO [q_no=" + q_no + ", a_no=" + a_no + ", q_subject=" + q_subject + ", q_value=" + q_value
+				+ ", q_type=" + q_type + ", q_selection=" + q_selection + ", q_page=" + q_page + ", q_svalue="
+				+ q_svalue + ", q_order=" + q_order + ", q_id=" + q_id + ", q_parentno=" + q_parentno + ", q_depth="
+				+ q_depth + "]";
 	}
-
-	
 
 }

@@ -32,6 +32,26 @@ public class UserServiceImpl implements UserService {
 		return sqlsession.selectOne("userMapper.userLogin", inputID);
 	}
 
+	@Override
+	public UserVO adminCheck(UserVO userVO) {
+		return sqlsession.selectOne("userMapper.getAdminInfo", userVO);
+	}
+
+	@Override
+	public List<UserVO> getUserList() {
+		return sqlsession.selectList("userMapper.getUserList");
+	}
+
+	@Override
+	public UserVO getUserInfo(String userid) {
+		return sqlsession.selectOne("userMapper.getUserInfo", userid);
+	}
+
+	@Override
+	public int userInfoUpdate(UserVO userVO) {
+		return sqlsession.update("userMapper.updateUserInfo", userVO);
+	}
+
 	
 	
 

@@ -1,0 +1,8 @@
+package com.fusion1.service;
+
+import com.fusion1.dao.PopupVO;
+
+public interface AdminService {
+
+	public PopupVO getPopupInfo();
+}

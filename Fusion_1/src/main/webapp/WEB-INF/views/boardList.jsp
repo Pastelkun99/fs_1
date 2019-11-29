@@ -29,6 +29,34 @@
  #close{font-size:16px; padding:5px; font-weight:bold;}
 </style>
 </head>
+<script>
+function windowPopup() {
+	var url = '${pageContext.request.contextPath}';
+	
+	var pop_title = '${pop_title}';
+	var pop_fromdateString = '${pop_fromdate}';
+	var pop_fromdate = Date.parse(pop_fromdateString);
+	
+	var pop_todateString = '${pop_todate}';
+	var pop_todate = Date.parse(pop_todateString);
+	
+	var pop_nowDate = new Date().getTime();
+	
+	if(pop_nowDate >= pop_fromdate && pop_nowDate <= pop_todate) {
+		var pop_aval = '${pop_aval}';
+		if(pop_aval == 1) {
+			var pop_height = '${pop_height}';
+			var pop_width= '${pop_width}';
+			var pop_content = '${pop_content}';
+			var pop_imageurl = '${pop_imageurl}';
+			var pop_url = '${pop_url}';
+			var opt = 'width=' + pop_width + ", height=" + pop_height;
+			window.open(url + '/mng/showPopup.do', "_blank", opt);
+		} 
+	}
+}
+
+</script>
 <body>
 </br>
 </br>
@@ -38,11 +66,8 @@
 		<div class="row">
 			<div class="col"></div>
 			<div class="col-11">
+				<input type="hidden" id="popup" name="popup" onclick="windowPopup();">
 				<c:if test="${sessionScope.username eq null }">
-				<script>
-					alert('로그인 후 가능한 서비스입니다.');
-					location.href="/";
-				</script>
 					<h2>로그인 후 가능한 서비스 입니다.</h2>
 					</br>
 				</c:if>
@@ -55,10 +80,11 @@
 					<!-- Button trigger modal -->
 					<button type="button" class="btn btn-dark" data-toggle="modal" id="myModal"
 						data-target="#exampleModalLong">공지사항 보기</button>
-					<c:if test="${sessionScope.userid eq 'admin' }">
+					<c:if test="${sessionScope.isAdmin eq 1 }">
 						<button type="button" class="btn btn-light" onClick="location.href='${pageContext.request.contextPath}/Chart.do?fromDate=&toDate='">관리자 통계 페이지</button>
+						<button type="button" class="btn btn-dark" onClick="location.href='${pageContext.request.contextPath}/mng/adminCheck.do'">관리자 페이지</button>
 					</c:if>
-					<button type="button" class="btn btn-warning" onClick="location.href='${pageContext.request.contextPath}/analysis.do'">설문조사 참여</button>
+					<button type="button" class="btn btn-warning" onClick="location.href='${pageContext.request.contextPath}/anal.do'">설문조사 참여</button>
 					</br>
 					</br>
 					<script>
@@ -207,6 +233,13 @@
   $(document).ready(function() {
 	 var currentUserId = '${sessionScope.userid}';
 	 var result = getCookie(currentUserId + "popup");
+	 var resultWindow = getCookie(currentUserId + "window");
+	 
+	 if(resultWindow == currentUserId) {
+		 return false;
+	 } else {
+		 windowPopup();
+	 }
 	 
 	 if(result == currentUserId) {
 		 return false;
@@ -285,7 +318,7 @@
 			  /* alert('데이터 전송 성공'); */
 		  },
 		  error : function(error) {
-			  alert(error);
+			  /* alert(error); */
 		  }
 	  });
   }

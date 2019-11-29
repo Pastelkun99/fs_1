@@ -45,3 +45,17 @@
 11월 26, 2019 12:31:45.61 [10716:5012:1126/123145.617:ERROR:socket_stream.cc(218)] Closing stream with result -2
 11월 26, 2019 12:44:55.53 [10716:5012:1126/124455.530:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -7
 11월 26, 2019 12:45:26.18 [10716:5012:1126/124526.186:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
+
+11월 29, 2019 08:23:42.79 NEW SESSION
+11월 29, 2019 08:23:42.79 [2920:8800:1129/082342.786:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
+11월 29, 2019 12:24:04.56 [2920:8800:1129/122404.562:ERROR:socket_stream.cc(218)] Closing stream with result -2
+11월 29, 2019 12:24:25.78 [2920:8800:1129/122425.779:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
+11월 29, 2019 12:31:05.65 [2920:8800:1129/123105.654:ERROR:socket_stream.cc(218)] Closing stream with result -2
+11월 29, 2019 12:58:44.54 [2920:8800:1129/125844.540:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -7
+11월 29, 2019 12:58:45.30 [2920:8800:1129/125845.304:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -106
+11월 29, 2019 12:59:12.10 [2920:8800:1129/125912.102:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
+11월 29, 2019 12:59:15.79 [2920:13716:1129/125915.795:ERROR:CONSOLE(7049)] "Uncaught (in promise) TypeError: Cannot read property 'requestContent' of undefined", source: devtools://devtools/bundled/shell.js (7049)
+11월 29, 2019 14:23:43.54 [2920:8800:1129/142343.543:ERROR:socket_stream.cc(218)] Closing stream with result -2
+11월 29, 2019 14:51:12.57 [2920:8800:1129/145112.570:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -7
+11월 29, 2019 14:51:12.62 [2920:8800:1129/145112.625:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -106
+11월 29, 2019 14:51:39.99 [2920:8800:1129/145139.991:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118

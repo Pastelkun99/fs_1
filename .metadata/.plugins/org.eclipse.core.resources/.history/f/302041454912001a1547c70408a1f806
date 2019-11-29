@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+					"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="adminMapper">
+	
+	<select id="getPopupInfoList" resultType="com.fusion1.dao.PopupVO">
+		SELECT * FROM popuptbl
+	</select>
+	
+	<select id="getPopupInfo"  parameterType="com.fusion1.dao.PopupVO" resultType="com.fusion1.dao.PopupVO">
+		SELECT * FROM popuptbl WHERE pop_id = #{pop_id}
+	</select>
+	
+	<select id="getPopupAval" resultType="com.fusion1.dao.PopupVO">
+		SELECT * FROM popuptbl WHERE pop_aval = 1 ORDER BY pop_id DESC LIMIT 1
+	</select>
+	
+	<update id="updatePopupInfo" parameterType="com.fusion1.dao.PopupVO">
+		UPDATE popuptbl SET 
+							pop_title = #{pop_title},
+							pop_fromdate = #{pop_fromdate},
+							pop_todate = #{pop_todate},
+							pop_height = #{pop_height},
+							pop_width = #{pop_width},
+							pop_content = #{pop_content},
+							pop_imageurl = #{pop_imageurl},
+							pop_url = #{pop_url},
+							pop_aval = #{pop_aval}
+					WHERE pop_id = #{pop_id}
+	</update>
+	
+	<insert id="insertPopupInfo" parameterType="com.fusion1.dao.PopupVO">
+		INSERT INTO popuptbl VALUES (0, #{pop_title}, #{pop_fromdate}, #{pop_todate}, #{pop_height}, #{pop_width}, #{pop_content}, #{pop_imageurl},	#{pop_url},	#{pop_aval})
+	</insert>
+	
+</mapper>

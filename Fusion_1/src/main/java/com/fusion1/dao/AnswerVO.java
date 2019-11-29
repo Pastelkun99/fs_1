@@ -4,6 +4,7 @@ public class AnswerVO {
 
 	int a_number;
 	int q_no;
+	int a_no;
 	String q_id;
 	String q_selection;
 	String q_value;
@@ -21,6 +22,14 @@ public class AnswerVO {
 
 	public int getQ_no() {
 		return q_no;
+	}
+
+	public int getA_no() {
+		return a_no;
+	}
+
+	public void setA_no(int a_no) {
+		this.a_no = a_no;
 	}
 
 	public void setQ_no(int q_no) {

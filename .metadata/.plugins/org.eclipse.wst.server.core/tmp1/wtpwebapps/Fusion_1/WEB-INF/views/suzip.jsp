@@ -12,6 +12,7 @@
 	src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
 	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
 	crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <html>
 <head>
 <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
@@ -24,7 +25,7 @@
 		<div class="card" style="width:100%;">
 	  		<div class="card-body">
 	  		  <h5 class="card-title"></h5>
-	   		  <h6 class="card-subtitle mb-2 text-muted">설문조사</h6>
+	   		  <h6 class="card-subtitle mb-2 text-muted">설문조사 ${infoList.a_no }</h6>
 	    	  <p class="card-text">${infoList.a_submitter }분들을 대상으로 ${infoList.a_name }(을)를 진행합니다.</br>
 	    	  응답하신 내용은 통계법 33조(비밀의 보호)에 의거 비밀이 보장되며, 서비스 개선을 위한 자료 외에 어떠한 목적으로도 사용되지 않음을 약속드립니다. 많은 참여 부탁드리며,
 	    	  앞으로도 교육정책 및 교육과정 정보를 보다 빠르게 활용하실 수 있도록 더욱 노력하겠습니다.</p>
@@ -38,18 +39,18 @@
 	    	  								- 당첨자 선정은 응답 내용의 성실성 등을 고려하여 선정됩니다.</br>
 	    	  								- 1인 1회에 한하여 참여 가능합니다.</li>
 	    	  	<li class="list-group-item">
-			   	  	<button class="btn btn-lg btn-primary" onClick="location.href='${pageContext.request.contextPath}/analysisList.do?page=1'" style="width:200px;">설문 참여하기</button>
-			   	  	<button class="btn btn-lg btn-danger" onClick="history.back()" style="width:200px">이전으로 돌아가기</button>
+			   	  	<button class="btn btn-lg btn-primary" onClick="location.href='${pageContext.request.contextPath}/analysisList.do?page=1&a_no=${infoList.a_no}'" style="width:200px;">설문 참여하기</button>
+			   	  	<button class="btn btn-lg btn-danger" onClick="location.href='${pageContext.request.contextPath}/anal.do'" style="width:200px">이전으로 돌아가기</button>
 	    	  	</li>
 	    	  </ul>
 		  	</div>
   		</div>
 	</div>
+  	<input type="hidden" id="no" value="${infoList.a_no }">
   	<div class="col-3"></div>
 </div>
 </body>
 <script type="text/javascript">
-
 var size = '${answerListSize}';
 if(size >= 21) {
 	var result = confirm('응답하신 설문이 있습니다. 설문조사를 수정하시겠습니까?');
@@ -64,5 +65,6 @@ if(size >= 21) {
 } else if (size == 0) {
 	alert('설문조사에 오신것을 환영합니다.');
 }
+
 </script>
 </html>

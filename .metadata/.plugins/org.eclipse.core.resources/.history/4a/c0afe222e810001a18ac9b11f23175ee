@@ -1,0 +1,19 @@
+package com.fusion1.service;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.fusion1.dao.PopupVO;
+
+@Service
+public class AdminServiceImpl implements AdminService {
+
+	@Resource(name="sqlSession")
+	
+	@Override
+	public PopupVO getPopupInfo() {
+		return null;
+	}
+
+}

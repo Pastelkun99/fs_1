@@ -35,7 +35,9 @@
 					<div class="card" style="width: 100%; margin-bottom:40px;">
 	  					<div class="card-header">
 	  					  <!-- 문제 번호, depth 처리를 함 -->
-	  					  ${question.q_parentno }.<c:if test="${question.q_depth ne 0 }">${question.q_depth }</c:if> 
+	  					  <c:if test="${question.q_depth eq 0 }">${status.index + 1 }.</c:if>
+	  					  <c:if test="${question.q_depth ne 0 }">${question.q_parentno }.</c:if>
+	  					  <c:if test="${question.q_depth ne 0 }">${question.q_depth }</c:if> 
 	  					  <strong>${question.q_subject }</strong> ${question.q_value }
 	  					</div>
 	  					<ul class="list-group list-group-flush">
@@ -51,7 +53,7 @@
 	  								<c:if test="${select.q_type eq '001'}">
 	  								
 	  									<!-- 객관식 중에서 복수 선택이 가능한 것 -->
-			  					  		<c:if test="${select.q_selection ne '1111' && select.q_selection ne '1115' }">
+			  					  		<c:if test="${select.q_selection gt 3000 && select.q_selection lt 5001 }">
 			  					  		
 			  					  			<c:if test="${select.q_svalue eq '기타' }">
 			  					  				 <c:set var="etc" value="Y" />
@@ -59,9 +61,10 @@
 				  					  		
 				  					  		<!-- 이 부분은 복수 체크 문항 -->
 				  					  		<input type="checkbox" 
-				  					  			   class="commitCheckMulti a${question.q_no }" 
+				  					  			   class="commitCheckMulti a${question.q_no } check${question.q_page}" 
 				  					  			   data-code="${question.q_no}" 
 				  					  			   data-code2="${select.q_svalue }" 
+				  					  			   a_no="${question.a_no }"
 				  					  			   id="selectGroup${question.q_no }_${select.q_order }" 
 				  					  			   name="selectGroup${question.q_no }"
 				  					  			   <c:forEach items="${answerList }" var="answer">
@@ -78,7 +81,7 @@
 			  					  		</c:if>
 			  					  		<!-- 복수선택 문항 끝 -->
 			  					  		
-	  									<c:if test="${select.q_selection eq '1111' || select.q_selection eq '1115' }">
+	  									<c:if test="${select.q_selection gt 1110 && select.q_selection lt 3001 }">
 	  									
 		  									<c:if test="${select.q_svalue eq '기타' }">
 		  					  					 <c:set var="etc" value="Y" />
@@ -86,9 +89,10 @@
 	  					  				
 		  									<!-- 이 부분은 단수 체크 문항 -->
 				  					  		<input type="checkbox" 
-				  					  			   class="commitCheck a${question.q_no }" 
+				  					  			   class="commitCheck a${question.q_no } check${question.q_page}" 
 				  					  			   data-code="${question.q_no}"
 				  					  			   data-code2="${select.q_svalue }"
+				  					  			   a_no="${question.a_no }"
 				  					  			   id="selectGroup${question.q_no }_${select.q_order }" 
 				  					  			   name="selectGroup${question.q_no }"
 				  					  			   onclick="commitCheck(${question.q_no});"
@@ -109,7 +113,7 @@
 			  			  			<!-- 객관식 끝 -->
 			  			  			
 			  			  			<!-- 주관식 문항 출력 시작 -->
-				  			  		<c:if test="${select.q_selection eq '1117'}">
+				  			  		<c:if test="${select.q_selection eq 5000}">
 			  				  			<textarea rows="5" cols="100" id="selectGroup${question.q_no }"><c:forEach items="${answerList }" var="answer"><c:if test="${question.q_no eq answer.q_no }"><c:if test="${answer.a_isetc eq 1 }">${answer.a_value }</c:if></c:if></c:forEach></textarea>
 			  				  			<button type="button" class="btn btn-success" onclick="subjectInput(${question.q_no});">저장</button>
 			  				  			<input type="hidden" id="q_selection${question.q_no }" value="${question.q_selection }">
@@ -288,7 +292,8 @@ $(".commitCheckMulti").on('click', function() {
 	// 조건을 제대로 만족했을 경우 ajax 통신을 통해 Database에 값을 입력한다.
 	if($(this).is(':checked')) {
 		
-		var test = '';											// 중복된 값을 처리하기 위해 미리 만들어둔 변수
+		var test = ''; 											// 중복된 값을 처리하기 위해 미리 만들어둔 변수
+		var a_no = $(this).attr('a_no');
 		var a_value = '';										// 중복된 값을 처리하기 위해 미리 만들어둔 변수
 		var cnt = 0;											// 값이 들어오는 숫자를 카운트
 		var currentUserid = '${userid}';						// 현재 로그인된 ID
@@ -312,7 +317,8 @@ $(".commitCheckMulti").on('click', function() {
 		$.ajax({
 			type:"POST",
 			url:"/analysisUpdateMulti.do",
-			data: {"q_no" : q_no,
+			data: {"a_no" : a_no,
+				   "q_no" : q_no,
 				   "q_id" : currentUserid,
 				   "q_selection" : currentSelection,
 				   "q_value" : test,
@@ -339,12 +345,14 @@ function commitCheck(q_no) {
 		 var currentUser = '${sessionScope.userid}';					// 현재 로그인 된 ID
 		 var currentSelection = $('#q_selection' + q_no).val();			// 문항의 타입. 1110, 1111 ...
 		 var a_value = $(this).attr('data-code2');						// 문항의 값. 매우만족, 약간 만족 ...
+		 var a_no = $(this).attr('a_no');
 		 
 		 // ajax를 통해 Controller로 VO 값을 보낸다.
 		 $.ajax({
 			 type:"POST",
 			 url:"/analysisUpdate.do",
-			 data: {"q_no" : q_no,
+			 data: {"a_no" : a_no,
+				 	"q_no" : q_no,
 			 	 	"q_id" : currentUser,
 					"q_selection" : currentSelection,
 					"q_value" : value,
@@ -428,8 +436,14 @@ function subjectInput(q_no) {
  * 하드 코딩 되었다. 이 부분을 가장 우선적으로 손봐야 함. */
 function nextPageCheck(page) {
 	
+	var temp = page;
 	var url = '${pageContext.request.contextPath}';
 	var limit = 2;
+	
+	/* $('input:checkbox[name*="selectGroup"]').each(function() {
+		var check = $(this).is(':checked').length;
+		alert(check);
+	}) */
 	
 	if(page == 1) {
 		var a = $('input:checkbox[name="selectGroup1"]:checked').length;

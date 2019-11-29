@@ -39,8 +39,21 @@ public class UserController {
 			// 입력한 비밀번호가 DB에서 불러온 비밀번호와 일치하는지 확인함.
 			if(inputPW.equals(uservo.getUserpw())) {
 				// 일치할 경우 세션에 현재 로그인한 유저의 정보를 등록시킴.
+				if(uservo.getUser_aval() == 0) {
+					model.addAttribute("msg", "비활성화된 계정입니다. 관리자에게 문의하십시오.");
+					model.addAttribute("href", request.getContextPath() + "/");
+					return "alert";
+				}
+				
+				if(uservo.getUser_admin() == 1) {
+					session.setAttribute("isAdmin", 1);
+				} else {
+					session.setAttribute("isAdmin",	0);
+				}
+				
 				session.setAttribute("userid", uservo.getUserid());
 				session.setAttribute("username", uservo.getUsername());
+				session.setAttribute("LoginAdminPage", 0);
 				model.addAttribute("msg", "로그인에 성공했습니다.");
 				model.addAttribute("href", "/boardList.do?page_no=1&pageSize=10");
 				return "alert";

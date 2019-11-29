@@ -9,6 +9,8 @@ public class InfoVO {
 	String a_fromdate;
 	String a_todate;
 	String a_deploydate;
+	int a_aval;
+	int cnt;
 
 	public int getA_no() {
 		return a_no;
@@ -66,12 +68,28 @@ public class InfoVO {
 		this.a_deploydate = a_deploydate;
 	}
 
+	public int getA_aval() {
+		return a_aval;
+	}
+
+	public void setA_aval(int a_aval) {
+		this.a_aval = a_aval;
+	}
+	
+	public int getCnt() {
+		return cnt;
+	}
+
+	public void setCnt(int cnt) {
+		this.cnt = cnt;
+	}
+
 	@Override
 	public String toString() {
 		return "InfoVO [a_no=" + a_no + ", a_name=" + a_name + ", a_collector=" + a_collector + ", a_submitter="
 				+ a_submitter + ", a_fromdate=" + a_fromdate + ", a_todate=" + a_todate + ", a_deploydate="
-				+ a_deploydate + "]";
+				+ a_deploydate + ", a_aval=" + a_aval + ", cnt=" + cnt + "]";
 	}
 
-	
+
 }

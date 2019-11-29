@@ -38,6 +38,8 @@ import com.fusion1.dao.BoardVO;
 import com.fusion1.dao.InfoVO;
 import com.fusion1.dao.LogVO;
 import com.fusion1.dao.PagenationVO;
+import com.fusion1.dao.PopupVO;
+import com.fusion1.service.AdminServiceImpl;
 import com.fusion1.service.AnalysisServiceImpl;
 import com.fusion1.service.BoardServiceImpl;
 import com.fusion1.service.LogServiceImpl;
@@ -57,6 +59,16 @@ public class BoardController {
 	@Autowired
 	LogServiceImpl ls;
 	
+	@Autowired
+	AdminServiceImpl ads;
+	
+	@RequestMapping(value="/alert.do")
+	public String alert(Model model) {
+		model.addAttribute("msg", "로그인 후 이용 가능합니다.");
+		model.addAttribute("href", "/");
+		return "alert";
+	}
+	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(HttpSession session, HttpServletRequest request, Model model) {
 		String currentUser = (String)session.getAttribute("userid");
@@ -72,99 +84,106 @@ public class BoardController {
 	
 	@RequestMapping(value="/boardList.do")
 	public String boardList(HttpSession session, Model model, PagenationVO page) {
-		String currentID = (String)session.getAttribute("userid");
-		if(currentID == null || currentID.equals("")) {
-			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
-			model.addAttribute("href", "/");
-			return "alert";
-		} else {
-			if(page.getKeyword() == null || page.getKeyword().equals("")) {
-				
-				// 검색어를 지정하지 않았을 때의 게시글 총 갯수
-				int totalCount = bs.getBoardCount();
-				
-				// 페이지에서 지정한 갯수 (몇 개씩 보여줄 것인가)
-				int getPageSize = page.getPageSize();
-				
-				int getPage_no = page.getPage_no();
-				
-				// 끝 페이지가 될 숫자. 
-				int endPage = totalCount / getPageSize;
-				
-				// 나누어 떨어지지 않으면 1을 추가한다.
-				if(totalCount % getPageSize > 0) {
-					endPage++;
-				}
-				
-				// 보내기 위한 페이지네이션 VO 객체
-				PagenationVO pageVO = new PagenationVO();
-				pageVO.setStartPage(1);
-				pageVO.setEndPage(endPage);
-				pageVO.setPageList(getPageSize);
-				pageVO.setPageSize(getPageSize);
-				pageVO.setTotalCount(totalCount);
-				
-				// page_no = 1 일때 0, 2일때 10, 3일때 20 ...
-				int pageCon = (getPage_no*getPageSize) - getPageSize;
-				pageVO.setPageCon(pageCon);
-				
-				int pageBoardNo = (getPage_no*getPageSize);
-				pageVO.setPageBoardNo(pageBoardNo);
-				
-				// 검색어가 없을때 
-				List<BoardVO> list = bs.getBoardList(pageVO);
-				
-				// 공지사항 리스트
-				List<BoardVO> noticeList = bs.getBoardNotice(1);
-				if(!noticeList.isEmpty()) {
-					BoardVO notice = noticeList.get(0);
-					model.addAttribute("notice", notice);
-				}
-				
-				model.addAttribute("boardlist", list);
-				model.addAttribute("noticeList", noticeList);
-				model.addAttribute("page", pageVO);
-				return "boardList";
-				
-			} else {
-				// 검색어가 있다는 것 외에는 앞의 로직과 같음.
-				int totalCount = bs.getBoardSearchCount(page);
-				int getPageSize = page.getPageSize();
-				int getPage_no = page.getPage_no();
-				int searchCon = page.getSearchCon();
-				int endPage = totalCount / getPageSize;
-				String keyword = page.getKeyword();
-				
-				if(totalCount % page.getPageSize() > 0) {
-					endPage++;
-				}
-				
-				PagenationVO pageSearch = new PagenationVO();
-				pageSearch.setStartPage(1);
-				pageSearch.setEndPage(endPage);
-				pageSearch.setPageList(page.getPageSize());
-				pageSearch.setPageSize(getPageSize);
-				
-				// 페이지 검색 조건과 검색어, 해당 조건에 맞는 게시글 수를 지정해줌.
-				pageSearch.setSearchCon(searchCon);
-				pageSearch.setKeyword(keyword);
-				pageSearch.setTotalCount(totalCount);
-				
-				int pageCon = (getPage_no*getPageSize) - getPageSize;
-				pageSearch.setPageCon(pageCon);
-				
-				List<BoardVO> list = bs.getBoardSearchList(pageSearch);
-				
-				List<BoardVO> noticeList = bs.getBoardNotice(1);
-				if(!noticeList.isEmpty()) {
-					BoardVO notice = noticeList.get(0);
-					model.addAttribute("notice", notice);
-				}
-				model.addAttribute("boardlist", list);
-				model.addAttribute("noticeList", noticeList);
-				model.addAttribute("page", pageSearch);
-				return "boardList";
+		if(page.getKeyword() == null || page.getKeyword().equals("")) {
+			
+			PopupVO temp = new PopupVO();
+			PopupVO popup = ads.getPopupAval();
+			System.out.println("게시판에서 뿌려지는 팝업 : " + popup.toString());
+			model.addAttribute("pop_id", popup.getPop_id());
+			model.addAttribute("pop_title", popup.getPop_title());
+			model.addAttribute("pop_fromdate", popup.getPop_fromdate());
+			model.addAttribute("pop_todate", popup.getPop_todate());
+			model.addAttribute("pop_height", popup.getPop_height());
+			model.addAttribute("pop_width", popup.getPop_width());
+			model.addAttribute("pop_content", popup.getPop_content());
+			model.addAttribute("pop_imageurl", popup.getPop_imageurl());
+			model.addAttribute("pop_url", popup.getPop_url());
+			model.addAttribute("pop_aval", popup.getPop_aval());
+			
+			// 검색어를 지정하지 않았을 때의 게시글 총 갯수
+			int totalCount = bs.getBoardCount();
+			
+			// 페이지에서 지정한 갯수 (몇 개씩 보여줄 것인가)
+			int getPageSize = page.getPageSize();
+			
+			int getPage_no = page.getPage_no();
+			
+			// 끝 페이지가 될 숫자. 
+			int endPage = totalCount / getPageSize;
+			
+			// 나누어 떨어지지 않으면 1을 추가한다.
+			if(totalCount % getPageSize > 0) {
+				endPage++;
 			}
+			
+			// 보내기 위한 페이지네이션 VO 객체
+			PagenationVO pageVO = new PagenationVO();
+			pageVO.setStartPage(1);
+			pageVO.setEndPage(endPage);
+			pageVO.setPageList(getPageSize);
+			pageVO.setPageSize(getPageSize);
+			pageVO.setTotalCount(totalCount);
+			
+			// page_no = 1 일때 0, 2일때 10, 3일때 20 ...
+			int pageCon = (getPage_no*getPageSize) - getPageSize;
+			pageVO.setPageCon(pageCon);
+			
+			int pageBoardNo = (getPage_no*getPageSize);
+			pageVO.setPageBoardNo(pageBoardNo);
+			
+			// 검색어가 없을때 
+			List<BoardVO> list = bs.getBoardList(pageVO);
+			
+			// 공지사항 리스트
+			List<BoardVO> noticeList = bs.getBoardNotice(1);
+			if(!noticeList.isEmpty()) {
+				BoardVO notice = noticeList.get(0);
+				model.addAttribute("notice", notice);
+			}
+			
+			model.addAttribute("boardlist", list);
+			model.addAttribute("noticeList", noticeList);
+			model.addAttribute("page", pageVO);
+			return "boardList";
+			
+		} else {
+			// 검색어가 있다는 것 외에는 앞의 로직과 같음.
+			int totalCount = bs.getBoardSearchCount(page);
+			int getPageSize = page.getPageSize();
+			int getPage_no = page.getPage_no();
+			int searchCon = page.getSearchCon();
+			int endPage = totalCount / getPageSize;
+			String keyword = page.getKeyword();
+			
+			if(totalCount % page.getPageSize() > 0) {
+				endPage++;
+			}
+			
+			PagenationVO pageSearch = new PagenationVO();
+			pageSearch.setStartPage(1);
+			pageSearch.setEndPage(endPage);
+			pageSearch.setPageList(page.getPageSize());
+			pageSearch.setPageSize(getPageSize);
+			
+			// 페이지 검색 조건과 검색어, 해당 조건에 맞는 게시글 수를 지정해줌.
+			pageSearch.setSearchCon(searchCon);
+			pageSearch.setKeyword(keyword);
+			pageSearch.setTotalCount(totalCount);
+			
+			int pageCon = (getPage_no*getPageSize) - getPageSize;
+			pageSearch.setPageCon(pageCon);
+			
+			List<BoardVO> list = bs.getBoardSearchList(pageSearch);
+			
+			List<BoardVO> noticeList = bs.getBoardNotice(1);
+			if(!noticeList.isEmpty()) {
+				BoardVO notice = noticeList.get(0);
+				model.addAttribute("notice", notice);
+			}
+			model.addAttribute("boardlist", list);
+			model.addAttribute("noticeList", noticeList);
+			model.addAttribute("page", pageSearch);
+			return "boardList";
 		}
 	}
 	
@@ -740,24 +759,47 @@ public class BoardController {
 	@Autowired
 	AnalysisServiceImpl as;
 	
+	// 설문조사 선택 페이지
+	@RequestMapping(value="/anal.do")
+	public String anal(Model model) {
+		
+		List<InfoVO> analList = as.getAnalysisInfoAvalList();
+		model.addAttribute("analList", analList);
+		return "analSelect";
+	}
+	
 	// 설문조사 입장 페이지
 	@RequestMapping(value="/analysis.do")
-	public String analysis(Model model, HttpSession session) {
+	public String analysis(Model model, HttpSession session, InfoVO info) {
 		
 		String curId = (String)session.getAttribute("userid");
-		
+		System.out.println(info.toString());
 		// 로그인 하지 않은 유저는 설문조사에 참여할 수 없음.
 		if(curId == null || curId.equals("")) {
 			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
 			model.addAttribute("href", "/");
 			return "alert";
 		} else {
+			// 진행중인 설문조사 리스트를 불러온다.
+			List<InfoVO> analList = as.getAnalysisInfoList();
+			model.addAttribute("analList", analList);
+			
+			int n = info.getA_no();
+			System.out.println("들어온 n의 값 : " + n);
 			// 현재 진행중인 설문의 정보를 불러온다.
-			InfoVO infoList = as.getAnalysisInfo(1);
+			if(n == 0) {
+				n = 1;
+			}
+			InfoVO infoList = as.getAnalysisInfo(n);
+			System.out.println(infoList.toString());
 			model.addAttribute("infoList", infoList);
 			
+			AnswerVO usevo = new AnswerVO();
+			usevo.setQ_id(curId);
+			usevo.setA_no(n);
+			
 			// 현재 접속한 사람이 이미 설문을 진행한 결과가 있는지 갖고 온다.
-			List<AnswerVO> answerList = as.getAnalysisAnswerList(curId);
+			List<AnswerVO> answerList = as.getAnalysisAnswerList(usevo);
 			int answerListSize = answerList.size();
 			//System.out.println("사이즈 " + answerListSize);
 			model.addAttribute("answerListSize", answerListSize);
@@ -768,21 +810,26 @@ public class BoardController {
 	
 	// 설문조사 리스트 페이지
 	@RequestMapping(value="/analysisList.do")
-	public String analysisList(Model model, HttpSession session, HttpServletRequest request, @RequestParam("page") int page) throws ParseException {
+	public String analysisList(Model model, HttpSession session, HttpServletRequest request, @RequestParam("page") int page, @RequestParam("a_no") int a_no) throws ParseException {
 		
 		// 현재 진행중인 설문을 불러온다.
-		InfoVO info = as.getAnalysisInfo(1);
+		InfoVO info = as.getAnalysisInfo(a_no);
+		if(info == null) {
+			model.addAttribute("msg", "잘못된 페이지 이동입니다.");
+			model.addAttribute("href", request.getContextPath() + "/anal.do");
+			return "alert";
+		}
 		
 		// 현재 진행중인 설문의 시작 날짜와 끝 날짜를 받아 처리함.
 		// 조건에 부합하지 않는 경우 설문을 진행할 수 없음.
-		SimpleDateFormat sm = new SimpleDateFormat("yyyy-mm-dd");
+		SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd");
 		Date fromDate = sm.parse(info.getA_fromdate());
 		Date toDate = sm.parse(info.getA_todate());
 		
 		Date today = new Date();
 		Date nowDate = sm.parse(sm.format(today).toString());
 		
-		if(fromDate.getTime() >= nowDate.getTime()|| toDate.getTime() <= nowDate.getTime()) {
+		if(fromDate.getTime() >= nowDate.getTime() || toDate.getTime() <= nowDate.getTime()) {
 			model.addAttribute("msg", "설문조사 기간이 아닙니다.");
 			model.addAttribute("href", request.getContextPath() + "/analysis.do");
 			return "alert";
@@ -798,12 +845,15 @@ public class BoardController {
 			return "alert";
 		} else {
 			
+			AnswerVO usevo = new AnswerVO();
+			usevo.setA_no(a_no);
+			usevo.setQ_id(curUserId);
 			// 현재 접속한 사람이 설문조사에 참여한 이력이 있는지 조사한다.
-			List<AnswerVO> answerList = as.getAnalysisAnswerList(curUserId);
+			List<AnswerVO> answerList = as.getAnalysisAnswerList(usevo);
 			int answerListSize = answerList.size();
 			
 			// 또한 문항 정보와 문제에 따른 문항 정보를 가져온다.
-			List<AnalysisDAO> analList = as.getAnalysisQuestionList();
+			List<AnalysisDAO> analList = as.getAnalysisQuestionList(a_no);
 			List<AnalysisDAO> selectList = as.getAnalysisSelectList();
 			
 			// 접속중인 유저가 응답한 복수 문항 처리
