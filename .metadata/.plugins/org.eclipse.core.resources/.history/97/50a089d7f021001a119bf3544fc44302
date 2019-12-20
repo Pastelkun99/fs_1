@@ -1,0 +1,85 @@
+package com.fusion1.dao;
+
+public class MultiBoardVO {
+
+	private int board_no;
+	private String board_name;
+	private int board_type;
+	private String board_reboardyn;
+	private String board_replyyn;
+	private String board_secretyn;
+	private int cnt;
+	private int board_order;
+
+	public int getBoard_no() {
+		return board_no;
+	}
+
+	public void setBoard_no(int board_no) {
+		this.board_no = board_no;
+	}
+
+	public String getBoard_name() {
+		return board_name;
+	}
+
+	public void setBoard_name(String board_name) {
+		this.board_name = board_name;
+	}
+
+	public int getBoard_type() {
+		return board_type;
+	}
+
+	public void setBoard_type(int board_type) {
+		this.board_type = board_type;
+	}
+
+	public String getBoard_reboardyn() {
+		return board_reboardyn;
+	}
+
+	public void setBoard_reboardyn(String board_reboardyn) {
+		this.board_reboardyn = board_reboardyn;
+	}
+
+	public String getBoard_replyyn() {
+		return board_replyyn;
+	}
+
+	public void setBoard_replyyn(String board_replyyn) {
+		this.board_replyyn = board_replyyn;
+	}
+
+	public String getBoard_secretyn() {
+		return board_secretyn;
+	}
+
+	public void setBoard_secretyn(String board_secretyn) {
+		this.board_secretyn = board_secretyn;
+	}
+
+	public int getCnt() {
+		return cnt;
+	}
+
+	public void setCnt(int cnt) {
+		this.cnt = cnt;
+	}
+	
+	public int getBoard_order() {
+		return board_order;
+	}
+
+	public void setBoard_order(int board_order) {
+		this.board_order = board_order;
+	}
+
+	@Override
+	public String toString() {
+		return "MultiBoardVO [board_no=" + board_no + ", board_name=" + board_name + ", board_type=" + board_type
+				+ ", board_reboardyn=" + board_reboardyn + ", board_replyyn=" + board_replyyn + ", board_secretyn="
+				+ board_secretyn + ", cnt=" + cnt + ", board_order=" + board_order + "]";
+	}
+
+}

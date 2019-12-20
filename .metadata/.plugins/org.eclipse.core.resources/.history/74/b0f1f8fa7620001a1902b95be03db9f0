@@ -1,0 +1,24 @@
+package com.fusion1.service;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fusion1.dao.ArticleVO;
+import com.fusion1.dao.MultiBoardVO;
+
+public class MultiBoardServiceImpl implements MultiBoardService {
+	
+	@Resource(name="sqlSession")
+	@Autowired
+	SqlSession sqlSession;
+
+	@Override
+	public List<ArticleVO> getArticleListByBoardNo(MultiBoardVO multiVO) {
+		return sqlSession.selectList("getArticleListByBoardNo", multiVO);
+	}
+
+}

@@ -59,3 +59,6 @@
 11월 29, 2019 14:51:12.57 [2920:8800:1129/145112.570:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -7
 11월 29, 2019 14:51:12.62 [2920:8800:1129/145112.625:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -106
 11월 29, 2019 14:51:39.99 [2920:8800:1129/145139.991:ERROR:connection_factory_impl.cc(417)] Failed to connect to MCS endpoint with error -118
+
+12월 19, 2019 08:14:44.06 NEW SESSION
+12월 19, 2019 08:14:44.06 [13780:1916:1219/081444.066:ERROR:data_pack.cc(117)] Could not open pak file for writing: ��û�� �۾���, ����ڰ� ������ ������ ���� �ִ� ������ ���Ͽ��� ������ �� �����ϴ�. (0x4C8)

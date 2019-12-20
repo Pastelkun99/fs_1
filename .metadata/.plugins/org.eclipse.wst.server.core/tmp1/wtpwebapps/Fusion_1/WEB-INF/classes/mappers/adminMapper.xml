@@ -38,4 +38,34 @@
 		DELETE FROM POPUPTBL WHERE pop_id = #{pop_id}
 	</delete>
 	
+	<select id="getMultiBoardList" resultType="MultiBoardVO">
+		SELECT * FROM multiboardtbl ORDER BY board_order;
+	</select>
+	
+	<insert id="newBoardAppend" parameterType="MultiBoardVO">
+		INSERT INTO multiboardtbl VALUES (0, #{board_name}, #{board_type}, #{board_reboardyn}, #{board_replyyn}, #{board_secretyn}, null)
+	</insert>
+	
+	<select id="getMultiBoardOne" parameterType="MultiBoardVO" resultType="MultiBoardVO">
+		SELECT * FROM multiboardtbl WHERE board_no = #{board_no}
+	</select>
+	
+	<update id="boardInfoUpdate" parameterType="MultiBoardVO">
+		UPDATE multiboardtbl SET 
+								board_name = #{board_name}, 
+								board_type = #{board_type},
+								board_reboardyn = #{board_reboardyn},
+								board_replyyn = #{board_replyyn},
+								board_secretyn = #{board_secretyn}
+							WHERE
+								board_no = #{board_no} 
+	</update>
+	
+	<delete id="boardInfoDelete" parameterType="MultiBoardVO">
+		DELETE FROM multiboardtbl WHERE board_no = #{board_no}
+	</delete>
+	
+	<update id="boardOrderUpdate" parameterType="MultiBoardVO">
+		UPDATE multiboardtbl SET board_order = #{board_order} WHERE board_no = #{board_no}
+	</update>
 </mapper>

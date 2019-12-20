@@ -1,0 +1,75 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ page session="true" pageEncoding="UTF-8"%>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+	crossorigin="anonymous">
+<script
+	src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+	crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<html>
+<head>
+<title>게시글 상세보기 - ${article.article_title }</title>
+</head>
+<body>
+	<div class="row">
+		<div class="col-xs-2 col-md-2"></div>
+		<div class="col-xs-8 col-md-8">
+			<h2 class="text-center">게시글 수정</h2>
+			<p>&nbsp;</p>
+			<div class="table table-responsive">
+			<form action="${pageContext.request.contextPath }/reArticleWrite.do" id="reArticleWrite" method="post">
+				<table class="table">
+						<tr>
+							<th class="table-success">작성자</th>
+							<td>${sessionScope.username }</td>
+							<th class="table-success">작성일</th>
+							<td>${date }</td>
+							<c:if test="${boardConfig.board_secretyn eq 'Y' }">
+								<select name="article_secretyn" id="article_secretyn" class="form-control" style="float:right; width:100px;">
+									<option value="N">일반글</option>
+									<option value="Y">비밀글</option>
+								</select>
+								<!-- 이 레이어는 보이지 않음 -->
+								<div class="layer">
+									<input type="password" id="article_password" class="form-control" name="article_password">
+								</div>
+							</c:if>
+						</tr>
+						<tr>
+							<th class="table-success">제목</th>
+							<td colspan="3"><input type="text" name="article_title" id="article_title" class="form-control" value="Re : ${article.article_title}"/></td>
+						</tr>
+						<tr>
+							<th class="table-success">글 내용</th>
+							<td colspan="3"><textarea class="summernote" name="article_content" id="article_content" rows="20" height="500px"></textarea></td>
+						</tr>
+					</table>
+				<input type="hidden" name="article_no" id="article_no" value=${article.article_no }>
+				<input type="hidden" name="board_no" id="board_no" value=${param.board_no }>
+				<input type="hidden" name="article_parentsno" id="article_parentsno" value=${article.article_parentsno }>
+				<input type="hidden" name="article_writer" id="article_writer" value="${sessionScope.username }"/>
+				<input type="hidden" name="article_userid" id="article_userid" value="${sessionScope.userid }"/>
+				<input type="hidden" name="article_grouporder" id="article_grouporder" value="${article.article_grouporder }"/>
+				<input type="hidden" name="article_groupdepth" id="article_groupdepth" value="${article.article_groupdepth }"/>
+				<button type="button" class="btn btn-primary" onclick="reArticleWrite();">작성 완료</button>
+				<button type="button" class="btn btn-danger" onclick="history.back();">돌아가기</button>
+			</form>
+			</div>
+		</div>
+	</div>
+<script type="text/javascript">
+	function reArticleWrite() {
+		var board_no = $('#board_no').val();
+		var article_writer = $('#article_writer').val();
+		var article_userid = $('#article_userid').val();
+		var article_content = $('#article_content').val();
+		var article_secretyn = $('#article_secretyn').val();
+	}
+</script>
+</body>
+</html>

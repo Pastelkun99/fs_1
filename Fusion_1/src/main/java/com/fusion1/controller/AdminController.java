@@ -1,13 +1,18 @@
 package com.fusion1.controller;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fusion1.dao.AnalysisDAO;
 import com.fusion1.dao.InfoVO;
+import com.fusion1.dao.MultiBoardVO;
 import com.fusion1.dao.PopupVO;
 import com.fusion1.dao.QuestionVO;
 import com.fusion1.dao.SelectVO;
@@ -22,6 +28,10 @@ import com.fusion1.dao.UserVO;
 import com.fusion1.service.AdminServiceImpl;
 import com.fusion1.service.AnalysisServiceImpl;
 import com.fusion1.service.UserServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import net.sf.json.JSONObject;
 
 @Controller
 public class AdminController {
@@ -135,8 +145,8 @@ public class AdminController {
 			return "adminManageAnalysis";
 			
 		} else if(mode.equals("popup")) {
+			// 팝업 관리 모드
 			int requestPopup = Integer.parseInt(request.getParameter("pop_id"));
-			//System.out.println("requestpopup : " + requestPopup);
 			
 			// 팝업 정보를 불러온다.
 			List<PopupVO> popList = as.getPopupInfoList();
@@ -144,16 +154,22 @@ public class AdminController {
 			temp.setPop_id(requestPopup);
 			PopupVO popup = as.getPopupInfo(temp);
 			if(popup == null) {
-				//System.out.println("조건에 만족하는 팝업이 없음.");
+				// 조건을 만족하는 팝업이 없는 경우 테스트
+				System.out.println("조건에 맞는 팝업이 없습니다.");
 			} else {
-				//System.out.println("뷰에서 부려주는 정보 : " + popup.toString());
-				// 가져올 수 있는 팝업이 있다면 이를 불러온다.
+				// 팝업이 있는 경우 model을 통해 View에 전달
 				model.addAttribute("popupInfo", popup);
 			}
 			model.addAttribute("popList", popList);
 			return "adminManagePopup";
 			
+		} else if(mode.equals("board")) {
+			// 게시판 관리모드
+			List<MultiBoardVO> multiList = as.getMultiBoardList();
+			model.addAttribute("multiList", multiList);
+			return "adminManageBoard";
 		} else  {
+			// 그 외 다른 url로 접속하려고 할 시 이를 불허한다.
 			model.addAttribute("msg", "허용되지 않은 페이지 이동입니다.");
 			model.addAttribute("href", request.getContextPath() + "/mng/adminManagement.do?mode=user");
 			return "alert";
@@ -161,6 +177,7 @@ public class AdminController {
 		
 	}
 	
+	// 유저관리 페이지에서 유저 아이디를 클릭했을 때, 새 창을 띄워 정보를 표시해준다.
 	@RequestMapping(value="/mng/userInfo.do", method=RequestMethod.GET)
 	public String userInfo(@RequestParam("userid") String userid, Model model) {
 		UserVO userInfo = us.getUserInfo(userid);
@@ -168,14 +185,17 @@ public class AdminController {
 		return "userinfo";
 	}
 	
+	// 유저의 정보를 수정하기위해 ajax를 통해 명령을 보낸다.
+	// 유저를 삭제하는 명령은 만들지 않음.
 	@RequestMapping(value="/mng/userInfoUpdate.do")
 	@ResponseBody
 	public String updateUserInfo(UserVO userVO) {
-		System.out.println(userVO.toString());
+		//System.out.println(userVO.toString());
 		int result = us.userInfoUpdate(userVO);
 		return String.valueOf(result);
 	}
 	
+	// 팝업을 수정하려고 할 때, 해당 팝업의 DB값을 화면에 보여주고, 이를 수정 가능하도록 한다.
 	@RequestMapping(value="/mng/popupModify.do")
 	public String popupModify(Model model, @RequestParam("pop_id") int pop_id) {
 		PopupVO temp = new PopupVO();
@@ -185,27 +205,32 @@ public class AdminController {
 		return "popupModify";
 	}
 	
+	// 팝업 정보를 수정하고 이를 update한다.
+	@RequestMapping(value="/mng/popupInfoUpdate.do")
+	@ResponseBody
+	public String popupInfoUpdate(PopupVO popupVO) {
+		//System.out.println(popupVO.toString());
+		int result = as.updatePopupInfo(popupVO);
+		return String.valueOf(result);
+	}
+	
+	// 팝업을 새로 등록할 때, 새 창을 띄워 처리한다.
 	@RequestMapping(value="/mng/popupInsert.do", method=RequestMethod.GET)
 	public String popupInsert(Model model, PopupVO popupVO) {
 		return "popupInsert";
 	}
 	
+	// 내용을 작성하고 완료 버튼을 누르면, 해당 정보를 저장하고 DB에 등록한다.
 	@RequestMapping(value="/mng/popupInsert.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String popupInsertPost(Model model, PopupVO popupVO) {
-		System.out.println("포스트로 들어온 것 : " + popupVO.toString());
 		int result = as.insertPopupInfo(popupVO);
 		return String.valueOf(result);
 	}
 	
-	@RequestMapping(value="/mng/popupInfoUpdate.do")
-	@ResponseBody
-	public String popupInfoUpdate(PopupVO popupVO) {
-		System.out.println(popupVO.toString());
-		int result = as.updatePopupInfo(popupVO);
-		return String.valueOf(result);
-	}
-	
+	// 팝업을 띄운다.
+	// 팝업의 정보는 DB에 저장되어 있고, BoardList 로딩이 완료되면 새창을 띄우고 이 url로 이동시킨다.
+	// DB에 있는 팝업의 정보 중 팝업을 보일 조건을 만족하는 가장 최근의 팝업을 불러와 View에 뿌려주는 것 
 	@RequestMapping(value="/mng/showPopup.do")
 	public String showPopup(Model model) {
 		PopupVO popup = as.getPopupAval();
@@ -222,14 +247,16 @@ public class AdminController {
 		return "popup";
 	}
 	
-	@RequestMapping(value="/mng/popupInfoInsert.do", method=RequestMethod.POST)
+	// 중복된 컨트롤러 메소드 주석처리함
+	/*@RequestMapping(value="/mng/popupInfoInsert.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String popupInfoInsert(PopupVO popupVO) {
-		System.out.println(popupVO.toString());
+		//System.out.println(popupVO.toString());
 		int result = as.insertPopupInfo(popupVO);
 		return String.valueOf(result);
-	}
+	}*/
 	
+	// 팝업 정보를 삭제한다.
 	@RequestMapping(value="/mng/popupDelete.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String popupDeletePost(PopupVO popupVO) {
@@ -237,6 +264,8 @@ public class AdminController {
 		return String.valueOf(result);
 	}
 	
+	
+	// 질문 정보를 불러온다.
 	@RequestMapping(value="/mng/questionInfo.do")
 	public String questionInfo(Model model, @RequestParam("a_no") int a_no, @RequestParam("q_no") int q_no) {
 		
@@ -244,32 +273,40 @@ public class AdminController {
 		temp.setA_no(a_no);
 		temp.setQ_no(q_no);
 		
+		// 특정 문제의 정보를 불러온다.
 		QuestionVO question = ans.getQuestionInfo(temp);
+		// 해당 문제에 엮인 문항을 불러온다.
 		List<SelectVO> selectionList = ans.getSelectionList();
 		
+		// 질문 정보와 그에 대한 문항 정보를 전송한다.
 		model.addAttribute("question", question);
 		model.addAttribute("selectionList", selectionList);
 		return "questionInfo";
 	}
 	
+	
+	// 수정한 질문 내용을 DB에 업데이트한다.
 	@RequestMapping(value="/mng/questionUpdate.do")
 	@ResponseBody
 	public String questionUpdate(QuestionVO questionVO) {
-		System.out.println(questionVO.toString());
+		//System.out.println(questionVO.toString());
 		int result = ans.updateQuestion(questionVO);
 		return String.valueOf(result);
 	}
 	
+	// 질문을 새롭게 추가한다.
 	@RequestMapping(value="/mng/questionAppend.do")
 	public String questionAppend(@RequestParam("a_no") int a_no, Model model) {
 		List<SelectVO> selectionList = ans.getSelectionList();
 		QuestionVO count = ans.getQuestionCount(a_no);
 		int cnt = count.getCnt() + 1;
 		model.addAttribute("selectionList", selectionList);
+		// 질문을 추가할때 어떤 번호에 추가될 것인지 지정.
 		model.addAttribute("count", cnt);
 		return "questionAppend";
 	}
 	
+	// 질문을 추가했을때 DB에 반영한다.
 	@RequestMapping(value="/mng/questionAppend.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String questionAppendForm(QuestionVO questionVO) {
@@ -278,6 +315,7 @@ public class AdminController {
 		return String.valueOf(result);
 	}
 	
+	// 질문을 삭제한다.
 	@RequestMapping(value="/mng/questionDelete.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String questionDelete(QuestionVO questionVO) {
@@ -286,6 +324,7 @@ public class AdminController {
 		return String.valueOf(result);
 	}
 	
+	// 객관식 단수 선택 문항을 추가할 때 몇번에 추가될지 판단한다.
 	@RequestMapping(value="/mng/newOddGroup.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String newOddGroup(SelectVO selectVO) {
@@ -294,6 +333,7 @@ public class AdminController {
 		return String.valueOf(result);
 	}
 	
+	// 객관식 복수 선택 문항을 추가할 때 몇번에 추가될지 판단한다.
 	@RequestMapping(value="/mng/newEvenGroup.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String newEvenGroup(SelectVO selectVO) {
@@ -302,6 +342,7 @@ public class AdminController {
 		return String.valueOf(result);
 	}
 	
+	// 문항정보를 업데이트 하고자 할 때 사용된다.
 	@RequestMapping(value="/mng/selectionUpdate.do", method=RequestMethod.GET)
 	public String updateSelection(SelectVO selectVO, Model model) {
 		System.out.println(selectVO.toString());
@@ -310,6 +351,7 @@ public class AdminController {
 		return "selectionModify";
 	}
 	
+	// 업데이트 시 DB에 등록한다.
 	@RequestMapping(value="/mng/selectionUpdate.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String updateSelectionPost(SelectVO selectVO, Model model) {
@@ -318,6 +360,36 @@ public class AdminController {
 		return String.valueOf(result);
 	}
 	
+	// 문항을 추가한다.
+	@RequestMapping(value="/mng/selectionAppend.do", method=RequestMethod.GET)
+	public String selectionInsert(@RequestParam("q_selection") int q_selection, Model model) {
+		SelectVO select = ans.getSelectionInfoCount(q_selection);
+		int count = select.getCnt();
+		String q_type = select.getQ_type();
+		model.addAttribute("count", count);
+		model.addAttribute("q_type", q_type);
+		return "selectionAppend";
+	}
+	
+	// 새창에 작성한 정보를 DB에 연동, 추가한다.
+	@RequestMapping(value="/mng/selectionAppend.do", method=RequestMethod.POST)
+	@ResponseBody
+	public String selectionAppendPost(SelectVO selectVO) {
+		System.out.println(selectVO.toString());
+		int result = ans.selectionAppend(selectVO);
+		return String.valueOf(result);
+	}
+	
+	// 문항을 삭제한다.
+	@RequestMapping(value="/mng/deleteSelection.do", method=RequestMethod.POST)
+	@ResponseBody
+	public String deleteSelectionPost(SelectVO selectVO) {
+		System.out.println(selectVO.toString());
+		int result = ans.deleteSelection(selectVO);
+		return String.valueOf(result);
+	}
+	
+	// 설문조사 등록 정보를 추가한다.
 	@RequestMapping(value="/mng/infoAppend.do", method=RequestMethod.GET)
 	public String infoAppend(Model model) {
 		InfoVO info = ans.getAnalysisCount();
@@ -332,6 +404,7 @@ public class AdminController {
 		return "infoAppend";
 	}
 	
+	// 내용을 채우면 DB에 업데이트한다.
 	@RequestMapping(value="/mng/infoAppend.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String infoAppendPost(InfoVO infoVO) {
@@ -340,6 +413,7 @@ public class AdminController {
 		return String.valueOf(result);
 	}
 	
+	// 설문조사 등록 정보를 업데이트한다.
 	@RequestMapping(value="/mng/infoUpdate.do", method=RequestMethod.GET)
 	public String infoModify(@RequestParam("a_no") int a_no, Model model) {
 		InfoVO info = ans.getAnalysisInfo(a_no);
@@ -347,46 +421,87 @@ public class AdminController {
 		return "infoModify";
 	}
 	
+	// 설문조사 등록 정보을 채워넣었으면 이를 DB에 업데이트한다.
 	@RequestMapping(value="/mng/infoUpdate.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String infoUpdatePost(InfoVO infoVO) {
-		System.out.println(infoVO.toString());
+		//System.out.println(infoVO.toString());
 		int result = ans.infoUpdate(infoVO);
 		return String.valueOf(result);
 	}
 	
+	// 설문조사 진행 정보를 삭제한다.
 	@RequestMapping(value="/mng/infoDelete.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String infoDeletePost(InfoVO infoVO) {
-		System.out.println(infoVO.toString());
 		int result = ans.infoDelete(infoVO);
 		int result2 = ans.infoDeleteTrigger(infoVO);
 		return String.valueOf(result);
 	}
 
-	@RequestMapping(value="/mng/selectionAppend.do", method=RequestMethod.GET)
-	public String selectionInsert(@RequestParam("q_selection") int q_selection, Model model) {
-		SelectVO select = ans.getSelectionInfoCount(q_selection);
-		int count = select.getCnt();
-		String q_type = select.getQ_type();
-		model.addAttribute("count", count);
-		model.addAttribute("q_type", q_type);
-		return "selectionAppend";
+	
+	
+	
+	// 게시판을 등록함
+	@RequestMapping(value="/mng/newBoardAppend.do", method=RequestMethod.GET)
+	public String newBoardAppend() {
+		return "multi/newBoardAppend";
 	}
 	
-	@RequestMapping(value="/mng/selectionAppend.do", method=RequestMethod.POST)
+	// 게시판 등록 포스트
+	@RequestMapping(value="/mng/newBoardAppend.do", method=RequestMethod.POST)
 	@ResponseBody
-	public String selectionAppendPost(SelectVO selectVO) {
-		System.out.println(selectVO.toString());
-		int result = ans.selectionAppend(selectVO);
+	public String newBoardAppendPost(MultiBoardVO multiboardVO) {
+		int result = as.newBoardAppend(multiboardVO);
 		return String.valueOf(result);
 	}
 	
-	@RequestMapping(value="/mng/deleteSelection.do", method=RequestMethod.POST)
+	// 게시판을 수정함
+	@RequestMapping(value="/mng/boardInfoUpdate.do", method=RequestMethod.GET)
+	public String boardInfoUpdate(@RequestParam("board_no") int board_no, Model model) {
+		MultiBoardVO temp = new MultiBoardVO();
+		temp.setBoard_no(board_no);
+		MultiBoardVO board = as.getMultiBoardOne(temp);
+		model.addAttribute("board", board);
+		return "multi/boardInfoUpdate";
+	}
+	
+	// 게시판 정보 수정 포스트
+	@RequestMapping(value="/mng/boardInfoUpdate.do", method=RequestMethod.POST)
 	@ResponseBody
-	public String deleteSelectionPost(SelectVO selectVO) {
-		System.out.println(selectVO.toString());
-		int result = ans.deleteSelection(selectVO);
+	public String boardInfoUpdatePost(MultiBoardVO multiBoardVO, @RequestParam("board_no") int board_no) {
+		multiBoardVO.setBoard_no(board_no);
+		System.out.println(multiBoardVO.toString());
+		int result = as.boardInfoUpdate(multiBoardVO);
 		return String.valueOf(result);
 	}
+	
+	// 게시판을 삭제함
+	@RequestMapping(value="/mng/boardInfoDelete.do", method=RequestMethod.POST)
+	@ResponseBody
+	public String boardInfoDeletePost(MultiBoardVO multiBoardVO) {
+		int result = as.boardInfoDelete(multiBoardVO);
+		return String.valueOf(result);
+	}
+	
+	// 게시판 순서 반영
+	@RequestMapping(value="/mng/boardOrderCommit.do", method=RequestMethod.POST)
+	@ResponseBody
+	public String boardOrderCommitPost(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
+		//System.out.println(params.toString());
+		
+		MultiBoardVO thisBoardinfo = new MultiBoardVO();
+		thisBoardinfo.setBoard_no(Integer.parseInt((String)params.get("board_no")));
+		thisBoardinfo = as.getMultiBoardOne(thisBoardinfo);
+		
+		//System.out.println("업데이트 이전 : " + thisBoardinfo.toString());
+		thisBoardinfo.setBoard_order((int)params.get("board_order") + 1);
+		int result = as.boardOrderUpdate(thisBoardinfo);
+		//System.out.println("업데이트 이후 : " + thisBoardinfo.toString() );
+		
+		return String.valueOf(result);
+	}
+	
+	
+	
 }

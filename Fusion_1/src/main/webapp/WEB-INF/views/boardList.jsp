@@ -75,6 +75,7 @@ function windowPopup() {
 					<h2>${sessionScope.username }님 환영합니다.</h2>
 					</br>
 					<button type="button" class="btn btn-danger" onClick="logoutLogic();">로그아웃</button>
+					<button type="button" class="btn btn-danger" onClick="location.href = '${pageContext.request.contextPath}/multi/boardList.do?board_no=-1&page_no=1&pageSize=10'">신페이지로 이동</button>
 					<button type="button" class="btn btn-primary" onClick="javascript:void(window.open('boardWrite.do', '_blank', 'location=no, toolbar=no, menubar=no, scrollbars=no, resizable=no')); return false;">새 글 쓰기</button>
 					<button type="button" class="btn btn-info" onClick="location.href='${pageContext.request.contextPath }/boardList.do?page_no=1&pageSize=${page.pageList}&searchCon=0&keyword='">게시판 보기</button>
 					<!-- Button trigger modal -->

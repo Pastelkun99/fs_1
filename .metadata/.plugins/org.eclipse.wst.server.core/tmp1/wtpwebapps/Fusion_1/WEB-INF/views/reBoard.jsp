@@ -68,7 +68,7 @@
 				var board_parentsno = document.getElementById('board_parentsno').value;
 				var board_userid = document.getElementById('board_userid').value;
 				var board_title = document.getElementById('board_title').value;
-				var board_content = CKEDITOR.instances['board_content'].getData();
+				var board_content = document.getElementById('board_content').value;
 				var board_writer = document.getElementById('board_writer').value;
 				var board_grouporder = document.getElementById('board_grouporder').value;
 				var board_groupdepth = document.getElementById('board_groupdepth').value;

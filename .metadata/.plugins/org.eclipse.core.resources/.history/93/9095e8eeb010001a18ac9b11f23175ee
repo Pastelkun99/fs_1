@@ -1,5 +1,0 @@
-package com.fusion1.interceptor;
-
-public class AuthenticationInterceptor {
-
-}

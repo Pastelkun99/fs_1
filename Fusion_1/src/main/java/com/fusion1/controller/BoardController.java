@@ -76,7 +76,7 @@ public class BoardController {
 			return "home";
 		} else {
 			model.addAttribute("msg", "이미 로그인 되어 있습니다.");
-			model.addAttribute("href", "/boardList.do?page_no=1&pageSize=10");
+			model.addAttribute("href", "multi/boardList.do?board_no=-1&page_no=1&pageSize=10");
 			return "alert";
 		}
 		
@@ -88,7 +88,7 @@ public class BoardController {
 			
 			PopupVO temp = new PopupVO();
 			PopupVO popup = ads.getPopupAval();
-			System.out.println("게시판에서 뿌려지는 팝업 : " + popup.toString());
+			//System.out.println(" 뿌려지는 팝업 : " + popup.toString());
 			model.addAttribute("pop_id", popup.getPop_id());
 			model.addAttribute("pop_title", popup.getPop_title());
 			model.addAttribute("pop_fromdate", popup.getPop_fromdate());
@@ -105,7 +105,6 @@ public class BoardController {
 			
 			// 페이지에서 지정한 갯수 (몇 개씩 보여줄 것인가)
 			int getPageSize = page.getPageSize();
-			
 			int getPage_no = page.getPage_no();
 			
 			// 끝 페이지가 될 숫자. 
@@ -187,6 +186,7 @@ public class BoardController {
 		}
 	}
 	
+	// 글 상세 보기
 	@RequestMapping(value="/board.do", method=RequestMethod.GET)
 	public String board(HttpSession session, @RequestParam("board_no") int board_no, Model model) {
 		String currentID = (String)session.getAttribute("userid");
@@ -212,6 +212,7 @@ public class BoardController {
 		}
 	}
 	
+	// 글쓰기 (빈칸)
 	@RequestMapping(value="/boardWrite.do", method=RequestMethod.GET)
 	public String boardWrite(Model model, HttpSession session) {
 		String currentUser = (String)session.getAttribute("userid");
@@ -231,6 +232,7 @@ public class BoardController {
 		
 	}
 	
+	// 글쓰기 포스트
 	@RequestMapping(value="/boardWrite.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String boardWrite(BoardVO boardVO, Model model, HttpServletRequest request) {
@@ -445,6 +447,7 @@ public class BoardController {
 		
 		
 		// 해당 dateMap을 통해 로그를 테이블에 뿌려주기 위함
+		
 		// ***** 리스트 로드 작업 시작 *****
 		List<LogVO> logList = ls.getLogList(dateMap);
 		model.addAttribute("logList", logList);

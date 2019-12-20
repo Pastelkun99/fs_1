@@ -55,7 +55,7 @@ public class UserController {
 				session.setAttribute("username", uservo.getUsername());
 				session.setAttribute("LoginAdminPage", 0);
 				model.addAttribute("msg", "로그인에 성공했습니다.");
-				model.addAttribute("href", "/boardList.do?page_no=1&pageSize=10");
+				model.addAttribute("href", "/multi/boardList.do?board_no=-1&page_no=1&pageSize=10");
 				return "alert";
 			} else {
 				// 일치하지 않을 경우 경고창 반환.

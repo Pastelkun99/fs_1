@@ -64,6 +64,8 @@ SELECT * FROM ANSWERTBL ORDER BY q_no;
 insert into infotbl values (0, '퓨전소프트 만족도 조사', '퓨전소프트', '회원', '2019-11-20', '2019-12-31', '2020-1-1', 1);
 insert into infotbl values (0, '구윤모의 잘생김 조사', '퓨전소프트', '회원', '2019-11-25', '2019-12-04', '2020-1-1', 0);
 
+select * from infotbl WHERE a_fromdate <= now() AND a_todate >= now() AND a_aval = 1;
+
 SELECT * FROM ANSWERTBL WHERE q_no = 17 ORDER BY a_number DESC limit 2;
 DELETE from answertbl where a_value = '기타';
 
@@ -88,6 +90,8 @@ SELECT * FROM ANSWERTBL WHERE q_no =19 AND a_isetc = 1;
 update questiontbl set q_type = '000' where q_no = 16;
 
 SELECT * FROM ANSWERTBL where q_id = 'admin';
+
+truncate infotbl;
 
 update infotbl set a_submitter = '퓨전소프트 회원' Where a_no = 1;
 
@@ -152,6 +156,8 @@ update questiontbl set q_value = '위의 서비스를 선택한 이유는 무엇
 update questiontbl set q_type = '000' where q_no = 16;
 
 delete from questiontbl where q_no = 6;
+
+SELECT DISTINCT q_selection FROM SELECTTBL ORDER BY q_selection;
 
 INSERT QUESTIONTBL VALUES (0, 1, '[주관식]', '주관식 테스트 질문', '002', '1112', 2);
 

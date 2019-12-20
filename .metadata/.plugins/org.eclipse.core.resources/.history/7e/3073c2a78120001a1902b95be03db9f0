@@ -1,0 +1,12 @@
+package com.fusion1.service;
+
+import java.util.List;
+
+import com.fusion1.dao.ArticleVO;
+import com.fusion1.dao.MultiBoardVO;
+
+public interface MultiBoardService {
+
+	public List<ArticleVO> getArticleListByBoardNo(MultiBoardVO multiVO);
+	
+}

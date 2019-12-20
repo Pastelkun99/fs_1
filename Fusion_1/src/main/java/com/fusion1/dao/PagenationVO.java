@@ -36,6 +36,8 @@ public class PagenationVO {
 	// 게시물 번호를 처리하기 위함
 	private int pageBoardNo;
 	
+	private int board_no;
+	
 	
 	public int getPage_no() {
 		return page_no;
@@ -116,12 +118,21 @@ public class PagenationVO {
 	public void setPageBoardNo(int pageBoardNo) {
 		this.pageBoardNo = pageBoardNo;
 	}
+	
+	public int getBoard_no() {
+		return board_no;
+	}
+
+	public void setBoard_no(int board_no) {
+		this.board_no = board_no;
+	}
 
 	@Override
 	public String toString() {
 		return "PagenationVO [page_no=" + page_no + ", pageSize=" + pageSize + ", totalCount=" + totalCount
 				+ ", pageList=" + pageList + ", startPage=" + startPage + ", endPage=" + endPage + ", pageCon="
-				+ pageCon + ", keyword=" + keyword + ", searchCon=" + searchCon + ", pageBoardNo=" + pageBoardNo + "]";
+				+ pageCon + ", keyword=" + keyword + ", searchCon=" + searchCon + ", pageBoardNo=" + pageBoardNo
+				+ ", board_no=" + board_no + "]";
 	}
-
+	
 }

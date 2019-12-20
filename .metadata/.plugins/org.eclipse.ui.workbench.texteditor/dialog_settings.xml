@@ -6,22 +6,23 @@
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="" key="selection"/>
+		<item value="System" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="새로운 문항"/>
-			<item value="anal.do"/>
-			<item value="1117`"/>
-			<item value="q_selection"/>
-			<item value="adminmanagement.do"/>
-			<item value="as"/>
-			<item value="window.open"/>
-			<item value="fromdate"/>
+			<item value="순서"/>
+			<item value="ㄱ"/>
+			<item value="reboard"/>
+			<item value="check"/>
+			<item value="delete"/>
+			<item value="articledelete"/>
+			<item value="multi"/>
+			<item value="이미"/>
 		</list>
 		<list key="replacehistory">
+			<item value="article"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">

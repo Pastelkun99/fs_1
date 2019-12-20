@@ -60,7 +60,9 @@
 	
 	<update id="reWriteGroupOrder" parameterType="com.fusion1.dao.BoardVO">
 		<![CDATA[
-			UPDATE BOARDTBL SET board_grouporder = board_grouporder + 1 WHERE board_parentsno = #{board_parentsno} AND board_grouporder > #{board_grouporder}
+			UPDATE BOARDTBL 
+			SET board_grouporder = board_grouporder + 1 
+			WHERE board_parentsno = #{board_parentsno} AND board_grouporder > #{board_grouporder}
 		]]>
 	</update>
 	
@@ -68,36 +70,60 @@
 	<select id="getBoardSearchCount" parameterType="com.fusion1.dao.PagenationVO" resultType="int">
 		SELECT COUNT(*) FROM BOARDTBL
 		<if test="searchCon == 1">
-			WHERE board_title LIKE CONCAT('%', #{keyword}, '%') AND board_deletecon = 0 AND board_isnotice = 0 ORDER BY board_date DESC
+			WHERE 
+				board_title LIKE CONCAT('%', #{keyword}, '%') AND 
+										board_deletecon = 0 AND 
+										board_isnotice = 0 
+			ORDER BY board_date DESC
 		</if>
 		<if test="searchCon == 2">
-			WHERE board_content LIKE CONCAT('%', #{keyword}, '%') AND board_deletecon = 0 AND board_isnotice = 0 ORDER BY board_date DESC
+			WHERE 
+				board_content LIKE CONCAT('%', #{keyword}, '%') AND 
+				board_deletecon = 0 AND 
+				board_isnotice = 0 
+			ORDER BY board_date DESC
 		</if>
 		<if test="searchCon == 3">
-			WHERE board_writer LIKE CONCAT('%', #{keyword}, '%') AND board_deletecon = 0 AND board_isnotice = 0 ORDER BY board_date DESC
+			WHERE board_writer LIKE CONCAT('%', #{keyword}, '%') AND 
+				board_deletecon = 0 AND 
+				board_isnotice = 0 
+			ORDER BY board_date DESC
 		</if>
 		<if test="searchCon == 4">
 			WHERE board_title LIKE CONCAT('%', #{keyword}, '%') 
 			OR board_content LIKE CONCAT('%', #{keyword}, '%')
-			OR board_writer LIKE CONCAT('%', #{keyword}, '%') AND board_deletecon = 0 AND board_isnotice = 0
+			OR board_writer LIKE CONCAT('%', #{keyword}, '%') 
+			AND board_deletecon = 0 
+			AND board_isnotice = 0
 		</if>
 	</select>
 	
 	<select id="getBoardSearchList" parameterType="com.fusion1.dao.PagenationVO" resultType="com.fusion1.dao.BoardVO">
 		SELECT * FROM BOARDTBL
 		<if test="searchCon == 1">
-			WHERE board_title LIKE CONCAT('%', #{keyword}, '%') AND board_deletecon = 0 AND board_isnotice = 0 ORDER BY board_date DESC LIMIT #{pageCon}, #{pageList}
+			WHERE board_title LIKE CONCAT('%', #{keyword}, '%') AND 
+			board_deletecon = 0 AND 
+			board_isnotice = 0 
+			ORDER BY board_date DESC LIMIT #{pageCon}, #{pageList}
 		</if>
 		<if test="searchCon == 2">
-			WHERE board_content LIKE CONCAT('%', #{keyword}, '%') AND board_deletecon = 0 AND board_isnotice = 0 ORDER BY board_date DESC LIMIT #{pageCon}, #{pageList}
+			WHERE board_content LIKE CONCAT('%', #{keyword}, '%') AND
+			board_deletecon = 0 AND 
+			board_isnotice = 0 
+			ORDER BY board_date DESC LIMIT #{pageCon}, #{pageList}
 		</if>
 		<if test="searchCon == 3">
-			WHERE board_writer LIKE CONCAT('%', #{keyword}, '%') AND board_deletecon = 0 AND board_isnotice = 0 ORDER BY board_date DESC LIMIT #{pageCon}, #{pageList}
+			WHERE board_writer LIKE CONCAT('%', #{keyword}, '%') AND 
+			board_deletecon = 0 AND 
+			board_isnotice = 0 
+			ORDER BY board_date DESC LIMIT #{pageCon}, #{pageList}
 		</if>
 		<if test="searchCon == 4">
 			WHERE board_title LIKE CONCAT('%', #{keyword}, '%') 
 			OR board_content LIKE CONCAT('%', #{keyword}, '%')
-			OR board_writer LIKE CONCAT('%', #{keyword}, '%') AND board_deletecon = 0 AND board_isnotice = 0 LIMIT #{pageCon}, #{pageList}
+			OR board_writer LIKE CONCAT('%', #{keyword}, '%') 
+			AND board_deletecon = 0 
+			AND board_isnotice = 0 LIMIT #{pageCon}, #{pageList}
 		</if>
 	</select>
 	

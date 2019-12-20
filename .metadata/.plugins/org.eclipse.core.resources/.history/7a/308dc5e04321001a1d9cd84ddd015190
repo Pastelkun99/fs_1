@@ -1,0 +1,41 @@
+package com.fusion1.service;
+
+import java.util.List;
+
+import com.fusion1.dao.ArticleVO;
+import com.fusion1.dao.MultiBoardVO;
+import com.fusion1.dao.PagenationVO;
+
+public interface MultiBoardService {
+
+	// 해당 게시판 번호에 따른 게시글 리스트를 불러온다.
+	public List<ArticleVO> getArticleListByBoardNo(MultiBoardVO multiVO);
+	
+	// 해당 게시판 번호에 따른 게시글 갯수를 불러온다.
+	public ArticleVO getArticleCountByBoardNo(MultiBoardVO multiVO);
+	
+	// 해당 게시판 번호에 따른 게시글 검색 결과를 불러온다.
+	public List<ArticleVO> getArticleSearchList(PagenationVO page);
+	
+	// 해당 게시판 번호에 따른 게시글 검색 갯수를 불러온다.
+	public ArticleVO getArticleSearchCount(PagenationVO page);
+	
+	// 게시글의 정보를 불러온다.
+	public ArticleVO getArticleOne(int article_no);
+	
+	// 게시글의 조회수를 up 시킨다.
+	public int articleHitUpdate(int article_no);
+	
+	// 게시글을 삭제한다.
+	public int articleDelete(ArticleVO articleVO);
+	
+	// 게시글을 수정한다.
+	public int articleUpdate(ArticleVO articleVO);
+	
+	// 게시글을 등록한다.
+	public int articleInsert(ArticleVO articleVO);
+	
+	// 답글 처리를 위해 parentsno를 업데이트 하기 위함
+	public int articleParentsnoUpdate(int article_no);
+	 
+}

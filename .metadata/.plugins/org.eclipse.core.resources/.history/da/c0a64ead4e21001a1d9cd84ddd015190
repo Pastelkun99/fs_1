@@ -1,0 +1,57 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ page session="true" pageEncoding="UTF-8"%>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+	crossorigin="anonymous">
+<script
+	src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+	crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<html>
+<head>
+<title>게시글 상세보기 - ${board.board_title }</title>
+</head>
+<body>
+	</br>
+	</br>
+	<div class="row">
+		<div class="col-xs-2 col-md-2"></div>
+		<div class="col-xs-8 col-md-8">
+			<h2 class="text-center">게시글 수정</h2>
+			<p>&nbsp;</p>
+			<div class="table table-responsive">
+			<form action="${pageContext.request.contextPath }/reBoardWrite.do" id="reBoardWrite" method="post">
+				<table class="table">
+						<tr>
+							<th class="table-success">작성자</th>
+							<td>${sessionScope.username }</td>
+							<th class="table-success">작성일</th>
+							<td>${date }</td>
+						</tr>
+						<tr>
+							<th class="table-success">제목</th>
+							<td colspan="3"><input type="text" name="board_title" id="board_title" class="form-control" value="Re : ${board.board_title}"/></td>
+						</tr>
+						<tr>
+							<th class="table-success">글 내용</th>
+							<td colspan="3"><textarea class="summernote" name="board_content" id="board_content" rows="20" height="500px"></textarea></td>
+						</tr>
+					</table>
+				<input type="hidden" name="board_no" id="board_no" value=${board.board_no }>
+				<input type="hidden" name="board_parentsno" id="board_parentsno" value=${board.board_parentsno }>
+				<input type="hidden" name="board_writer" id="board_writer" value="${sessionScope.username }"/>
+				<input type="hidden" name="board_grouporder" id="board_grouporder" value="${board.board_grouporder }"/>
+				<input type="hidden" name="board_groupdepth" id="board_groupdepth" value="${board.board_groupdepth }"/>
+				<button type="button" class="btn btn-primary" onclick="reBoardWrite();">작성 완료</button>
+				<button type="button" class="btn btn-danger" onclick="history.back();">돌아가기</button>
+				<input type="hidden" name="board_userid" id="board_userid" value="${sessionScope.userid }"/>
+			</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
