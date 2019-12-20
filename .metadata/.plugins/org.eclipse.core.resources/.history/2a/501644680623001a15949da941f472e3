@@ -63,11 +63,8 @@ public class MultiBoardController {
 	
 	@RequestMapping(value="/multi/testFormArticle.do")
 	public String testFormArticle(BoardVO boardVO, Model model) {
-		int board_no = boardVO.getBoard_no();
-		BoardVO thisArticle = bs.getBoardOne(board_no);
-		model.addAttribute("article", thisArticle);
-		
-		return "multi/testFormArticle";
+		System.out.println(boardVO.toString());
+		return "";
 	}
 	
 	// 신 게시판의 리스트를 불러온다.

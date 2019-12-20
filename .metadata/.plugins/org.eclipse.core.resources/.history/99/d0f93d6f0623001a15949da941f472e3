@@ -67,7 +67,7 @@ public class MultiBoardController {
 		BoardVO thisArticle = bs.getBoardOne(board_no);
 		model.addAttribute("article", thisArticle);
 		
-		return "multi/testFormArticle";
+		return "";
 	}
 	
 	// 신 게시판의 리스트를 불러온다.

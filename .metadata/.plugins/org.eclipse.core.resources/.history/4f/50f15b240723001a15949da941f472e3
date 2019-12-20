@@ -55,7 +55,7 @@
 	}); */
 	function goToArticle(board_no) {
 		window.open("", "popup_window", "width=500px, height=500px");
-		$('#readArticle' + board_no).submit();
+		$('')
 	}	
 </script>
 </body>
