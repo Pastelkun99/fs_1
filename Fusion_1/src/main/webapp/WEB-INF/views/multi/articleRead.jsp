@@ -189,7 +189,7 @@
 		
 		$.ajax({
 			type : "GET",
-			url : "/getReplyList",
+			url : "/multi/getReplyList",
 			data : {"article_no" : article_no},
 			dataType : "json",
 			success : function(result) {

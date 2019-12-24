@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ page session="true"%>
 <meta charset="UTF-8">
 <link rel="stylesheet"
@@ -89,24 +90,7 @@
 <div class="row" style="margin-bottom: 3rem;"></div>
 		<div class="row" style="margin-left: 3rem; margin-right: 25rem;">
 			<div class="col-3" style="text-align: left; margin-top:10rem;">
-				<h4><a href="http://localhost:8080/multi/boardList.do?board_no=-1&page_no=1&pageSize=10">Board List</a></h4>
-				<%-- <c:forEach items="${boardList }" var="boardName">
-					<button type="button" 
-					<c:if test="${boardName.board_type eq 1 }">
-						class="btn-sm btn-primary" 
-					</c:if>
-					<c:if test="${boardName.board_type eq 0 }">
-						class="btn-sm btn-success" 
-					</c:if>
-					onClick="location.href='${pageContext.request.contextPath}/multi/boardList.do?board_no=${boardName.board_no }&page_no=1&pageSize=10'">${boardName.board_name }</button><br>
-				</c:forEach> --%>
-				<ul class="list-group">
-				<c:forEach items="${boardList }" var="boardName">
-				  <li class="list-group-item">
-				  	<c:if test="${boardName.board_type eq 1 }"><i class="fas fa-lightbulb"></i></c:if>
-				  	<a href="${pageContext.request.contextPath}/multi/boardList.do?board_no=${boardName.board_no }&page_no=1&pageSize=10">${boardName.board_name }</a></li>
-				</c:forEach>
-				</ul>
+				<jsp:include page="menubar.jsp"></jsp:include>
 			</div>
 			<div class="col-9">
 				<input type="hidden" id="popup" name="popup" onclick="windowPopup();">
@@ -124,11 +108,9 @@
 					<!-- Button trigger modal -->
 					<button type="button" class="btn btn-dark" data-toggle="modal" id="myModal" data-target="#exampleModalLong">공지사항 보기</button>
 					<c:if test="${sessionScope.isAdmin eq 1 }">
-						<button type="button" class="btn btn-dark" onClick="location.href='${pageContext.request.contextPath}/Chart.do?fromDate=&toDate='">관리자 통계 페이지</button>
-						<button type="button" class="btn btn-dark" onClick="location.href='${pageContext.request.contextPath}/mng/adminCheck.do'">관리자 페이지</button>
+						<button type="button" class="btn btn-outline-secondary" onClick="location.href='${pageContext.request.contextPath}/mng/adminCheck.do'">관리자 페이지</button>
 					</c:if>
-					<button type="button" class="btn btn-warning" onClick="location.href='${pageContext.request.contextPath}/anal.do'">설문조사 참여</button>
-					<button type="button" class="btn btn-dark" onClick="location.href='${pageContext.request.contextPath}/multi/testForm.do'">테스트 폼</button>
+					<%-- <button type="button" class="btn btn-dark" onClick="location.href='${pageContext.request.contextPath}/multi/testForm.do'">테스트 폼</button> --%>
 					
 					<c:if test="${param.board_no ne -1}">
 						<form name="pagefrm" method="get">

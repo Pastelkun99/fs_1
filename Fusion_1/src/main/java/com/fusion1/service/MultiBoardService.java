@@ -3,6 +3,7 @@ package com.fusion1.service;
 import java.util.List;
 
 import com.fusion1.dao.ArticleVO;
+import com.fusion1.dao.MenuVO;
 import com.fusion1.dao.MultiBoardVO;
 import com.fusion1.dao.PagenationVO;
 import com.fusion1.dao.ReadNoticeVO;
@@ -63,5 +64,5 @@ public interface MultiBoardService {
 	
 	// 알림형 게시판에 등록된 글 들 중 사용자가 읽지 않은 글을 불러온다.
 	public List<ArticleVO> getNonReadNoticeList(MultiBoardVO multiVO);
-	 
+	
 }

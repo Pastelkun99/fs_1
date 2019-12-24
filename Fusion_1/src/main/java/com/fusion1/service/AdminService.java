@@ -2,6 +2,7 @@ package com.fusion1.service;
 
 import java.util.List;
 
+import com.fusion1.dao.MenuVO;
 import com.fusion1.dao.MultiBoardVO;
 import com.fusion1.dao.PopupVO;
 
@@ -42,4 +43,23 @@ public interface AdminService {
 	
 	// 게시판의 order를 업데이트한다
 	public int boardOrderUpdate(MultiBoardVO multiBoardVO);
+	
+	// 메뉴 리스트를 불러온다.
+	public List<MenuVO> getMenuList();
+	
+	// 메뉴를 추가한다.
+	public int newMenuAppend(MenuVO menuVO);
+	
+	// 메뉴를 가져온다.
+	public MenuVO getMenuInfo(int menu_no);
+	
+	// 메뉴를 수정한다.
+	public int menuInfoUpdate(MenuVO menuVO);
+	
+	// 메뉴를 삭제한다.
+	public int menuInfoDelete(int menu_no);
+	
+	// 메뉴 순서를 업데이트한다.
+	public int menuOrderUpdate(MenuVO menuVO);
+	
 }

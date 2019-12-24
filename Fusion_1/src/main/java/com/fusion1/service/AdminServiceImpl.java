@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fusion1.dao.MenuVO;
 import com.fusion1.dao.MultiBoardVO;
 import com.fusion1.dao.PopupVO;
 
@@ -77,5 +78,37 @@ public class AdminServiceImpl implements AdminService {
 	public int boardOrderUpdate(MultiBoardVO multiBoardVO) {
 		return sqlSession.update("adminMapper.boardOrderUpdate", multiBoardVO);
 	}
+
+	@Override
+	public List<MenuVO> getMenuList() {
+		return sqlSession.selectList("adminMapper.getMenuList");
+	}
+	
+	@Override
+	public int newMenuAppend(MenuVO menuVO) {
+		return sqlSession.insert("adminMapper.newMenuAppend", menuVO);
+	}
+
+	@Override
+	public MenuVO getMenuInfo(int menu_no) {
+		return sqlSession.selectOne("adminMapper.getMenuInfo", menu_no);
+	}
+
+	@Override
+	public int menuInfoUpdate(MenuVO menuVO) {
+		return sqlSession.update("adminMapper.menuInfoUpdate", menuVO);
+	}
+
+	@Override
+	public int menuInfoDelete(int menu_no) {
+		return sqlSession.delete("adminMapper.menuInfoDelete", menu_no);
+	}
+
+	@Override
+	public int menuOrderUpdate(MenuVO menuVO) {
+		return sqlSession.update("adminMapper.menuOrderUpdate", menuVO);
+	}
+
+
 
 }

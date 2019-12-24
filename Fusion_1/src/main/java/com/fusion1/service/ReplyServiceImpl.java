@@ -2,6 +2,9 @@ package com.fusion1.service;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,10 @@ public class ReplyServiceImpl implements ReplyService {
 	
 	@Autowired
 	ReplyDAOImpl dao;
+	
+	@Autowired
+	@Resource(name="sqlSession")
+	SqlSession sqlSession;
 
 	@Override
 	public int replyWrite(ReplyVO reply) {
@@ -39,5 +46,52 @@ public class ReplyServiceImpl implements ReplyService {
 	public int updateReplyConfirm(ReplyVO reply) {
 		return dao.updateReplyConfirm(reply);
 	}
+
+	@Override
+	public int updateReplyParentsNo(ReplyVO reply) {
+		return dao.updateReplyParentsNo(reply);
+	}
+
+	@Override
+	public ReplyVO getReplyOne() {
+		return dao.getReplyOne();
+	}
+
+	@Override
+	public ReplyVO getReplyOneByNo(int reply_no) {
+		return dao.getReplyOneByNo(reply_no);
+	}
+
+	@Override
+	public int reReplyGroupOrder(ReplyVO replyVO) {
+		return dao.reReplyGroupOrder(replyVO);
+	}
+
+	@Override
+	public int reReplyWriteAction(ReplyVO replyVO) {
+		return dao.reReplyWriteAction(replyVO);
+	}
+
+	@Override
+	public int replyLikeAndHateAction(ReplyVO replyVO) {
+		return sqlSession.insert("replyMapper.replyLikeAndHateAction", replyVO);
+	}
+
+	@Override
+	public int replyLikeAndHateScoreAdjust(ReplyVO replyVO) {
+		return sqlSession.update("replyMapper.replyLikeAndHateScoreAdjust", replyVO);
+	}
+
+	@Override
+	public ReplyVO replyLikeAndHateConfirm(ReplyVO replyVO) {
+		return sqlSession.selectOne("replyMapper.replyLikeAndHateConfirm", replyVO);
+	}
+
+	@Override
+	public int replyLikeAndHateLogAdjust(ReplyVO replyVO) {
+		return sqlSession.update("replyMapper.replyLikeAndHateLogAdjust", replyVO);
+	}
+	
+	
 
 }

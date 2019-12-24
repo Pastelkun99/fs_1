@@ -10,6 +10,7 @@
 	src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
 	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
 	crossorigin="anonymous"></script>
+<script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <html>
 <head>
@@ -67,6 +68,12 @@
 			
 			<c:if test="${boardConfig.board_replyyn eq 'Y' }">
 				<hr>
+				<div class="btn-group" role="group" aria-label="Basic example">
+  					<button type="button" class="btn btn-secondary" onclick="getReplyListInNew();">최신순</button>
+  					<button type="button" class="btn btn-secondary" onclick="getReplyListInOld();">등록순</button>
+  					<button type="button" class="btn btn-secondary" onclick="getReplyListInScore();">평점순</button>
+				</div>
+				<hr>
 				<div class="row">
 					<div class="col-2">
 						작성자</br>
@@ -78,7 +85,7 @@
 						</c:if>
 					</div>
 					<div class="col-8">
-						<textarea id="replyContent" placeholder="댓글 내용을 입력하십시오." rows="3" style="width:100%"></textarea>
+						<textarea class="form-control" id="replyContent" placeholder="댓글 내용을 입력하십시오." rows="3" style="width:100%"></textarea>
 					</div>
 					<div class="col-2">
 						<input type="button" class="btn-lg btn btn-primary" id="button1" onclick="replyWriteAction();" value="작성"/>
@@ -100,7 +107,7 @@
 				  					${reply_list.reply_date }	  					  						
 		  						</div>
 		  					</div>
-		  					<div class="col-2">		
+ 		  					<div class="col-2">		
 		  					<c:choose>
 		  						<c:when test="${sessionScope.userid eq reply_list.reply_userid}">
 		  							<input type="button" id="reply_config${reply_list.reply_no }" class="btn-sm btn btn-info" onclick="updateReply(${reply_list.reply_no})" value="수정"/>
@@ -125,6 +132,213 @@
 	$(window).on('beforeunload', function() {
 		opener.location.reload();
 	});
+	
+	function getReplyListInNew() {
+		var current_userid = '${sessionScope.userid}';
+		var order_type = 'new';
+		var article_no = '${param.article_no}';
+		
+		$.ajax({
+			type:"post",
+			url : "/multi/getReplyListNew",
+			data : {
+				"article_no" : article_no,				
+				"orderType" : order_type 
+			},
+			dataType : "json",
+			success : function(result) {
+				var innerHTML = '';
+				for(var i = 0; i<result.length; i++) {
+					innerHTML += '<div class="row"> <div class="col-10"> <div class="row-1">';
+					innerHTML += '<input type="hidden" value="'
+					innerHTML += result[i].reply_no;
+					innerHTML += '"/>';
+					if(result[i].level > 0) {
+						for(var t = 1; t < result[i].level; t++) {
+							innerHTML += '<i class="fas fa-arrow-right"></i>';
+						}
+					}
+					innerHTML += '<strong>';
+					innerHTML += result[i].reply_writer;
+					innerHTML += '</strong>';
+					innerHTML += '</div> <div class="row-3" id="reply_component';
+					innerHTML += result[i].reply_no;
+					innerHTML += '">';
+					innerHTML += result[i].reply_content;
+					innerHTML += '</div> <div class="row-1">';
+					innerHTML += result[i].reply_date;
+					innerHTML += '</div> <div class="row-1"> 현재 점수 : ';
+					innerHTML += result[i].reply_score;
+					innerHTML += '</div> </div> <div class="col-2">';
+					if(current_userid == result[i].reply_userid || current_userid == 'admin') {
+						innerHTML += '<input type="button" class="btn-sm btn btn-info" onclick="updateReply(';
+						innerHTML += result[i].reply_no;
+						innerHTML += ')" value="수정"/>';
+						innerHTML += '<input type="button" class="btn-sm btn btn-danger" onclick="deleteReply(';
+						innerHTML += result[i].reply_no;
+						innerHTML += ')" value="삭제"/> </br>';
+					}
+					innerHTML += '<input type="radio" name="reply_rate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '" onClick="reply_like(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" id="reply_like';
+					innerHTML += result[i].reply_no;
+					innerHTML += '"/> 좋아요 </br>';
+					innerHTML += '<input type="radio" name="reply_rate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '" onClick="reply_hate(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" id="reply_hate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '"/> 싫어요 </br>';
+					innerHTML += '<input type="button" class="btn-sm btn btn-secondary" onclick="reReplyAction(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" value="대댓글"/>';
+					innerHTML += '</div> </div> <hr>';
+				}
+				$('#replyListView').html(innerHTML);
+			}
+		})
+	}
+	
+	function getReplyListInOld() {
+		var current_userid = '${sessionScope.userid}';
+		var order_type = 'old';
+		var article_no = '${param.article_no}';
+		
+		$.ajax({
+			type:"post",
+			url : "/multi/getReplyListOld",
+			data : {
+				"article_no" : article_no,				
+				"orderType" : order_type 
+			},
+			dataType : "json",
+			success : function(result) {
+				var innerHTML = '';
+				for(var i = 0; i<result.length; i++) {
+					innerHTML += '<div class="row"> <div class="col-10"> <div class="row-1">';
+					innerHTML += '<input type="hidden" value="'
+					innerHTML += result[i].reply_no;
+					innerHTML += '"/>';
+					if(result[i].level > 0) {
+						for(var t = 1; t < result[i].level; t++) {
+							innerHTML += '<i class="fas fa-arrow-right"></i>';
+						}
+					}
+					innerHTML += '<strong>';
+					innerHTML += result[i].reply_writer;
+					innerHTML += '</strong>';
+					innerHTML += '</div> <div class="row-3" id="reply_component';
+					innerHTML += result[i].reply_no;
+					innerHTML += '">';
+					innerHTML += result[i].reply_content;
+					innerHTML += '</div> <div class="row-1">';
+					innerHTML += result[i].reply_date;
+					innerHTML += '</div> <div class="row-1"> 현재 점수 : ';
+					innerHTML += result[i].reply_score;
+					innerHTML += '</div> </div> <div class="col-2">';
+					if(current_userid == result[i].reply_userid || current_userid == 'admin') {
+						innerHTML += '<input type="button" class="btn-sm btn btn-info" onclick="updateReply(';
+						innerHTML += result[i].reply_no;
+						innerHTML += ')" value="수정"/>';
+						innerHTML += '<input type="button" class="btn-sm btn btn-danger" onclick="deleteReply(';
+						innerHTML += result[i].reply_no;
+						innerHTML += ')" value="삭제"/> </br>';
+					}
+					innerHTML += '<input type="radio" name="reply_rate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '" onClick="reply_like(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" id="reply_like';
+					innerHTML += result[i].reply_no;
+					innerHTML += '"/> 좋아요 </br>';
+					innerHTML += '<input type="radio" name="reply_rate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '" onClick="reply_hate(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" id="reply_hate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '"/> 싫어요 </br>';
+					innerHTML += '<input type="button" class="btn-sm btn btn-secondary" onclick="reReplyAction(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" value="대댓글"/>';
+					innerHTML += '</div> </div> <hr>';
+				}
+				$('#replyListView').html(innerHTML);
+			}
+		})
+	}
+	
+	function getReplyListInScore() {
+		var current_userid = '${sessionScope.userid}';
+		var order_type = 'score';
+		var article_no = '${param.article_no}';
+		
+		$.ajax({
+			type:"post",
+			url : "/multi/getReplyListScore",
+			data : {
+				"article_no" : article_no,				
+				"orderType" : order_type 
+			},
+			dataType : "json",
+			success : function(result) {
+				var innerHTML = '';
+				for(var i = 0; i<result.length; i++) {
+					innerHTML += '<div class="row"> <div class="col-10"> <div class="row-1">';
+					innerHTML += '<input type="hidden" value="'
+					innerHTML += result[i].reply_no;
+					innerHTML += '"/>';
+					if(result[i].level > 0) {
+						for(var t = 1; t < result[i].level; t++) {
+							innerHTML += '<i class="fas fa-arrow-right"></i>';
+						}
+					}
+					innerHTML += '<strong>';
+					innerHTML += result[i].reply_writer;
+					innerHTML += '</strong>';
+					innerHTML += '</div> <div class="row-3" id="reply_component';
+					innerHTML += result[i].reply_no;
+					innerHTML += '">';
+					innerHTML += result[i].reply_content;
+					innerHTML += '</div> <div class="row-1">';
+					innerHTML += result[i].reply_date;
+					innerHTML += '</div> <div class="row-1"> 현재 점수 : ';
+					innerHTML += result[i].reply_score;
+					innerHTML += '</div> </div> <div class="col-2">';
+					if(current_userid == result[i].reply_userid || current_userid == 'admin') {
+						innerHTML += '<input type="button" class="btn-sm btn btn-info" onclick="updateReply(';
+						innerHTML += result[i].reply_no;
+						innerHTML += ')" value="수정"/>';
+						innerHTML += '<input type="button" class="btn-sm btn btn-danger" onclick="deleteReply(';
+						innerHTML += result[i].reply_no;
+						innerHTML += ')" value="삭제"/> </br>';
+					}
+					innerHTML += '<input type="radio" name="reply_rate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '" onClick="reply_like(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" id="reply_like';
+					innerHTML += result[i].reply_no;
+					innerHTML += '"/> 좋아요 </br>';
+					innerHTML += '<input type="radio" name="reply_rate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '" onClick="reply_hate(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" id="reply_hate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '"/> 싫어요 </br>';
+					innerHTML += '<input type="button" class="btn-sm btn btn-secondary" onclick="reReplyAction(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" value="대댓글"/>';
+					innerHTML += '</div> </div> <hr>';
+				}
+				$('#replyListView').html(innerHTML);
+			}
+		})
+	}
 	
 	function articleDelete() {
 		
@@ -177,7 +391,7 @@
 		
 		$.ajax({
 			type : "POST",
-			url : "/writeReplyAction",
+			url : "/multi/writeReplyAction",
 			data : {"article_no" : article_no,				
 					"reply_writer" : reply_writer,
 					"reply_userid" : reply_userid,
@@ -200,7 +414,7 @@
 		
 		$.ajax({
 			type : "GET",
-			url : "/getReplyList",
+			url : "/multi/getReplyList.do",
 			data : {"article_no" : article_no},
 			dataType : "json",
 			success : function(result) {
@@ -210,6 +424,11 @@
 					innerHTML += '<input type="hidden" value="'
 					innerHTML += result[i].reply_no;
 					innerHTML += '"/>';
+					if(result[i].level > 0) {
+						for(var t = 1; t < result[i].level; t++) {
+							innerHTML += '<i class="fas fa-arrow-right"></i>';
+						}
+					}
 					innerHTML += '<strong>';
 					innerHTML += result[i].reply_writer;
 					innerHTML += '</strong>';
@@ -219,6 +438,8 @@
 					innerHTML += result[i].reply_content;
 					innerHTML += '</div> <div class="row-1">';
 					innerHTML += result[i].reply_date;
+					innerHTML += '</div> <div class="row-1"> 현재 점수 : ';
+					innerHTML += result[i].reply_score;
 					innerHTML += '</div> </div> <div class="col-2">';
 					if(current_userid == result[i].reply_userid || current_userid == 'admin') {
 						innerHTML += '<input type="button" class="btn-sm btn btn-info" onclick="updateReply(';
@@ -226,8 +447,25 @@
 						innerHTML += ')" value="수정"/>';
 						innerHTML += '<input type="button" class="btn-sm btn btn-danger" onclick="deleteReply(';
 						innerHTML += result[i].reply_no;
-						innerHTML += ')" value="삭제"/>';
+						innerHTML += ')" value="삭제"/> </br>';
 					}
+					innerHTML += '<input type="radio" name="reply_rate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '" onClick="reply_like(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" id="reply_like';
+					innerHTML += result[i].reply_no;
+					innerHTML += '"/> 좋아요 </br>';
+					innerHTML += '<input type="radio" name="reply_rate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '" onClick="reply_hate(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" id="reply_hate';
+					innerHTML += result[i].reply_no;
+					innerHTML += '"/> 싫어요 </br>';
+					innerHTML += '<input type="button" class="btn-sm btn btn-secondary" onclick="reReplyAction(';
+					innerHTML += result[i].reply_no;
+					innerHTML += ')" value="대댓글"/>';
 					innerHTML += '</div> </div> <hr>';
 				}
 				$('#replyListView').html(innerHTML);
@@ -238,11 +476,70 @@
 		});
 	}
 	
+	function reReplyAction(reply_no) {
+		var article_no = '${param.article_no}';
+		window.open("/multi/reReplyWriteAction.do?article_no=" + article_no + "&reply_no=" + reply_no, "_blank", "width=600px, height=250px, left=600px, top=400px");
+	}
+	
+	function reply_like(reply_no) {
+		
+		var reply_userid = '${sessionScope.userid}';
+		var orderType = 'Y';
+		
+		$.ajax({
+			type : "post",
+			url : "/multi/replyLikeAndHate",
+			data : {"reply_userid" : reply_userid,
+					"reply_no" : reply_no,				
+					"orderType" : orderType},
+			dataType : "json",
+			success : function(result) {
+				if(result.orderType == 'Y') {
+					alert('이미 좋아요를 누른 댓글입니다.');
+					return false;
+				} else {
+					alert('댓글에 좋아요를 눌렀습니다.');
+					location.reload();
+				}
+			},
+			error : function(error) {
+				alert('몬가 일어나고 있음');
+			}
+		})
+		
+	}
+	
+	function reply_hate(reply_no) {
+		var reply_userid = '${sessionScope.userid}';
+		var orderType = 'N';
+		
+		$.ajax({
+			type : "post",
+			url : "/multi/replyLikeAndHate",
+			data : {"reply_userid" : reply_userid,
+					"reply_no" : reply_no,				
+					"orderType" : orderType},
+			dataType : "json",
+			success : function(result) {
+				if(result.orderType == 'Y') {
+					alert('이미 싫어요를 누른 댓글입니다.');
+					return false;
+				} else {
+					alert('댓글에 싫어요를 눌렀습니다.');
+					location.reload();
+				}
+			},
+			error : function(error) {
+				alert('몬가 일어나고 있음');
+			}
+		})
+	}
+	
 	function deleteReply(reply_no) {
 		// alert('삭제될 번호는' + reply_no);
 		$.ajax({
 			type : "GET",
-			url : "/deleteReply",
+			url : "/multi/deleteReply",
 			data : {"reply_no" : reply_no},
 			dataType : "json",
 			success : function(result) {
@@ -259,11 +556,11 @@
 		var before_reply_content = $('#reply_component' + reply_no).text();
 		var innerHTML = '';
 		
-		innerHTML += '<textarea id="replyContent';
+		innerHTML += '<textarea class="form-control" id="replyContent';
 		innerHTML += reply_no;
 		innerHTML += '" placeholder="댓글 내용을 입력하십시오." rows="1" style="width:100%">';
 		innerHTML += before_reply_content;
-		innerHTML += '</textarea> </br>';
+		innerHTML += '</textarea>';
 		innerHTML += '<input type="button" class="btn-sm btn btn-success" id="updateConfirm';
 		innerHTML += reply_no;
 		innerHTML += '" onclick="updateReplyConfirm(';
@@ -278,7 +575,7 @@
 		
 		$.ajax({
 			type : "POST",
-			url : "/updateReplyConfirm",
+			url : "/multi/updateReplyConfirm",
 			data : {"reply_content" : new_reply_content,
 					"reply_no" : reply_no},
 			dataType : "json",

@@ -39,4 +39,29 @@ public class ReplyDAOImpl implements ReplyDAO {
 	public int updateReplyConfirm(ReplyVO reply) {
 		return sqlSession.update("replyMapper.updateReplyConfirm", reply);
 	}
+
+	@Override
+	public int updateReplyParentsNo(ReplyVO reply) {
+		return sqlSession.update("replyMapper.updateReplyParentsNo", reply);
+	}
+
+	@Override
+	public ReplyVO getReplyOne() {
+		return sqlSession.selectOne("replyMapper.getReplyOne");
+	}
+
+	@Override
+	public ReplyVO getReplyOneByNo(int reply_no) {
+		return sqlSession.selectOne("replyMapper.getReplyOneByNo", reply_no);
+	}
+
+	@Override
+	public int reReplyGroupOrder(ReplyVO reply) {
+		return sqlSession.update("replyMapper.reReplyGroupOrder", reply);
+	}
+
+	@Override
+	public int reReplyWriteAction(ReplyVO reply) {
+		return sqlSession.insert("replyMapper.reReplyWriteAction", reply);
+	}
 }

@@ -18,4 +18,19 @@ public interface ReplyDAO {
 	// 댓글 수정
 	public int updateReplyConfirm(ReplyVO reply);
 	
+	// 댓글 parentsno 업데이트
+	public int updateReplyParentsNo(ReplyVO reply);
+	
+	// 댓글 정보 가져오기
+	public ReplyVO getReplyOne();
+	
+	// 댓글 정보 가져오기
+	public ReplyVO getReplyOneByNo(int reply_no);
+	
+	// 댓글 정보 재정렬
+	public int reReplyGroupOrder(ReplyVO reply);
+	
+	// 대댓글 작성하기
+	public int reReplyWriteAction(ReplyVO reply);
+	
 }

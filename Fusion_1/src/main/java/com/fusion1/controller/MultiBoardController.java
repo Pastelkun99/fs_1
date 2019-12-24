@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fusion1.dao.ArticleVO;
 import com.fusion1.dao.BoardVO;
+import com.fusion1.dao.MenuVO;
 import com.fusion1.dao.MultiBoardVO;
 import com.fusion1.dao.PagenationVO;
 import com.fusion1.dao.ReadNoticeVO;
@@ -51,6 +52,8 @@ public class MultiBoardController {
 		return "multi/exit";
 	}
 	
+	
+	// form 테스트를 위한 컨트롤러 메서드. 실제 구동에서는 필요없음.
 	@RequestMapping(value="/multi/testForm.do")
 	public String testForm(Model model) {
 		PagenationVO page = new PagenationVO();
@@ -94,6 +97,9 @@ public class MultiBoardController {
 			
 			List<ArticleVO> nonReadList = ms.getNonReadNoticeList(supertemp);
 			model.addAttribute("nonReadList", nonReadList);
+			
+			List<MenuVO> menuList = as.getMenuList();
+			model.addAttribute("menuList", menuList);
 			return "multi/boardList";
 		}
 		
@@ -158,8 +164,10 @@ public class MultiBoardController {
 			model.addAttribute("page", pageVO);
 			
 			List<ArticleVO> articleList = ms.getArticleListByBoardNo2(pageVO);
-			
 			model.addAttribute("articleList", articleList);
+			
+			List<MenuVO> menuList = as.getMenuList();
+			model.addAttribute("menuList", menuList);
 			
 			return "multi/boardList";
 		} else  {
@@ -209,8 +217,11 @@ public class MultiBoardController {
 			pageSearch.setPageCon(pageCon);
 			
 			List<ArticleVO> articleList = ms.getArticleSearchList(pageSearch);
-			
 			model.addAttribute("articleList", articleList);
+			
+			List<MenuVO> menuList = as.getMenuList();
+			model.addAttribute("menuList", menuList);
+			
 			model.addAttribute("page", pageSearch);
 			return "multi/boardList";
 		}
@@ -610,7 +621,7 @@ public class MultiBoardController {
 	ReplyServiceImpl rs;
 	
 	// 댓글 작성 프로세스
-	@RequestMapping(value="/writeReplyAction")
+	@RequestMapping(value="/multi/writeReplyAction")
 	@ResponseBody
 	public String writeReplyAction(@ModelAttribute ReplyVO reply) {
 		// 현재 날짜 정보
@@ -620,19 +631,54 @@ public class MultiBoardController {
 		reply.setReply_date(date);
 		
 		int result = rs.replyWrite(reply);
+		
+		//ReplyVO updatedReply = rs.getReplyOne();
+		//rs.updateReplyParentsNo(updatedReply);
+		
 		return String.valueOf(result);
 	}
 	
 	// 댓글 리스트 불러오기
-	@RequestMapping(value="/getReplyList", method=RequestMethod.GET)
+	@RequestMapping(value="/multi/getReplyList", method=RequestMethod.GET)
 	@ResponseBody
 	public List<ReplyVO> getReplyList(@ModelAttribute ReplyVO reply) {
+		reply.setOrderType("new");
 		List<ReplyVO> reply_list = rs.getReplyList(reply);
 		return reply_list;
 	}
 	
+	// 최신순 리스트 불러오기
+	@RequestMapping(value="/multi/getReplyListNew", method=RequestMethod.POST)
+	@ResponseBody
+	public List<ReplyVO> getReplyListNew(ReplyVO replyVO) {
+		System.out.println(replyVO.toString());
+		replyVO.setOrderType("new");
+		List<ReplyVO> result = rs.getReplyList(replyVO);
+		return result;
+	}
+	
+	// 등록순 리스트 불러오기
+	@RequestMapping(value="/multi/getReplyListOld", method=RequestMethod.POST)
+	@ResponseBody
+	public List<ReplyVO> getReplyListOld(ReplyVO replyVO) {
+		System.out.println(replyVO.toString());
+		replyVO.setOrderType("old");
+		List<ReplyVO> result = rs.getReplyList(replyVO);
+		return result;
+	}
+		
+	// 점수순 리스트 불러오기
+	@RequestMapping(value="/multi/getReplyListScore", method=RequestMethod.POST)
+	@ResponseBody
+	public List<ReplyVO> getReplyListScore(ReplyVO replyVO) {
+		System.out.println(replyVO.toString());
+		replyVO.setOrderType("score");
+		List<ReplyVO> result = rs.getReplyList(replyVO);
+		return result;
+	}
+	
 	// 댓글 삭제
-	@RequestMapping(value="/deleteReply", method=RequestMethod.GET)
+	@RequestMapping(value="/multi/deleteReply", method=RequestMethod.GET)
 	@ResponseBody
 	public String deleteReply(@ModelAttribute ReplyVO reply, HttpServletRequest request) {
 		int result = rs.deleteReply(reply);
@@ -640,10 +686,74 @@ public class MultiBoardController {
 	}
 	
 	// 댓글 수정 확인
-	@RequestMapping(value="/updateReplyConfirm", method=RequestMethod.POST)
+	@RequestMapping(value="/multi/updateReplyConfirm", method=RequestMethod.POST)
 	@ResponseBody
 	public String updateReplyConfirm(@ModelAttribute ReplyVO reply, HttpServletRequest request) {
 		int result = rs.updateReplyConfirm(reply);
 		return String.valueOf(result);
+	}
+	
+	// 대댓글 쓰기
+	@RequestMapping(value="/multi/reReplyWriteAction", method=RequestMethod.GET)
+	public String reReplyWriteAction(@ModelAttribute ReplyVO reply, HttpServletRequest request, Model model) {
+		System.out.println(reply.toString());
+		ReplyVO thisReply = rs.getReplyOneByNo(reply.getReply_no());
+		model.addAttribute("thisReply", thisReply);
+		return "/multi/reReplyAction";
+	}
+	
+	// 대댓글 쓰기
+	@RequestMapping(value="/multi/reReplyWriteAction", method=RequestMethod.POST)
+	@ResponseBody
+	public String reReplyWriteActionPost(ReplyVO replyVO) {
+		System.out.println("포스트 : " + replyVO.toString());
+		int result = rs.reReplyWriteAction(replyVO);
+		return String.valueOf(result);
+	}
+	
+	@RequestMapping(value="/multi/replyLikeAndHate", method=RequestMethod.POST)
+	@ResponseBody
+	public ReplyVO replyListAndHate(ReplyVO replyVO) {
+		System.out.println(replyVO.toString());
+		
+		ReplyVO likeInfo = rs.replyLikeAndHateConfirm(replyVO);
+		int result = 0;
+		if(likeInfo.getCnt() == 0) {
+			// 정보가 없는 경우 신규 등록
+			result = rs.replyLikeAndHateAction(replyVO);
+			rs.replyLikeAndHateScoreAdjust(replyVO);
+			return new ReplyVO();
+		} else {
+			// db에 있는 값이 Y인 경우.
+			if(likeInfo.getOrderType().equals("Y")) {
+				// 여기서 replyVO의 ordertype이 Y인 경우, 좋아요 했는데 또 좋아요를 하려는 경우고, n인 경우 싫어요로 바꾸려는 것.
+				if(replyVO.getOrderType().equals("Y")) {
+					// 에러 처리
+					ReplyVO resultVO = new ReplyVO();
+					resultVO.setOrderType("Y");
+					return resultVO;
+				} else {
+					// 그대로 처리. 점수와 로그를 교체한다.
+					rs.replyLikeAndHateLogAdjust(replyVO);
+					rs.replyLikeAndHateScoreAdjust(replyVO);
+					replyVO.setOrderType("N");
+					return replyVO;
+				}
+			} else {
+				// db에 있는 값이 N인 경우.
+				// 여기서 replyVO의 ordertype이 N인 경우, 싫어요 했는데 또 싫어요를 하려는 경우고, Y인 경우 좋아요로 바꾸려는 것.
+				if(replyVO.getOrderType().equals("N")) {
+					ReplyVO resultVO = new ReplyVO();
+					resultVO.setOrderType("Y");
+					return resultVO;
+				} else {
+					// 누른 값이 Y인 경우, 좋아요로 교체 한다.
+					rs.replyLikeAndHateLogAdjust(replyVO);
+					rs.replyLikeAndHateScoreAdjust(replyVO);
+					replyVO.setOrderType("N");
+					return replyVO;
+				}
+			}
+		}
 	}
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fusion1.dao.ArticleVO;
+import com.fusion1.dao.MenuVO;
 import com.fusion1.dao.MultiBoardVO;
 import com.fusion1.dao.PagenationVO;
 import com.fusion1.dao.ReadNoticeVO;
@@ -109,5 +110,5 @@ public class MultiBoardServiceImpl implements MultiBoardService {
 	public List<ArticleVO> getNonReadNoticeList(MultiBoardVO multiVO) {
 		return sqlSession.selectList("multiBoardMapper.getNonReadNoticeList", multiVO);
 	}
-
+	
 }

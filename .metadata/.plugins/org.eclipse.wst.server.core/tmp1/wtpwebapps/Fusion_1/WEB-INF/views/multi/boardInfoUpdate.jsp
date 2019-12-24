@@ -57,6 +57,14 @@
 				</select>
 			</li>
 			<li class="list-group-item">
+				속한 메뉴 : 
+				<select id="menu_no" name="menu_no" class="form-control">
+					<c:forEach items="${menuList }" var="menuList">
+						<option value="${menuList.menu_no }"<c:if test="${menuList.menu_no eq board.menu_no }"> selected </c:if>>${menuList.menu_name }</option>
+					</c:forEach> 
+				</select>
+			</li>
+			<li class="list-group-item">
 				<button type="button" class="btn btn-danger" style="width:150px;" onClick="closeWindow();">취소</button>
 				<button type="button" class="btn btn-success" style="width:150px;" onClick="boardUpdate();">수정</button>
 			</li>
@@ -89,6 +97,7 @@ function boardUpdate() {
 	var board_reboardyn = $('#board_reboardyn').val();
 	var board_replyyn = $('#board_replyyn').val();
 	var board_secretyn= $('#board_secretyn').val();
+	var menu_no = $('#menu_no').val();
 	
 	$.ajax({
 		type : "post",
@@ -98,7 +107,8 @@ function boardUpdate() {
 				"board_type" : board_type,
 				"board_reboardyn" : board_reboardyn,
 				"board_replyyn" : board_replyyn,
-				"board_secretyn" : board_secretyn},
+				"board_secretyn" : board_secretyn,
+				"menu_no" : menu_no},
 		dataType : "json",
 		success : function(result) {
 			alert('게시판 정보 수정에 성공했습니다.');

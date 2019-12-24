@@ -62,6 +62,23 @@ public class BoardController {
 	@Autowired
 	AdminServiceImpl ads;
 	
+	
+	@RequestMapping(value="/test.do")
+	public String test() {
+		return "test";
+	}
+	
+	@RequestMapping(value="/testPage.do")
+	public String testPage() {
+		return "test.page";
+	}
+	
+	@RequestMapping("/testPart.do")
+	public String testPart() {
+		return "test.part";
+	}
+	
+	
 	@RequestMapping(value="/alert.do")
 	public String alert(Model model) {
 		model.addAttribute("msg", "로그인 후 이용 가능합니다.");
@@ -182,7 +199,7 @@ public class BoardController {
 			model.addAttribute("boardlist", list);
 			model.addAttribute("noticeList", noticeList);
 			model.addAttribute("page", pageSearch);
-			return "boardList";
+			return "boardList.page";
 		}
 	}
 	

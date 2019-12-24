@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fusion1.dao.AnalysisDAO;
 import com.fusion1.dao.InfoVO;
+import com.fusion1.dao.MenuVO;
 import com.fusion1.dao.MultiBoardVO;
 import com.fusion1.dao.PopupVO;
 import com.fusion1.dao.QuestionVO;
@@ -27,6 +28,7 @@ import com.fusion1.dao.SelectVO;
 import com.fusion1.dao.UserVO;
 import com.fusion1.service.AdminServiceImpl;
 import com.fusion1.service.AnalysisServiceImpl;
+import com.fusion1.service.MultiBoardServiceImpl;
 import com.fusion1.service.UserServiceImpl;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -44,6 +46,9 @@ public class AdminController {
 	
 	@Autowired
 	AnalysisServiceImpl ans;
+	
+	@Autowired
+	MultiBoardServiceImpl ms;
 
 	// 관리자를 체크하기 위한 메소드
 	@RequestMapping(value="/mng/adminCheck.do", method=RequestMethod.GET)
@@ -166,9 +171,16 @@ public class AdminController {
 		} else if(mode.equals("board")) {
 			// 게시판 관리모드
 			List<MultiBoardVO> multiList = as.getMultiBoardList();
+			List<MenuVO> menuList = as.getMenuList();
 			model.addAttribute("multiList", multiList);
+			model.addAttribute("menuList", menuList);
 			return "adminManageBoard";
-		} else  {
+		} else if(mode.equals("menu")) {
+			// 메뉴 관리 모드
+			List<MenuVO> menuList = as.getMenuList();
+			model.addAttribute("menuList", menuList);
+			return "adminManageMenu";
+		} else {
 			// 그 외 다른 url로 접속하려고 할 시 이를 불허한다.
 			model.addAttribute("msg", "허용되지 않은 페이지 이동입니다.");
 			model.addAttribute("href", request.getContextPath() + "/mng/adminManagement.do?mode=user");
@@ -444,7 +456,9 @@ public class AdminController {
 	
 	// 게시판을 등록함
 	@RequestMapping(value="/mng/newBoardAppend.do", method=RequestMethod.GET)
-	public String newBoardAppend() {
+	public String newBoardAppend(Model model) {
+		List<MenuVO> menuList = as.getMenuList();
+		model.addAttribute("menuList", menuList);
 		return "multi/newBoardAppend";
 	}
 	
@@ -463,6 +477,8 @@ public class AdminController {
 		temp.setBoard_no(board_no);
 		MultiBoardVO board = as.getMultiBoardOne(temp);
 		model.addAttribute("board", board);
+		List<MenuVO> menuList = as.getMenuList();
+		model.addAttribute("menuList", menuList);
 		return "multi/boardInfoUpdate";
 	}
 	
@@ -502,6 +518,73 @@ public class AdminController {
 		return String.valueOf(result);
 	}
 	
+	// 특수 게시판을 등록함.
+	@RequestMapping(value="/mng/specialChartAppend.do", method=RequestMethod.GET)
+	public String specialChartAppend(Model model) {
+		List<MenuVO> menuList = as.getMenuList();
+		model.addAttribute("menuList", menuList);
+		return "multi/specialChartAppend";
+	}
 	
+	@RequestMapping(value="/mng/specialAnalAppend.do", method=RequestMethod.GET)
+	public String specialAnalAppend(Model model) {
+		List<MenuVO> menuList = as.getMenuList();
+		model.addAttribute("menuList", menuList);
+		return "multi/specialAnalAppend";
+	}
 	
+	// 메뉴를 등록함.
+	@RequestMapping(value="/mng/newMenuAppend.do", method=RequestMethod.GET)
+	public String newMenuAppend() {
+		return "multi/newMenuAppend";
+	}
+	
+	// 메뉴를 등록함 POST
+	@RequestMapping(value="/mng/newMenuAppend.do", method=RequestMethod.POST)
+	@ResponseBody
+	public int newMenuAppendPost(MenuVO menuVO) {
+		System.out.println("menu : " + menuVO.toString());
+		int result = as.newMenuAppend(menuVO);
+		return result;
+	}
+	
+	// 메뉴 수정
+	@RequestMapping(value="/mng/menuInfoUpdate.do", method=RequestMethod.GET)
+	public String menuInfoUpdate(@RequestParam("menu_no") int menu_no, Model model) {
+		MenuVO thisMenu = as.getMenuInfo(menu_no);
+		model.addAttribute("menuInfo", thisMenu);
+		return "multi/menuInfoUpdate";
+	}
+	
+	// 메뉴 수정 POST
+	@RequestMapping(value="/mng/menuInfoUpdate.do", method=RequestMethod.POST)
+	@ResponseBody
+	public int menuInfoUpdatePost(MenuVO menuVO) {
+		System.out.println(menuVO.toString());
+		int result = as.menuInfoUpdate(menuVO);
+		return result;
+	}
+	
+	// 메뉴 삭제
+	@RequestMapping(value="/mng/menuInfoDelete.do", method=RequestMethod.POST)
+	@ResponseBody
+	public int menuInfoDelete(MenuVO menuVO) {
+		int menu_no = menuVO.getMenu_no();
+		int result = as.menuInfoDelete(menu_no);
+		return result;
+	}
+	
+	// 메뉴 순서 반영
+	@RequestMapping(value="/mng/menuOrderCommit.do", method=RequestMethod.POST)
+	@ResponseBody
+	public String menuOrderCommitPost(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
+	
+		MenuVO menuVO = new MenuVO();
+		menuVO.setMenu_no(Integer.parseInt((String)params.get("menu_no")));
+		menuVO = as.getMenuInfo(Integer.parseInt((String)params.get("menu_no")));
+		
+		menuVO.setMenu_order((int)params.get("menu_order") + 1);
+		int result = as.menuOrderUpdate(menuVO);
+		return String.valueOf(result);
+	}
 }

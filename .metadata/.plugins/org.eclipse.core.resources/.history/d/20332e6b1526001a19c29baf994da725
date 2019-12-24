@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+					"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="replyMapper">
+
+	<insert id="replyWrite" parameterType="com.fusion1.dao.ReplyVO">
+		INSERT INTO 
+					REPLYTBL(reply_no, article_no, reply_writer, reply_userid, reply_date, reply_content, reply_parentsno, reply_grouporder, reply_groupdepth, reply_score)
+			 VALUES
+			 		(0, #{article_no}, #{reply_writer}, #{reply_userid}, now(), #{reply_content}, 0, 0, 0, 0)
+	</insert>
+
+	<!-- <select id="getReplyList" parameterType="int" resultType="com.fusion1.dao.ReplyVO">
+		SELECT * FROM REPLYTBL WHERE article_no = #{article_no} ORDER BY reply_date DESC
+		SELECT 
+			reply_no, 
+			article_no, 
+			reply_writer, 
+			reply_userid, 
+			DATE_FORMAT(reply_date, '%Y-%m-%d %H:%i:%s') AS reply_date, 
+			reply_content, 
+			reply_parentsno 
+			reply_score
+		FROM replytbl
+		WHERE article_no = #{article_no} ORDER BY reply_parentsno 
+	</select> -->
+	
+	<select id="getReplyList" parameterType="ReplyVO" resultType="ReplyVO">
+        SELECT 
+			    B.*, 
+    			(select article_no from replytbl where reply_no = B.reply_no) as article_no,
+    			(select reply_writer from replytbl where reply_no = B.reply_no) as reply_writer,
+    			(select reply_userid from replytbl where reply_no = B.reply_no) as reply_userid,
+    			(select reply_content from replytbl where reply_no = B.reply_no) as reply_content,
+    			(select reply_parentsno from replytbl where reply_no = B.reply_no) as reply_parentsno,
+    			(select reply_score from replytbl where reply_no = B.reply_no) as reply_score
+        FROM
+            (SELECT
+                <if test="orderType == 'new'.toString()">
+                GET_REPLY_LIST_NEW
+                </if>
+                <if test="orderType == 'old'.toString()">
+                GET_REPLY_LIST_OLD
+                </if>
+                <if test="orderType == 'score'.toString()">
+                GET_REPLY_LIST_SCORE
+                </if>
+                (#{bno}) AS rno, @level AS level
+            FROM
+                (SELECT @start_with:=0, @id:=@start_with, @level:=0) vars, reply
+            WHERE
+                @id IS NOT NULL) CONNECTBY
+                LEFT JOIN
+            reply A ON CONNECTBY.rno = A.rno
+    </select>
+	
+	
+	<select id="getReplyList2" parameterType="int" resultType="com.fusion1.dao.ReplyVO">
+		SELECT * FROM REPLYTBL WHERE article_no = #{article_no} ORDER BY reply_date DESC
+	</select>
+	
+	<delete id="deleteReply" parameterType="com.fusion1.dao.ReplyVO">
+		DELETE FROM REPLYTBL WHERE reply_no = #{reply_no}
+	</delete>
+	
+	<update id="updateReplyConfirm" parameterType="com.fusion1.dao.ReplyVO">
+		UPDATE REPLYTBL SET reply_content = #{reply_content} WHERE reply_no = #{reply_no}
+	</update>
+	
+	<update id="updateReplyParentsNo" parameterType="ReplyVO">
+		UPDATE REPLYTBL SET reply_parentsno = #{reply_no} WHERE reply_no = #{reply_no}
+	</update>
+	
+	<select id="getReplyOne" resultType="ReplyVO">
+		SELECT * FROM REPLYTBL ORDER BY reply_date DESC LIMIT 1
+	</select>
+	
+	<select id="getReplyOneByNo" parameterType="int" resultType="ReplyVO">
+		SELECT * FROM REPLYTBL WHERE reply_no = #{reply_no}
+	</select>
+	
+	<update id="reReplyGroupOrder" parameterType="ReplyVO">
+		<![CDATA[
+			UPDATE replytbl 
+			SET reply_grouporder = reply_grouporder + 1 
+			WHERE reply_parentsno = #{reply_parentsno} AND reply_grouporder > #{reply_grouporder}
+		]]>
+	</update>
+	
+	<insert id="reReplyWriteAction" parameterType="ReplyVO">
+		INSERT INTO replytbl VALUES (
+										0,
+										#{article_no},
+										#{reply_writer},
+										#{reply_userid},
+										now(),
+										#{reply_content},
+										#{reply_parentsno},
+										#{reply_grouporder},
+										#{reply_groupdepth},
+										0
+									)
+	</insert>
+	
+	<insert id="replyLikeAndHateAction" parameterType="ReplyVO">
+		INSERT INTO likereplytbl VALUES (0, #{reply_userid}, #{reply_no})
+	</insert>
+	
+	
+	
+</mapper>

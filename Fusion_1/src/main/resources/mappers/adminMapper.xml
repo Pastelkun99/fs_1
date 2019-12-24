@@ -39,11 +39,28 @@
 	</delete>
 	
 	<select id="getMultiBoardList" resultType="MultiBoardVO">
-		SELECT * FROM multiboardtbl ORDER BY board_order;
+		SELECT * FROM multiboardtbl ORDER BY board_order
 	</select>
 	
 	<insert id="newBoardAppend" parameterType="MultiBoardVO">
-		INSERT INTO multiboardtbl VALUES (0, #{board_name}, #{board_type}, #{board_reboardyn}, #{board_replyyn}, #{board_secretyn}, null)
+		INSERT INTO multiboardtbl VALUES (0, 
+										  #{board_name}, 
+										  #{board_type}, 
+										  #{board_reboardyn}, 
+										  #{board_replyyn}, 
+										  #{board_secretyn}, 
+										  null, 
+										  #{menu_no}, 
+										  0,
+										  <choose>
+										  	<when test="board_url != null">
+										  		#{board_url}
+										  	</when>
+										  	<when test="board_url == null">
+										  		null
+										  	</when>
+										  </choose>
+										  ) 
 	</insert>
 	
 	<select id="getMultiBoardOne" parameterType="MultiBoardVO" resultType="MultiBoardVO">
@@ -56,7 +73,8 @@
 								board_type = #{board_type},
 								board_reboardyn = #{board_reboardyn},
 								board_replyyn = #{board_replyyn},
-								board_secretyn = #{board_secretyn}
+								board_secretyn = #{board_secretyn},
+								menu_no = #{menu_no}
 							WHERE
 								board_no = #{board_no} 
 	</update>
@@ -68,4 +86,29 @@
 	<update id="boardOrderUpdate" parameterType="MultiBoardVO">
 		UPDATE multiboardtbl SET board_order = #{board_order} WHERE board_no = #{board_no}
 	</update>
+	
+	<select id="getMenuList" resultType="MenuVO">
+		SELECT * FROM menutbl ORDER BY menu_order
+	</select>
+	
+	<insert id="newMenuAppend" parameterType="MenuVO">
+		INSERT INTO menutbl VALUES (0, #{menu_name}, 0, null, #{menu_useyn})
+	</insert>
+	
+	<update id="menuInfoUpdate" parameterType="MenuVO">
+		UPDATE menutbl SET menu_name = #{menu_name}, menu_useyn = #{menu_useyn} WHERE menu_no = #{menu_no}
+	</update>
+	
+	<select id="getMenuInfo" parameterType="int" resultType="MenuVO">
+		SELECT * FROM menutbl WHERE menu_no = #{menu_no}
+	</select>
+	
+	<delete id="menuInfoDelete" parameterType="int">
+		DELETE FROM menutbl WHERE menu_no = #{menu_no} 
+	</delete>
+	
+	<update id="menuOrderUpdate" parameterType="MenuVO">
+		UPDATE menutbl SET menu_order = #{menu_order} WHERE menu_no = #{menu_no}
+	</update>
+	
 </mapper>

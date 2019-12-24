@@ -74,23 +74,7 @@
 		
 	}
 </script>
-	<nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom: 100px;">
-		<a class="navbar-brand">관리자 페이지</a>
-		<button class="navbar-toggler" type="button" data-toggle="collapse"
-			data-target="#navbarNav" aria-controls="navbarNav"
-			aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse" id="navbarNav">
-			<ul class="navbar-nav">
-				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=user">유저 관리</a></li>
-				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=analysis&a_no=1&q_selection=1111">설문 관리</a></li>
-				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=popup&pop_id=1">팝업 관리</a></li>
-				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=board">게시판 관리</a></li>
-				<li class="nav-item"><button type="button" class="btn btn-danger" onClick="logoutLogic();">로그아웃</button></li>
-			</ul>
-		</div>
-	</nav>
+	<jsp:include page="adminNavbar.jsp"></jsp:include>
 	<div class="row">
 		<div class="col-md-2"></div>
 		<div class="col-md-8">
@@ -103,6 +87,7 @@
 					<th scope="col">답글 사용 여부</th>
 					<th scope="col">댓글 사용 여부</th>
 					<th scope="col">비밀글 사용 여부</th>
+					<th scope="col">메뉴 지정</th>
 					<th scope="col">MODE</th>
 				</tr>
 				<c:forEach items="${multiList }" var="multiList" varStatus="status">
@@ -134,6 +119,13 @@
 							</select>
 						</td>
 						<td>
+							<select id="board_menuSetting${multiList.board_no}" name="menu_no" class="form-control" data-code="board_menuSetting" disabled="disabled">
+								<c:forEach items="${menuList }" var="menuList">
+									<option value="${menuList.menu_no }" <c:if test="${menuList.menu_no eq multiList.menu_no }"> selected </c:if>>${menuList.menu_name }</option>
+								</c:forEach>
+							</select>
+						</td>
+						<td>
 							<input type="hidden" id="board_no" name="board_no" class="form-control" data-code="board_no" value="${multiList.board_no }"/>
 							<button type="button" id="boardInfoUpdate(${multiList.board_no})" onclick="boardInfoUpdate(${multiList.board_no});" class="btn btn-warning">수정</button>
 							<button type="button" id="boardInfoDelete(${multiList.board_no})" onclick="boardInfoDelete(${multiList.board_no});" class="btn btn-danger">삭제</button>
@@ -143,12 +135,22 @@
 			</table>
 			<button type="button" id="newBoardAppend" onclick="newBoardAppend();" class="btn btn-success">등록</button>
 			<button type="button" id="orderCommit" onclick="rowEffect();" class="btn btn-primary">순서 반영</button>
+			<button type="button" id="specialBoardAppendChart" onclick="boardChartAppend()" class="btn btn-warning">차트 페이지 추가</button>
+			<button type="button" id="specialBoardAppendAnalysis" onclick="boardAnalAppend()" class="btn btn-warning">설문 페이지 추가</button>
 			<button type="button" id="goToBoardList" onclick="location.href='${pageContext.request.contextPath}/multi/boardList.do?board_no=-1&page_no=1&pageSize=10'" class="btn btn-Info">게시판으로</button>
 		</div>
 		<div class="col-md-3"></div>
 	</div>
 <script>
 var url = '${pageContext.request.contextPath}';
+
+function boardChartAppend() {
+	window.open("/mng/specialChartAppend.do", '_blank', 'width=600px, height=300px');
+}
+
+function boardAnalAppend() {
+	window.open("/mng/specialAnalAppend.do", '_blank', 'width=600px, height=300px');
+}
 
 function newBoardAppend() {
 	window.open('/mng/newBoardAppend.do', '_blank', 'width=500px, height=700px');

@@ -28,7 +28,7 @@
       <td>
       	<form name="readArticle" id="readArticle${boardList.board_no }" action="/multi/testFormArticle.do" method="post" target="popup_window">
       		<input type="hidden" id="board_no" name="board_no" value="${boardList.board_no }">
-<%-- 	      	<a href="#" onclick="document.getElementById('readArticle').submit();">${boardList.board_title }</a> --%>
+	      	<%-- <a href="#" onclick="document.getElementById('readArticle').submit();">${boardList.board_title }</a> --%>
 	      	<a href="#" id="submitLink" onclick="goToArticle(${boardList.board_no});" class="goToArticle ${boardList.board_no }">${boardList.board_title }</a>
       	</form>
       </td>
@@ -53,6 +53,7 @@
 		window.open("", 'popup_window', 'width=500px, height=500px');
 		$('#readArticle').submit();		
 	}); */
+	
 	function goToArticle(board_no) {
 		window.open("", "popup_window", "width=500px, height=500px");
 		$('#readArticle' + board_no).submit();
