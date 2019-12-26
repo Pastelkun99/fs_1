@@ -111,4 +111,8 @@
 		UPDATE menutbl SET menu_order = #{menu_order} WHERE menu_no = #{menu_no}
 	</update>
 	
+	<insert id="insertExcelData" parameterType="java.util.Map">
+		INSERT INTO usertbl VALUES (0, #{IDCOL}, #{PWCOL}, #{NAMECOL}, 0, 1)
+	</insert>
+	
 </mapper>

@@ -1,6 +1,7 @@
 package com.fusion1.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fusion1.dao.MenuVO;
 import com.fusion1.dao.MultiBoardVO;
@@ -61,5 +62,11 @@ public interface AdminService {
 	
 	// 메뉴 순서를 업데이트한다.
 	public int menuOrderUpdate(MenuVO menuVO);
+	
+	// 엑셀 업로드 처리
+	public List<?> getExcelUpload(String excelFile);
+	
+	// db 처리
+	public int insertExcelData(Map<String, Object> map);
 	
 }

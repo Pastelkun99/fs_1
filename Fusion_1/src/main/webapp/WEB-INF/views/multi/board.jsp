@@ -140,6 +140,7 @@
 		
 		$.ajax({
 			type:"post",
+			cache : false,
 			url : "/multi/getReplyListNew",
 			data : {
 				"article_no" : article_no,				
@@ -209,6 +210,7 @@
 		
 		$.ajax({
 			type:"post",
+			cache : false,
 			url : "/multi/getReplyListOld",
 			data : {
 				"article_no" : article_no,				
@@ -278,6 +280,7 @@
 		
 		$.ajax({
 			type:"post",
+			cache : false,
 			url : "/multi/getReplyListScore",
 			data : {
 				"article_no" : article_no,				
@@ -356,6 +359,7 @@
 		} else {
 			$.ajax({
 				    type : "post",
+				    cache : false,
 			        url : "/multi/articleDelete.do",
 			        data : {"article_no" : article_no,
 							"article_userid" : article_userid},
@@ -391,6 +395,7 @@
 		
 		$.ajax({
 			type : "POST",
+			cache : false,
 			url : "/multi/writeReplyAction",
 			data : {"article_no" : article_no,				
 					"reply_writer" : reply_writer,
@@ -415,6 +420,7 @@
 		$.ajax({
 			type : "GET",
 			url : "/multi/getReplyList.do",
+			cache : false,
 			data : {"article_no" : article_no},
 			dataType : "json",
 			success : function(result) {

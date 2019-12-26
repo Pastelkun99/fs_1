@@ -18,7 +18,7 @@
 			   article_grouporder,
 			   article_groupdepth,
 			   article_hit,
-			   DATE_FORMAT(article_date, '%Y-%m-%d %h:%i:%s') AS article_date,
+			   DATE_FORMAT(article_date, '%Y-%m-%d %H:%i:%s') AS article_date,
 			   article_deleteyn,
 			   article_noticeyn
 		FROM multiboardtbl A, articletbl B
@@ -40,7 +40,7 @@
 			   B.article_grouporder,
 			   B.article_groupdepth,
 			   B.article_hit,
-			   DATE_FORMAT(B.article_date, '%Y-%m-%d %h:%i:%s') AS article_date,
+			   DATE_FORMAT(B.article_date, '%Y-%m-%d %H:%i:%s') AS article_date,
 			   B.article_deleteyn,
 			   B.article_noticeyn
 		FROM multiboardtbl A, articletbl B

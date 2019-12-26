@@ -121,6 +121,19 @@
 		WHERE reply_no = #{reply_no}
 	</update>
 	
+	<update id="replyLikeAndHateScoreAdjust2" parameterType="ReplyVO">
+		UPDATE replytbl SET reply_score =
+		<choose>
+			<when test='orderType == "Y"'>
+				reply_score + 2
+			</when>
+			<when test='orderType == "N"'>
+				reply_score - 2
+			</when>
+		</choose> 
+		WHERE reply_no = #{reply_no}
+	</update>
+	
 	<select id="replyLikeAndHateConfirm" parameterType="ReplyVO" resultType="ReplyVO">
 		SELECT COUNT(*) as cnt, 
 			   reply_userid, 

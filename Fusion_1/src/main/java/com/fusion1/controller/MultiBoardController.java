@@ -260,6 +260,9 @@ public class MultiBoardController {
 			convertedContents = XssPreventer.unescape(convertedContents);
 			article.setArticle_content(convertedContents);
 			
+			// 날짜 처리
+			
+			
 			// 비밀글에 대한 처리
 			if(article.getArticle_secretyn().equals("Y") || article.getArticle_secretyn() == "Y") {
 				
@@ -735,7 +738,7 @@ public class MultiBoardController {
 				} else {
 					// 그대로 처리. 점수와 로그를 교체한다.
 					rs.replyLikeAndHateLogAdjust(replyVO);
-					rs.replyLikeAndHateScoreAdjust(replyVO);
+					rs.replyLikeAndHateScoreAdjust2(replyVO);
 					replyVO.setOrderType("N");
 					return replyVO;
 				}
@@ -749,7 +752,7 @@ public class MultiBoardController {
 				} else {
 					// 누른 값이 Y인 경우, 좋아요로 교체 한다.
 					rs.replyLikeAndHateLogAdjust(replyVO);
-					rs.replyLikeAndHateScoreAdjust(replyVO);
+					rs.replyLikeAndHateScoreAdjust2(replyVO);
 					replyVO.setOrderType("N");
 					return replyVO;
 				}

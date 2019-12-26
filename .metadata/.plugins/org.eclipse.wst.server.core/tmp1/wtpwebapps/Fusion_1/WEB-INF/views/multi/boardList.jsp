@@ -101,7 +101,7 @@
 					<h2>${sessionScope.username }님 환영합니다.</h2>
 					<button type="button" class="btn btn-danger" onClick="logoutLogic();">로그아웃</button>
 					<c:if test="${param.board_no ne -1 }">
-						<button type="button" class="btn btn-primary" onClick="javascript:void(window.open('articleWrite.do?board_no=${param.board_no}', '_blank', 'height=900px, width=1200px')); return false;">
+						<button type="button" class="btn btn-primary" onClick="javascript:void(window.open('articleWrite.do?board_no=${param.board_no}', '_blank', 'height=900px, width=1200px, scrollbars=1')); return false;">
 						새 글 쓰기
 						</button>
 					</c:if>
@@ -164,7 +164,7 @@
 						<c:forEach var="noticeBoard" items="${noticeList }">
 							<tr>
 								<td><strong>공지</strong></td>
-								<td><a href="#" onclick="javascript:void(window.open('board.do?board_no=${noticeBoard.board_no}', 'height=600px', '_blank'));" />${noticeBoard.board_title }</a></td>
+								<td><a href="#" onclick="javascript:void(window.open('board.do?board_no=${noticeBoard.board_no}', '_blank', 'height=600px, scrollbars=yes'));" />${noticeBoard.board_title }</a></td>
 								<td>${noticeBoard.board_writer}</td>
 								<td>${noticeBoard.board_hit}</td>
 								<td>${noticeBoard.board_date}</td>
@@ -183,7 +183,7 @@
 									<tr>
 										<td>${page.totalCount - (param.page_no-1)*param.pageSize - status.index}</td>								
 										<td>
-											<a href="#"	onclick="javascript:void(window.open('board.do?board_no=${param.board_no}&article_no=${article.article_no}', '${article.article_title }', '_blank')); return false;"/>${article.article_title}</a>
+											<a href="#"	onclick="javascript:void(window.open('board.do?board_no=${param.board_no}&article_no=${article.article_no}', '_blank', 'scrollbars=1')); return false;"/>${article.article_title}</a>
 											<c:if test="${article.article_secretyn eq 'Y' }">
 												<i class="fas fa-lock"></i>
 											</c:if>

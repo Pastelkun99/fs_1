@@ -24,6 +24,7 @@
 <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.css"/>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.fileDownload/1.4.2/jquery.fileDownload.js"></script>
 
 <html>
 <head>
@@ -77,11 +78,26 @@
 				</c:forEach>
 				</tbody>
 			</table>
+			<button type="button" id="excelUpload" onclick="excelUploadOpen();" class="btn btn-warning">엑셀 업로드</button>
+			<button type="button" id="excelDownload" class="btn btn-info">샘플파일 다운로드</button>
 		</div>
 		<div class="col-md-3"></div>
 	</div>
 <script>
 var url = '${pageContext.request.contextPath}';
+
+$('#excelDownload').click(function() {
+		
+	var filePath = "C:/upload/Using_This_Sample.xlsx";
+	var fileName = "Using_This_Sample.xlsx";
+	
+	location.href='/mng/excelDownload.do?filePath=' + filePath + '&fileName=' + fileName;
+})
+
+
+function excelUploadOpen() {
+	window.open("/mng/excelUpload.do", "_blank", "width=700px, height=280px");
+}
 
 function userInfoOpen(user_id) {
 	var windowInfo = window.open(url + "/mng/userInfo.do?userid=" + user_id, "유저 정보", "width=400, height=460");

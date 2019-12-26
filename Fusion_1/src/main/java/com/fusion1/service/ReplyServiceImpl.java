@@ -91,6 +91,11 @@ public class ReplyServiceImpl implements ReplyService {
 	public int replyLikeAndHateLogAdjust(ReplyVO replyVO) {
 		return sqlSession.update("replyMapper.replyLikeAndHateLogAdjust", replyVO);
 	}
+
+	@Override
+	public int replyLikeAndHateScoreAdjust2(ReplyVO replyVO) {
+		return sqlSession.update("replyMapper.replyLikeAndHateScoreAdjust2", replyVO);
+	}
 	
 	
 

@@ -1,12 +1,20 @@
 package com.fusion1.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.swing.plaf.multi.MultiRootPaneUI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fusion1.dao.AnalysisDAO;
 import com.fusion1.dao.InfoVO;
@@ -28,6 +38,7 @@ import com.fusion1.dao.SelectVO;
 import com.fusion1.dao.UserVO;
 import com.fusion1.service.AdminServiceImpl;
 import com.fusion1.service.AnalysisServiceImpl;
+import com.fusion1.service.FileUploadService;
 import com.fusion1.service.MultiBoardServiceImpl;
 import com.fusion1.service.UserServiceImpl;
 import com.google.gson.Gson;
@@ -205,6 +216,117 @@ public class AdminController {
 		//System.out.println(userVO.toString());
 		int result = us.userInfoUpdate(userVO);
 		return String.valueOf(result);
+	}
+	
+	// Excel을 통해 유저를 db에 등록할 수 있도록 한다.
+	@RequestMapping(value="/mng/excelUpload.do", method=RequestMethod.GET)
+	public String excelUpload() {
+		return "/multi/excelUpload";
+	}
+	
+	@Autowired
+	FileUploadService fileUploadService;
+	
+	@RequestMapping(value="/mng/excelUpload.do", method=RequestMethod.POST, produces="application/text; charset=utf8")
+	@ResponseBody
+	public String excelUploadPost(@RequestParam("excelFile") MultipartFile file, Model model, HttpServletRequest request, HttpServletResponse response) {
+		
+		try {
+			String result = fileUploadService.restore(file);
+			Map returnObject = new HashMap();
+			MultipartHttpServletRequest mhsr = (MultipartHttpServletRequest)request;
+			Iterator iter = mhsr.getFileNames();
+			MultipartFile mfile = null;
+			String fieldName = "";
+			// 값이 나올때까지
+            while (iter.hasNext()) { 
+                fieldName = iter.next().toString(); // 내용을 가져와서 
+                mfile = mhsr.getFile(fieldName); 
+                String origName;
+                //origName = new String(mfile.getOriginalFilename().getBytes("8859_1"), "UTF-8"); //한글꺠짐 방지 // 파일명이 없다면
+                origName = mfile.getOriginalFilename();
+                returnObject.put("params", mhsr.getParameterMap()); 
+                //위치 및 파일
+                List<?> testList = as.getExcelUpload("C:\\upload\\" + origName);
+                if(testList == null) {
+                	// 문제가 있을 때
+                	String msg = "올바른 파일 형식이 아니거나, 정합성을 만족하지 않습니다.\n정합성을 만족하는 일부 행만 데이터에 추가되었을 수 있습니다.\n새로고침된 페이지에서 등록된 데이터를 확인하세요.";
+                	request.setCharacterEncoding("UTF-8");
+                	return msg;
+                }
+            }
+            return "정상적으로 업로드 되었습니다.";
+            
+            } catch (UnsupportedEncodingException e) {  
+                e.printStackTrace();
+                return "파일 형식이 올바르지 않습니다.";
+            }catch (IllegalStateException e) {  
+                e.printStackTrace();
+                return "파일 형식이 올바르지 않습니다.";
+            } catch (IOException e) {  
+                e.printStackTrace();
+                return "파일 형식이 올바르지 않습니다.";
+            } catch (StringIndexOutOfBoundsException e) {
+            	e.printStackTrace();
+            	return "파일 형식이 올바르지 않습니다.";
+			}
+	}
+	
+	@RequestMapping(value = "/mng/excelDownload.do")
+	public void fileDownload(HttpServletResponse response, HttpServletRequest request, @RequestParam Map<String, String> paramMap) {
+
+		String path = paramMap.get("filePath"); // full경로
+		String fileName = paramMap.get("fileName"); // 파일명
+
+		File file = new File(path);
+
+		FileInputStream fileInputStream = null;
+		ServletOutputStream servletOutputStream = null;
+
+		try {
+			String downName = null;
+			String browser = request.getHeader("User-Agent");
+			// 파일 인코딩
+			if (browser.contains("MSIE") || browser.contains("Trident") || browser.contains("Chrome")) {// 브라우저, 확인, 파일명, encode
+				downName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+			} else {
+				downName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
+			}
+
+			response.setHeader("Content-Disposition", "attachment;filename=\"" + downName + "\"");
+			response.setContentType("application/octer-stream");
+			response.setHeader("Content-Transfer-Encoding", "binary;");
+
+			fileInputStream = new FileInputStream(file);
+			servletOutputStream = response.getOutputStream();
+
+			byte b[] = new byte[1024];
+			int data = 0;
+
+			while ((data = (fileInputStream.read(b, 0, b.length))) != -1) {
+				servletOutputStream.write(b, 0, data);
+			}
+
+			servletOutputStream.flush();// 출력
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (servletOutputStream != null) {
+				try {
+					servletOutputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (fileInputStream != null) {
+				try {
+					fileInputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	// 팝업을 수정하려고 할 때, 해당 팝업의 DB값을 화면에 보여주고, 이를 수정 가능하도록 한다.
@@ -587,4 +709,5 @@ public class AdminController {
 		int result = as.menuOrderUpdate(menuVO);
 		return String.valueOf(result);
 	}
+	
 }

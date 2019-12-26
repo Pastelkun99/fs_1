@@ -1,10 +1,17 @@
 package com.fusion1.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
 import org.apache.ibatis.session.SqlSession;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -107,6 +114,67 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public int menuOrderUpdate(MenuVO menuVO) {
 		return sqlSession.update("adminMapper.menuOrderUpdate", menuVO);
+	}
+
+	@Override
+	public List<?> getExcelUpload(String excelFile) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+	        
+        try {
+            Workbook wbs = ExcelUtil.getWorkbook(excelFile);
+            Sheet sheet = (Sheet) wbs.getSheetAt(0);
+            int sival = sheet.getFirstRowNum();
+            System.out.println("firstrownum : " + sival);
+            int ssival = sheet.getLastRowNum();
+            System.out.println("lastrownum : " + ssival);
+ 
+            //excel file 세번째줄부터 시작
+            for (int i = sheet.getFirstRowNum() + 2; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                //map.put("IDCOL", ""+ExcelUtil.cellValue(row.getCell(0)));
+                String idcol = ""+ExcelUtil.cellValue(row.getCell(1));
+                idcol = idcol.toLowerCase();
+                String IDregex = "^[a-zA-Z]{1}[a-zA-Z0-9_]{4,17}$";
+                if(!Pattern.matches(IDregex, idcol)) {
+                	// 에러 발생 시키면 됨
+                	return null;
+                }
+                
+                String pwcol = ""+ExcelUtil.cellValue(row.getCell(2));
+                String PWregex = "[a-zA-Z0-9]{4,17}$";
+                if(!Pattern.matches(PWregex, pwcol)) {
+                	// 에러 발생 시키면 됨
+                	return null;
+                }
+                
+                String namecol = ""+ExcelUtil.cellValue(row.getCell(3));
+                String NAMEregex = "^[a-zA-Z가-힣]*{4,17}$";
+                if(!Pattern.matches(NAMEregex, namecol)) {
+                	// 에러 발생 시키면 됨
+                	return null;
+                }
+                
+                map.put("IDCOL", idcol);
+                map.put("PWCOL", pwcol);
+                map.put("NAMECOL", namecol);
+                
+                //신규삽입
+                insertExcelData(map);
+                list.add(map);
+            }
+            
+        } catch(Exception e) {
+        	// 파일이 잘못 들어오면 여기에 걸립니다.
+        	return null;
+        }
+        
+        return list;
+	}
+
+	@Override
+	public int insertExcelData(Map<String, Object> map) {
+		return sqlSession.insert("adminMapper.insertExcelData", map);
 	}
 
 
