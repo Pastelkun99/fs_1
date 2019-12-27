@@ -12,7 +12,7 @@
 				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=user">유저 관리</a></li>
 				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=analysis&a_no=1&q_selection=1111">설문 관리</a></li>
 				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=popup&pop_id=1">팝업 관리</a></li>
-				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=board">게시판 관리</a></li>
+				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=board&menu_no=1">게시판 관리</a></li>
 				<li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath }/mng/adminManagement.do?mode=menu">메뉴 관리</a></li>
 				<li class="nav-item"><button type="button" class="btn btn-danger" onClick="logoutLogic();">로그아웃</button></li>
 			</ul>

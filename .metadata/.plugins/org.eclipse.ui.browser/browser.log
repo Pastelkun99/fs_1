@@ -68,3 +68,7 @@
 
 12월 24, 2019 08:31:24.17 NEW SESSION
 12월 24, 2019 08:31:24.17 [7244:852:1224/083124.171:ERROR:data_pack.cc(117)] Could not open pak file for writing: ��û�� �۾���, ����ڰ� ������ ������ ���� �ִ� ������ ���Ͽ��� ������ �� �����ϴ�. (0x4C8)
+
+12월 27, 2019 08:29:47.57 NEW SESSION
+12월 27, 2019 08:29:47.57 [1828:13812:1227/082947.576:ERROR:data_pack.cc(117)] Could not open pak file for writing: ��û�� �۾���, ����ڰ� ������ ������ ���� �ִ� ������ ���Ͽ��� ������ �� �����ϴ�. (0x4C8)
+12월 27, 2019 08:30:10.70 [1828:4712:1227/083010.701:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -118

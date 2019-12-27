@@ -275,7 +275,7 @@ public class AdminController {
 	@RequestMapping(value = "/mng/excelDownload.do")
 	public void fileDownload(HttpServletResponse response, HttpServletRequest request, @RequestParam Map<String, String> paramMap) {
 
-		String path = paramMap.get("filePath"); // full경로
+		String path = paramMap.get("filePath"); 	// full경로
 		String fileName = paramMap.get("fileName"); // 파일명
 
 		File file = new File(path);

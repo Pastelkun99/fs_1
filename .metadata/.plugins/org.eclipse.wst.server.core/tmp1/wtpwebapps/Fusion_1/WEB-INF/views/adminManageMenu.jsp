@@ -42,6 +42,9 @@
 	$(function() {
 		$('#boardTable').tableDnD({
 			onDragClass : "dragRow",
+			onDrop : function(table, row) {
+				$('#orderCommit').click();
+			}
 	    });
 	})
 	
@@ -79,15 +82,15 @@
 		<div class="col-md-8">
 			<h1 style="text-align: center; margin-bottom: 30px;">메뉴 관리</h1>
 			<table id="boardTable" class="table" style="width:100%;">
-				<tr id="rowTemp">
+				<tr id="rowTemp" class="nodrag nodrop">
 					<th scope="col">순서</th>
 					<th scope="col">메뉴 이름</th>
 					<th scope="col">메뉴 사용 여부</th>
 					<th scope="col">MODE</th>
 				</tr>
 				<c:forEach items="${menuList }" var="menuList" varStatus="status">
-					<tr id="rowTemp" class="rowAttr">
-						<td>${status.index + 1}</td>
+					<tr id="rowTemp${status.index }" class="rowAttr">
+						<td><strong>${status.index + 1}</strong></td>
 						<td>${menuList.menu_name}</td>
 						<td>
 							<c:if test="${menuList.menu_useyn eq 'Y' }">
@@ -119,7 +122,7 @@ function newMenuAppend() {
 }
 
 function menuInfoUpdate(menu_no) {
-	window.open('/mng/menuInfoUpdate.do?menu_no=' + menu_no, '_blank', 'width=500px, height=700px');
+	window.open('/mng/menuInfoUpdate.do?menu_no=' + menu_no, '_blank', 'width=500px, height=300px');
 }
 
 function menuInfoDelete(menu_no) {

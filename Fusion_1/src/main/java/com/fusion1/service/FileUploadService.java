@@ -26,17 +26,16 @@ public class FileUploadService {
 			// 서버에서 저장 할 파일 이름
 			//String saveFileName = genSaveFileName(extName);
 			
-			System.out.println("originFilename : " + originFilename);
-			System.out.println("extensionName : " + extName);
-			System.out.println("size : " + size);
-			System.out.println("saveFileName : " + originFilename);
+			System.out.println("파일 이름 : " + originFilename);
+			System.out.println("확장자 : " + extName);
+			System.out.println("크기 : " + size);
+			System.out.println("서버에 저장되는 이름 : " + originFilename);
 			
 			writeFile(multipartFile, originFilename);
 			url = PREFIX_URL + originFilename;
 		}
 		catch (IOException e) {
-			// 원래라면 RuntimeException 을 상속받은 예외가 처리되어야 하지만
-			// 편의상 RuntimeException을 던진다.
+			// 원래라면 RuntimeException 을 상속받은 예외가 처리되어야 하지만 편의상 RuntimeException을 던진다.
 			// throw new FileUploadException();	
 			throw new RuntimeException(e);
 		}
@@ -45,6 +44,7 @@ public class FileUploadService {
 	
 	
 	// 현재 시간을 기준으로 파일 이름 생성
+	@SuppressWarnings("unused")
 	private String genSaveFileName(String extName) {
 		String fileName = "";
 		
@@ -63,8 +63,8 @@ public class FileUploadService {
 	
 	
 	// 파일을 실제로 write 하는 메서드
-	private boolean writeFile(MultipartFile multipartFile, String saveFileName)
-								throws IOException{
+	private boolean writeFile(MultipartFile multipartFile, String saveFileName) throws IOException {
+		
 		boolean result = false;
 
 		byte[] data = multipartFile.getBytes();

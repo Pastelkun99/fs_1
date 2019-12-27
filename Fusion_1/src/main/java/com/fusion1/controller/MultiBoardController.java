@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -284,7 +285,7 @@ public class MultiBoardController {
 			}
 			
 			// 조회수 up
-			ms.articleHitUpdate(article_no);
+			//ms.articleHitUpdate(article_no);
 			
 			model.addAttribute("article", article);
 			return "/multi/board";
@@ -316,7 +317,7 @@ public class MultiBoardController {
 			article.setArticle_content(convertedContents);
 			
 			// 조회수 up
-			ms.articleHitUpdate(article_no);
+			//ms.articleHitUpdate(article_no);
 			
 			model.addAttribute("article", article);
 			return "/multi/articleRead";
@@ -647,6 +648,9 @@ public class MultiBoardController {
 	public List<ReplyVO> getReplyList(@ModelAttribute ReplyVO reply) {
 		reply.setOrderType("new");
 		List<ReplyVO> reply_list = rs.getReplyList(reply);
+		if(reply_list.size() == 1 && reply_list.get(0).getReply_writer() == null) {
+			return null;
+		}
 		return reply_list;
 	}
 	
@@ -657,6 +661,9 @@ public class MultiBoardController {
 		System.out.println(replyVO.toString());
 		replyVO.setOrderType("new");
 		List<ReplyVO> result = rs.getReplyList(replyVO);
+		if(result == null) {
+			return null;
+		}
 		return result;
 	}
 	
@@ -681,12 +688,31 @@ public class MultiBoardController {
 	}
 	
 	// 댓글 삭제
-	@RequestMapping(value="/multi/deleteReply", method=RequestMethod.GET)
+	@RequestMapping(value="/multi/deleteReply", produces="application/text; charset=utf8")
 	@ResponseBody
-	public String deleteReply(@ModelAttribute ReplyVO reply, HttpServletRequest request) {
-		int result = rs.deleteReply(reply);
-		return String.valueOf(result);
+	public String deleteReply(@ModelAttribute ReplyVO reply, HttpServletRequest request, HttpSession session) {
+		System.out.println(reply.toString());
+		String currentUserid = (String)session.getAttribute("userid");
+		System.out.println(currentUserid);
+		int thisReplyNo = reply.getReply_no();
+		ReplyVO thisReplyVO = rs.getReplyOneByNo(thisReplyNo);
+		
+		int queryValue = 0;
+		if(thisReplyVO.getReply_userid() == null) {
+			return "그런 댓글은 존재하지 않습니다.";
+		} else  {
+			queryValue = rs.deleteReply(thisReplyVO);
+		}
+		
+		if(queryValue == 1) {
+			String result = "success";
+			return result;
+		} else {
+			String result = "fail";
+			return result;
+		}
 	}
+
 	
 	// 댓글 수정 확인
 	@RequestMapping(value="/multi/updateReplyConfirm", method=RequestMethod.POST)

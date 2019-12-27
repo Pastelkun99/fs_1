@@ -52,6 +52,7 @@
                 (SELECT @start_with:=0, @id:=@start_with, @level:=0) vars, replytbl
             WHERE
                 @id IS NOT NULL) B
+        WHERE reply_no != 0
     </select>
 	
 	

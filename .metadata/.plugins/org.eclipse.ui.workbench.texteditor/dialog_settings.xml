@@ -12,14 +12,14 @@
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
+			<item value="adjust"/>
+			<item value="hate"/>
 			<item value="getReplyList"/>
 			<item value="정합성"/>
 			<item value="poi"/>
 			<item value="poi-ooxml"/>
 			<item value="reply_like"/>
 			<item value="reply_component"/>
-			<item value="작성"/>
-			<item value="board_order"/>
 		</list>
 		<list key="replacehistory">
 			<item value="article"/>

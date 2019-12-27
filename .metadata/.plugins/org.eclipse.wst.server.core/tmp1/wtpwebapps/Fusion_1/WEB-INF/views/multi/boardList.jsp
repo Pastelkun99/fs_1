@@ -181,9 +181,9 @@
 								</c:if>
 								<c:if test="${article.article_deleteyn eq 'N' }">
 									<tr>
-										<td>${page.totalCount - (param.page_no-1)*param.pageSize - status.index}</td>								
+										<td><strong>${page.totalCount - (param.page_no-1)*param.pageSize - status.index}</strong></td>								
 										<td>
-											<a href="#"	onclick="javascript:void(window.open('board.do?board_no=${param.board_no}&article_no=${article.article_no}', '_blank', 'scrollbars=1')); return false;"/>${article.article_title}</a>
+											<strong><a href="#"	onclick="javascript:void(window.open('board.do?board_no=${param.board_no}&article_no=${article.article_no}', '_blank', 'scrollbars=1')); return false;"/>${article.article_title}</a></strong>
 											<c:if test="${article.article_secretyn eq 'Y' }">
 												<i class="fas fa-lock"></i>
 											</c:if>

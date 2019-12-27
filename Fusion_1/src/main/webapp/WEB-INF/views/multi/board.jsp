@@ -477,7 +477,6 @@
 				$('#replyListView').html(innerHTML);
 			},
 			error : function(error) {
-				alert('실패');
 			}
 		});
 	}
@@ -543,17 +542,24 @@
 	
 	function deleteReply(reply_no) {
 		// alert('삭제될 번호는' + reply_no);
+		var reply_userid = '${sessionScope.userid}';
+		
 		$.ajax({
-			type : "GET",
+			type : "POST",
 			url : "/multi/deleteReply",
-			data : {"reply_no" : reply_no},
-			dataType : "json",
+			data : {"reply_no" : reply_no,
+					"reply_userid" : reply_userid},
+			dataType : "text",
 			success : function(result) {
-				getReplyList();
-				//location.reload();
+				if(result == 'success') {
+					alert('댓글이 삭제되었습니다.');
+					getReplyList();
+				} else  {
+					alert('fail');
+				}
 			},
 			error : function(error) {
-				alert('오류 발생');
+				alert('여기에 걸렸다');
 			}
 		});
 	}

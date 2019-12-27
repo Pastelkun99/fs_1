@@ -23,6 +23,7 @@
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/TableDnD/1.0.3/jquery.tablednd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/TableDnD/1.0.3/jquery.tablednd.min.js"></script>
+<!-- <script type="text/javascript" src="resources/jquery.tablednd.js"></script> -->
 <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.css"/>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.js"></script>
@@ -40,7 +41,6 @@
 <body>
 <script type="text/javascript">
 	$(function() {
-		var ordered_items;
 		$('#boardTable').tableDnD({
 			onDragClass : "dragRow",
 	    });
@@ -73,15 +73,24 @@
 		})
 		
 	}
+	
+	
 </script>
 	<jsp:include page="adminNavbar.jsp"></jsp:include>
 	<div class="row">
 		<div class="col-md-2"></div>
 		<div class="col-md-8">
-			<h1 style="text-align: center; margin-bottom: 30px;">게시판 관리</h1>
+			<h1 style="text-align: center; margin-bottom: 4rem;">게시판 관리</h1>
+			<div class="row" style="margin-bottom: 2rem;">
+				<select id="boardMenu" class="form-control" style="width: 400px" onchange="select_board();">
+					<option value="" disabled selected>메뉴를 선택해주세요.</option>
+					<c:forEach items="${menuList }" var="menuList">
+						<option value="${menuList.menu_no}"<c:if test="${param.menu_no eq menuList.menu_no }"> selected </c:if>>${menuList.menu_name }</option>
+					</c:forEach>
+				</select>
+			</div>
 			<table id="boardTable" class="table" style="width:100%;">
-				<tr id="rowTemp">
-					<th scope="col">No</th>
+				<tr id="rowTemp" class="nodrop nodrag">
 					<th scope="col">게시판 이름</th>
 					<th scope="col">게시판 타입</th>
 					<th scope="col">답글 사용 여부</th>
@@ -91,8 +100,8 @@
 					<th scope="col">MODE</th>
 				</tr>
 				<c:forEach items="${multiList }" var="multiList" varStatus="status">
+					<c:if test="${multiList.menu_no eq param.menu_no}">
 					<tr id="rowTemp" class="rowAttr">
-						<th scope="row">${status.index + 1 }</th>
 						<td><input type="text" class="form-control" value="${multiList.board_name}" readonly="readonly" data-code="board_name"></td>
 						<td>
 							<select id="board_type${multiList.board_no}" name="board_type" class="form-control" data-code="board_type" disabled="disabled">
@@ -120,6 +129,7 @@
 						</td>
 						<td>
 							<select id="board_menuSetting${multiList.board_no}" name="menu_no" class="form-control" data-code="board_menuSetting" disabled="disabled">
+								<option value="" disabled selected>메뉴가 선택되지 않았습니다.</option>
 								<c:forEach items="${menuList }" var="menuList">
 									<option value="${menuList.menu_no }" <c:if test="${menuList.menu_no eq multiList.menu_no }"> selected </c:if>>${menuList.menu_name }</option>
 								</c:forEach>
@@ -131,6 +141,7 @@
 							<button type="button" id="boardInfoDelete(${multiList.board_no})" onclick="boardInfoDelete(${multiList.board_no});" class="btn btn-danger">삭제</button>
 						</td>
 					</tr>
+					</c:if>
 				</c:forEach>
 			</table>
 			<button type="button" id="newBoardAppend" onclick="newBoardAppend();" class="btn btn-success">등록</button>
@@ -175,6 +186,12 @@ function boardInfoDelete(board_no) {
 			alert('문제가 발생했습니다.');
 		}
 	});
+}
+
+function select_board() {
+	var board_no = $('#boardMenu').val();
+	var root = '${pageContext.request.contextPath}';
+	location.href = root + '/mng/adminManagement.do?mode=board&menu_no=' + board_no;
 }
 
 function logoutLogic() {

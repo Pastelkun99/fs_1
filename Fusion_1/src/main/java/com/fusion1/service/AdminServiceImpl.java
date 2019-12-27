@@ -122,12 +122,13 @@ public class AdminServiceImpl implements AdminService {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 	        
         try {
+        	// excelFile 변수에는 엑셀 파일의 절대경로가 들어와야 정상.
             Workbook wbs = ExcelUtil.getWorkbook(excelFile);
             Sheet sheet = (Sheet) wbs.getSheetAt(0);
-            int sival = sheet.getFirstRowNum();
-            System.out.println("firstrownum : " + sival);
-            int ssival = sheet.getLastRowNum();
-            System.out.println("lastrownum : " + ssival);
+            int firstRow = sheet.getFirstRowNum();
+            System.out.println("firstrownum : " + firstRow);
+            int lastRow = sheet.getLastRowNum();
+            System.out.println("lastrownum : " + lastRow);
  
             //excel file 세번째줄부터 시작
             for (int i = sheet.getFirstRowNum() + 2; i <= sheet.getLastRowNum(); i++) {
@@ -160,9 +161,11 @@ public class AdminServiceImpl implements AdminService {
                 map.put("NAMECOL", namecol);
                 
                 //신규삽입
-                insertExcelData(map);
                 list.add(map);
+                insertExcelData(map);
             }
+            
+            
             
         } catch(Exception e) {
         	// 파일이 잘못 들어오면 여기에 걸립니다.
