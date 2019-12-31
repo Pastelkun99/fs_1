@@ -43,6 +43,9 @@
 	$(function() {
 		$('#boardTable').tableDnD({
 			onDragClass : "dragRow",
+			onDrop : function(table, row) {
+				$('#orderCommit').click();
+			}
 	    });
 	})
 	
@@ -51,8 +54,6 @@
 		$('.rowAttr').each(function(index) {
 			var totalArr = {};
 			$(this).find('td').each(function() {
-				/* alert($(this).find('.form-control').attr('data-code'));
-				alert($(this).find('.form-control').val()); */
 				totalArr[$(this).find('.form-control').attr('data-code')] = $(this).find('.form-control').val();
 			});
 			totalArr['board_order'] = index;
@@ -64,13 +65,13 @@
 				data : JSON.stringify(totalArr),
 				dataType : "json",
 				success : function(result) {
-					window.location.reload();
+					//window.location.reload();
 				},
 				error : function(error) {
 					alert('문제 발생' + error);
 				}
-			})
-		})
+			});
+		});
 		
 	}
 	
@@ -91,6 +92,7 @@
 			</div>
 			<table id="boardTable" class="table" style="width:100%;">
 				<tr id="rowTemp" class="nodrop nodrag">
+					<th scope="col">No</th>
 					<th scope="col">게시판 이름</th>
 					<th scope="col">게시판 타입</th>
 					<th scope="col">답글 사용 여부</th>
@@ -101,34 +103,35 @@
 				</tr>
 				<c:forEach items="${multiList }" var="multiList" varStatus="status">
 					<c:if test="${multiList.menu_no eq param.menu_no}">
-					<tr id="rowTemp" class="rowAttr">
-						<td><input type="text" class="form-control" value="${multiList.board_name}" readonly="readonly" data-code="board_name"></td>
+					<tr id="rowTemp${status.index }" class="rowAttr">
+						<td><strong>${status.index + 1 }</strong></td>
+						<td><input type="text" class="form-control" value="${multiList.board_name}" readonly="readonly" data-code="board_name" name="board_name" /></td>
 						<td>
-							<select id="board_type${multiList.board_no}" name="board_type" class="form-control" data-code="board_type" disabled="disabled">
+							<select id="board_type${multiList.board_no}" name="board_type" class="form-control" data-code="board_type">
 								<option value="0"<c:if test="${multiList.board_type eq 0 }"> selected </c:if>>일반형</option>
 								<option value="1"<c:if test="${multiList.board_type eq 1 }"> selected </c:if>>알림형</option> 
 							</select>
 						</td>
 						<td>
-							<select id="board_reBoardAval${multiList.board_no}" name="board_reBoardAval" class="form-control" data-code="board_reBoardAval" disabled="disabled">
+							<select id="board_reBoardAval${multiList.board_no}" name="board_reBoardAval" class="form-control" data-code="board_reBoardAval" >
 								<option value="Y"<c:if test="${multiList.board_reboardyn eq 'Y' }"> selected </c:if>>활성화</option>
 								<option value="N"<c:if test="${multiList.board_reboardyn eq 'N' }"> selected </c:if>>비활성화</option> 
 							</select>
 						</td>
 						<td>
-							<select id="board_replyAval${multiList.board_no}" name="board_replyAval" class="form-control" data-code="board_replyAval" disabled="disabled">
+							<select id="board_replyAval${multiList.board_no}" name="board_replyAval" class="form-control" data-code="board_replyAval" >
 								<option value="Y"<c:if test="${multiList.board_replyyn eq 'Y' }"> selected </c:if>>활성화</option>
 								<option value="N"<c:if test="${multiList.board_replyyn eq 'N' }"> selected </c:if>>비활성화</option> 
 							</select>
 						</td>
 						<td>
-							<select id="board_secretAval${multiList.board_no}" name="board_secretAval" class="form-control" data-code="board_secretAval" disabled="disabled">
+							<select id="board_secretAval${multiList.board_no}" name="board_secretAval" class="form-control" data-code="board_secretAval" >
 								<option value="Y"<c:if test="${multiList.board_secretyn eq 'Y' }"> selected </c:if>>활성화</option>
 								<option value="N"<c:if test="${multiList.board_secretyn eq 'N' }"> selected </c:if>>비활성화</option> 
 							</select>
 						</td>
 						<td>
-							<select id="board_menuSetting${multiList.board_no}" name="menu_no" class="form-control" data-code="board_menuSetting" disabled="disabled">
+							<select id="board_menuSetting${multiList.board_no}" name="menu_no" class="form-control" data-code="board_menuSetting" >
 								<option value="" disabled selected>메뉴가 선택되지 않았습니다.</option>
 								<c:forEach items="${menuList }" var="menuList">
 									<option value="${menuList.menu_no }" <c:if test="${menuList.menu_no eq multiList.menu_no }"> selected </c:if>>${menuList.menu_name }</option>

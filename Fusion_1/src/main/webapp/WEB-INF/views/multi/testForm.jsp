@@ -13,6 +13,9 @@
 <title>테스트 중입니다.</title>
 </head>
 <body>
+<div class="row">
+<div class="col-md-3"></div>
+<div class="col-md-6">
 <table class="table table-striped">
   <thead>
     <tr>
@@ -28,7 +31,6 @@
       <td>
       	<form name="readArticle" id="readArticle${boardList.board_no }" action="/multi/testFormArticle.do" method="post" target="popup_window">
       		<input type="hidden" id="board_no" name="board_no" value="${boardList.board_no }">
-	      	<%-- <a href="#" onclick="document.getElementById('readArticle').submit();">${boardList.board_title }</a> --%>
 	      	<a href="#" id="submitLink" onclick="goToArticle(${boardList.board_no});" class="goToArticle ${boardList.board_no }">${boardList.board_title }</a>
       	</form>
       </td>
@@ -37,6 +39,9 @@
   	</c:forEach>
   </tbody>
 </table>
+</div>
+<div class="col-md-3"></div>
+</div>
 <script type="text/javascript">
 	/* function goToArticle() {
 		var articleForm = document.readArticle;

@@ -1,6 +1,8 @@
 package com.fusion1.dao;
 
-public class UserVO {
+import java.io.Serializable;
+
+public class UserVO implements Serializable {
 
 	private int userno;
 	private String userid;
@@ -60,7 +62,7 @@ public class UserVO {
 	@Override
 	public String toString() {
 		return "UserVO [userno=" + userno + ", userid=" + userid + ", userpw=" + userpw + ", username=" + username
-				+ ", user_admin=" + user_admin + ", user_aval=" + user_aval + "]";
+				+ "]";
 	}
 
 }

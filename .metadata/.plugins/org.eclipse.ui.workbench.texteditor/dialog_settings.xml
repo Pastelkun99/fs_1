@@ -6,20 +6,20 @@
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="getReplyList" key="selection"/>
+		<item value="summernote" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="adjust"/>
-			<item value="hate"/>
-			<item value="getReplyList"/>
-			<item value="정합성"/>
-			<item value="poi"/>
-			<item value="poi-ooxml"/>
-			<item value="reply_like"/>
-			<item value="reply_component"/>
+			<item value="summernote"/>
+			<item value="userinfoup"/>
+			<item value="info"/>
+			<item value="nonread"/>
+			<item value="getnonreadlist"/>
+			<item value="nonReadLIst"/>
+			<item value="당신이"/>
+			<item value="articleList"/>
 		</list>
 		<list key="replacehistory">
 			<item value="article"/>

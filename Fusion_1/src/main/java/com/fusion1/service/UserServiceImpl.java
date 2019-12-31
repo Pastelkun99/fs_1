@@ -8,10 +8,13 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fusion1.dao.IndividualVO;
 import com.fusion1.dao.UserVO;
 
 @Service
 public class UserServiceImpl implements UserService {
+	
+	private static final String NAMESPACE = "userMapper.";
 
 	@Autowired
 	@Resource(name="sqlSession")
@@ -19,40 +22,43 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserVO userLogin(String inputID) {
-		return sqlsession.selectOne("userMapper.userLogin", inputID);
+		return sqlsession.selectOne(NAMESPACE + "userLogin", inputID);
 	}
 
 	@Override
 	public int userRegister(UserVO uservo) {
-		return sqlsession.insert("userMapper.userRegister", uservo);
+		return sqlsession.insert(NAMESPACE + "userRegister", uservo);
 	}
 
 	@Override
 	public UserVO userIdCheck(String inputID) {
-		return sqlsession.selectOne("userMapper.userLogin", inputID);
+		return sqlsession.selectOne(NAMESPACE + "userLogin", inputID);
 	}
 
 	@Override
 	public UserVO adminCheck(UserVO userVO) {
-		return sqlsession.selectOne("userMapper.getAdminInfo", userVO);
+		return sqlsession.selectOne(NAMESPACE + "getAdminInfo", userVO);
 	}
 
 	@Override
 	public List<UserVO> getUserList() {
-		return sqlsession.selectList("userMapper.getUserList");
+		return sqlsession.selectList(NAMESPACE + "getUserList");
 	}
 
 	@Override
 	public UserVO getUserInfo(String userid) {
-		return sqlsession.selectOne("userMapper.getUserInfo", userid);
+		return sqlsession.selectOne(NAMESPACE + "getUserInfo", userid);
 	}
 
 	@Override
 	public int userInfoUpdate(UserVO userVO) {
-		return sqlsession.update("userMapper.updateUserInfo", userVO);
+		return sqlsession.update(NAMESPACE + "updateUserInfo", userVO);
 	}
 
-	
+	@Override
+	public List<IndividualVO> getUserIndividualInfoList(UserVO userVO) {
+		return sqlsession.selectList(NAMESPACE + "getUserIndividualInfoList", userVO);
+	}
 	
 
 }

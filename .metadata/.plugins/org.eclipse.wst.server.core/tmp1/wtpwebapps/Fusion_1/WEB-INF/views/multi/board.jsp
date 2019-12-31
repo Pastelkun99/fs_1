@@ -405,6 +405,7 @@
 			success : function(result) {
 				getReplyList();
 				$('#replyContent').val('');
+				opener.location.reload();
 			},
 			error : function(error) {
 				alert('오류 발생');

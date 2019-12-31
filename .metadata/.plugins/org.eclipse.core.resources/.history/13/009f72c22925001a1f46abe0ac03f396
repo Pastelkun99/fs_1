@@ -1,8 +1,0 @@
-<h4><a href="http://localhost:8080/multi/boardList.do?board_no=-1&page_no=1&pageSize=10">Board List</a></h4>
-	<ul class="list-group">
-	<c:forEach items="${boardList }" var="boardName">
-	  <li class="list-group-item">
-	  	<c:if test="${boardName.board_type eq 1 }"><i class="fas fa-lightbulb"></i></c:if>
-	  	<a href="${pageContext.request.contextPath}/multi/boardList.do?board_no=${boardName.board_no }&page_no=1&pageSize=10">${boardName.board_name }</a></li>
-	</c:forEach>
-	</ul>

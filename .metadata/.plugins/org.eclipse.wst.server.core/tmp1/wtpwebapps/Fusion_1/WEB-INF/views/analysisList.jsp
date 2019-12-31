@@ -30,7 +30,6 @@
 		</div>
 		<!-- 질문 출력 -->
 		<c:forEach items="${questionList }" var="question" varStatus="status">
-				<!-- 지정한 페이지와 같은 페이지 컬럼을 가진 항목만 출력함 -->
 				<c:if test="${question.q_page eq param.page }">
 					<div class="card" style="width: 100%; margin-bottom:40px;">
 	  					<div class="card-header">
@@ -120,7 +119,6 @@
 			  				  		</c:if>
 		  				  		
 		  			  			</c:if>
-		  			  			<!-- 문제에 맞는 문항 출력 끝 -->
 	  			  			</c:forEach>
 	  			  			<!-- 문제 출력 끝 -->
 	  			  			

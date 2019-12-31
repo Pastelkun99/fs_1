@@ -60,6 +60,14 @@ public class AdminController {
 	
 	@Autowired
 	MultiBoardServiceImpl ms;
+	
+	// 테스트 메소드
+	@RequestMapping(value="/mng/somethingEvent.do", produces="application/text; charset=UTF-8")
+	@ResponseBody
+	public String somethingEventMethod(@RequestBody UserVO multiboardVO) {
+		System.out.println(multiboardVO.toString());
+		return "됐어!";
+	}
 
 	// 관리자를 체크하기 위한 메소드
 	@RequestMapping(value="/mng/adminCheck.do", method=RequestMethod.GET)
@@ -213,7 +221,7 @@ public class AdminController {
 	@RequestMapping(value="/mng/userInfoUpdate.do")
 	@ResponseBody
 	public String updateUserInfo(UserVO userVO) {
-		//System.out.println(userVO.toString());
+		System.out.println(userVO.toString());
 		int result = us.userInfoUpdate(userVO);
 		return String.valueOf(result);
 	}
@@ -231,13 +239,25 @@ public class AdminController {
 	@ResponseBody
 	public String excelUploadPost(@RequestParam("excelFile") MultipartFile file, Model model, HttpServletRequest request, HttpServletResponse response) {
 		
-		try {
+		String result = fileUploadService.restore(file);
+		
+		// 익셉션이 발생하지 않았다면 일단 null 값을 가지지는 않을 것이다.
+		if(result == null || result.equals("")) {
+			// 뭔가 에러가 발생한 경우
+			return "파일이 업로드 되지 못했습니다.";
+		} else {
+			// 정상적으로 수행 된 경우
+			return "파일이 정상적으로 업로드 되었습니다.";
+		}
+		
+		/*try {
 			String result = fileUploadService.restore(file);
 			Map returnObject = new HashMap();
 			MultipartHttpServletRequest mhsr = (MultipartHttpServletRequest)request;
 			Iterator iter = mhsr.getFileNames();
 			MultipartFile mfile = null;
 			String fieldName = "";
+			
 			// 값이 나올때까지
             while (iter.hasNext()) { 
                 fieldName = iter.next().toString(); // 내용을 가져와서 
@@ -245,10 +265,12 @@ public class AdminController {
                 String origName;
                 //origName = new String(mfile.getOriginalFilename().getBytes("8859_1"), "UTF-8"); //한글꺠짐 방지 // 파일명이 없다면
                 origName = mfile.getOriginalFilename();
-                returnObject.put("params", mhsr.getParameterMap()); 
+                returnObject.put("params", mhsr.getParameterMap());
+                
                 //위치 및 파일
                 List<?> testList = as.getExcelUpload("C:\\upload\\" + origName);
                 if(testList == null) {
+                	
                 	// 문제가 있을 때
                 	String msg = "올바른 파일 형식이 아니거나, 정합성을 만족하지 않습니다.\n정합성을 만족하는 일부 행만 데이터에 추가되었을 수 있습니다.\n새로고침된 페이지에서 등록된 데이터를 확인하세요.";
                 	request.setCharacterEncoding("UTF-8");
@@ -269,7 +291,7 @@ public class AdminController {
             } catch (StringIndexOutOfBoundsException e) {
             	e.printStackTrace();
             	return "파일 형식이 올바르지 않습니다.";
-			}
+			}*/
 	}
 	
 	@RequestMapping(value = "/mng/excelDownload.do")
@@ -626,7 +648,6 @@ public class AdminController {
 	@RequestMapping(value="/mng/boardOrderCommit.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String boardOrderCommitPost(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> params) {
-		//System.out.println(params.toString());
 		
 		MultiBoardVO thisBoardinfo = new MultiBoardVO();
 		thisBoardinfo.setBoard_no(Integer.parseInt((String)params.get("board_no")));

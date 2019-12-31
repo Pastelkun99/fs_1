@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ page session="true"%>
 <meta charset="UTF-8">
@@ -111,6 +112,7 @@
 						<button type="button" class="btn btn-outline-secondary" onClick="location.href='${pageContext.request.contextPath}/mng/adminCheck.do'">관리자 페이지</button>
 					</c:if>
 					<%-- <button type="button" class="btn btn-dark" onClick="location.href='${pageContext.request.contextPath}/multi/testForm.do'">테스트 폼</button> --%>
+					<button type="button" class="btn btn-dark" onClick="location.href='/multi/individualInfo.do'">유저 개인 페이지</button>
 					
 					<c:if test="${param.board_no ne -1}">
 						<form name="pagefrm" method="get">
@@ -164,7 +166,11 @@
 						<c:forEach var="noticeBoard" items="${noticeList }">
 							<tr>
 								<td><strong>공지</strong></td>
-								<td><a href="#" onclick="javascript:void(window.open('board.do?board_no=${noticeBoard.board_no}', '_blank', 'height=600px, scrollbars=yes'));" />${noticeBoard.board_title }</a></td>
+								<td><a href="#" onclick="javascript:void(window.open('board.do?board_no=${noticeBoard.board_no}', '_blank', 'height=600px, scrollbars=yes'));" />${noticeBoard.board_title }</a>
+								<c:if test="${noticeBoard.reply_cnt ne 0 }">
+								&nbsp;[${noticeBoard.reply_cnt }]
+								</c:if>
+								</td>
 								<td>${noticeBoard.board_writer}</td>
 								<td>${noticeBoard.board_hit}</td>
 								<td>${noticeBoard.board_date}</td>
@@ -183,9 +189,16 @@
 									<tr>
 										<td><strong>${page.totalCount - (param.page_no-1)*param.pageSize - status.index}</strong></td>								
 										<td>
-											<strong><a href="#"	onclick="javascript:void(window.open('board.do?board_no=${param.board_no}&article_no=${article.article_no}', '_blank', 'scrollbars=1')); return false;"/>${article.article_title}</a></strong>
+											<strong><a href="#"	onclick="javascript:void(window.open('board.do?board_no=${param.board_no}&article_no=${article.article_no}', '_blank', 'scrollbars=1')); return false;"/>${article.article_title}
+											</a></strong>
+											<c:if test="${article.reply_cnt ne 0 }" >
+											&nbsp;[${article.reply_cnt }]
+											</c:if>
+											<c:if test="${fn:indexOf(article.article_content, 'img') ne -1}">
+											&nbsp;<i class="far fa-image"></i>
+											</c:if>
 											<c:if test="${article.article_secretyn eq 'Y' }">
-												<i class="fas fa-lock"></i>
+												&nbsp;<i class="fas fa-lock"></i>
 											</c:if>
 										</td>
 										<td>${article.article_writer}</td>
@@ -237,9 +250,15 @@
 						      <td>${nonReadList.board_name }</td>
 						      <td>
 						      	<c:if test="${nonReadList.article_secretyn eq 'Y' }">
-						      		<i class="fas fa-lock"></i>
+						      		&nbsp;<i class="fas fa-lock"></i>
 						      	</c:if>
 						      	<a href="#" onclick="javascript:void(window.open('board.do?board_no=${nonReadList.board_no}&article_no=${nonReadList.article_no}', '${nonReadList.article_title }', '_blank')); return false;">${nonReadList.article_title }</a>
+						      	<c:if test="${nonReadList.reply_cnt ne 0 }">
+						      	&nbsp;[${nonReadList.reply_cnt }]
+						      	</c:if>
+						      	<c:if test="${fn:indexOf(nonReadList.article_content, 'img') ne -1}">
+								&nbsp;<i class="far fa-image"></i>
+								</c:if>
 						      </td>
 						      <td>${nonReadList.article_date }</td>
 						    </tr>
@@ -302,6 +321,7 @@
 				//document.getElementById('myModal').click();
 			}
 		});
+		
 
 		function setCookie(cname, value, expire) {
 			var todayValue = new Date();

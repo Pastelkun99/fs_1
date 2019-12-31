@@ -28,4 +28,21 @@
 		UPDATE usertbl SET user_admin = #{user_admin}, user_aval = #{user_aval} WHERE userno = #{userno}
 	</update>
 	
+	<select id="getUserIndividualInfoList" parameterType="UserVO" resultType="IndividualVO">
+		SELECT
+				A.menu_name,
+				B.board_no,
+				B.article_no,
+				B.article_userid,
+				B.article_writer,
+				B.article_title,
+				substring(B.article_content, 1, 100) as article_content
+		FROM
+				menutbl A,
+				articletbl B,
+				multiboardtbl C
+		WHERE
+				A.menu_no = C.menu_no AND B.board_no = C.board_no AND B.article_userid = #{userid}				
+	</select>
+	
 </mapper>

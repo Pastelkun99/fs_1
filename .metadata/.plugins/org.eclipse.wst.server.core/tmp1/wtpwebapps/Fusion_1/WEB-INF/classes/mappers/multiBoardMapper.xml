@@ -6,21 +6,22 @@
 	
 	<select id="getArticleListByBoardNo" parameterType="MultiBoardVO" resultType="ArticleVO">
 		SELECT 
-			   article_no,
-			   board_no,
-			   article_writer,
-			   article_userid,
-			   article_title,
-			   article_content,
-			   article_secretyn,
-			   article_password,
-			   article_parentsno,
-			   article_grouporder,
-			   article_groupdepth,
-			   article_hit,
+			   B.article_no,
+			   B.board_no,
+			   B.article_writer,
+			   B.article_userid,
+			   B.article_title,
+			   B.article_content,
+			   B.article_secretyn,
+			   B.article_password,
+			   B.article_parentsno,
+			   B.article_grouporder,
+			   B.article_groupdepth,
+			   B.article_hit,
 			   DATE_FORMAT(article_date, '%Y-%m-%d %H:%i:%s') AS article_date,
-			   article_deleteyn,
-			   article_noticeyn
+			   B.article_deleteyn,
+			   B.article_noticeyn,
+               (SELECT COUNT(*) FROM replytbl A WHERE A.article_no = B.article_no) as reply_cnt
 		FROM multiboardtbl A, articletbl B
 		WHERE A.board_no = B.board_no AND A.board_no = #{board_no}
 		ORDER BY article_parentsno DESC, article_grouporder ASC, article_date DESC
@@ -40,12 +41,13 @@
 			   B.article_grouporder,
 			   B.article_groupdepth,
 			   B.article_hit,
-			   DATE_FORMAT(B.article_date, '%Y-%m-%d %H:%i:%s') AS article_date,
+			   DATE_FORMAT(article_date, '%Y-%m-%d %H:%i:%s') AS article_date,
 			   B.article_deleteyn,
-			   B.article_noticeyn
+			   B.article_noticeyn,
+			   (SELECT COUNT(*) FROM replytbl A WHERE A.article_no = B.article_no) as reply_cnt
 		FROM multiboardtbl A, articletbl B
 		WHERE A.board_no = B.board_no AND A.board_no = #{board_no}
-		ORDER BY article_parentsno DESC, article_grouporder ASC, article_date DESC LIMIT ${pageCon}, #{pageList}
+		ORDER BY article_parentsno DESC, article_grouporder ASC, article_date DESC LIMIT #{pageCon}, #{pageList}
 	</select>
 
 	<select id="getArticleCountByBoardNo" parameterType="MultiBoardVO" resultType="ArticleVO">
@@ -293,7 +295,7 @@
 	</insert>
 	
 	<select id="getNonReadNoticeList" parameterType="MultiBoardVO" resultType="ArticleVO">
-		SELECT A.board_name, B.* 
+		SELECT A.board_name, B.*, (SELECT COUNT(*) FROM replytbl A WHERE A.article_no = B.article_no) as reply_cnt
 			FROM multiboardtbl A, articletbl B 
 			WHERE B.board_no IN (SELECT board_no FROM multiboardtbl WHERE board_type = 1) 
 					AND B.article_no NOT IN (SELECT article_no from readnoticetbl where user_id = #{user_id})

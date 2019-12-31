@@ -5,6 +5,7 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Base64.Encoder;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fusion1.dao.ArticleVO;
 import com.fusion1.dao.BoardVO;
+import com.fusion1.dao.IndividualVO;
 import com.fusion1.dao.MenuVO;
 import com.fusion1.dao.MultiBoardVO;
 import com.fusion1.dao.PagenationVO;
@@ -285,7 +288,7 @@ public class MultiBoardController {
 			}
 			
 			// 조회수 up
-			//ms.articleHitUpdate(article_no);
+			ms.articleHitUpdate(article_no);
 			
 			model.addAttribute("article", article);
 			return "/multi/board";
@@ -317,7 +320,7 @@ public class MultiBoardController {
 			article.setArticle_content(convertedContents);
 			
 			// 조회수 up
-			//ms.articleHitUpdate(article_no);
+			ms.articleHitUpdate(article_no);
 			
 			model.addAttribute("article", article);
 			return "/multi/articleRead";
@@ -618,6 +621,31 @@ public class MultiBoardController {
 		 
 		return String.valueOf(result);
 	}
+	
+	@RequestMapping(value="/multi/individualInfo.do")
+	public String individualInfo(HttpSession session, Model model) {
+		String currentUserId = (String)session.getAttribute("userid");
+		System.out.println("넘어온 아이디 : " + currentUserId);
+		
+		// 새로운 객체 생성
+		UserVO userVO = new UserVO();
+		userVO.setUserid(currentUserId);
+		List<IndividualVO> indiList = us.getUserIndividualInfoList(userVO);
+		Iterator<IndividualVO> indiListIt = indiList.iterator();
+		while(indiListIt.hasNext()) {
+			IndividualVO info = indiListIt.next();
+			String tag = info.getArticle_content();
+			tag = tag.replaceAll("img", "");
+			String nor = XssPreventer.unescape(tag);
+			info.setArticle_content(nor);
+		}
+		
+		model.addAttribute("indiList", indiList);
+		
+		return "/multi/individualInfo";
+	}
+	
+	
 	
 	
 	// 댓글 처리 관련

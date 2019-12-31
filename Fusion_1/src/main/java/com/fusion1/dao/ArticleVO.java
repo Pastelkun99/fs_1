@@ -21,6 +21,7 @@ public class ArticleVO {
 	private String menu_name;
 	
 	private String board_name;
+	private String reply_cnt;
 
 	public int getArticle_no() {
 		return article_no;
@@ -165,6 +166,14 @@ public class ArticleVO {
 	public void setMenu_name(String menu_name) {
 		this.menu_name = menu_name;
 	}
+	
+	public String getReply_cnt() {
+		return reply_cnt;
+	}
+
+	public void setReply_cnt(String reply_cnt) {
+		this.reply_cnt = reply_cnt;
+	}
 
 	@Override
 	public String toString() {
@@ -174,8 +183,8 @@ public class ArticleVO {
 				+ ", article_parentsno=" + article_parentsno + ", article_grouporder=" + article_grouporder
 				+ ", article_groupdepth=" + article_groupdepth + ", article_hit=" + article_hit + ", article_date="
 				+ article_date + ", article_deleteyn=" + article_deleteyn + ", article_noticeyn=" + article_noticeyn
-				+ ", cnt=" + cnt + ", menu_name=" + menu_name + ", board_name=" + board_name + "]";
+				+ ", cnt=" + cnt + ", menu_name=" + menu_name + ", board_name=" + board_name + ", reply_cnt="
+				+ reply_cnt + "]";
 	}
-	
-	
+
 }

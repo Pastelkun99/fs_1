@@ -87,9 +87,33 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				$('#article_content').summernote({
-					height:400
+					height:400,
+					callbacks: {
+						onImageUpload: function(files, editor, welEditable) {
+							for(var i = file.length - 1; i>=0; i--) {
+								sendFile(files[i], this);
+							}
+						}
+					}
 				});
 			});
+			
+			/*  function sendFile(file, el) {
+				var form_data = new FormData();
+				form_data.append('file', file);
+				$.ajax({
+					data : form_data,
+					type : "POST",
+					url : "/multi/profileImageUpload.do",
+					cache : false,
+					contentType : false,
+					enctype : "mulripart/form-data",
+					processData, false,
+					success : function(img_name) {
+						$(el).summernote('editor.insertImage', img_name);
+					}
+				})
+			} */
 			
 			$('#article_secretyn').change(function() {
 				var state = $('#article_secretyn option:selected').val();

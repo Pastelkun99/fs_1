@@ -72,3 +72,11 @@
 12월 27, 2019 08:29:47.57 NEW SESSION
 12월 27, 2019 08:29:47.57 [1828:13812:1227/082947.576:ERROR:data_pack.cc(117)] Could not open pak file for writing: ��û�� �۾���, ����ڰ� ������ ������ ���� �ִ� ������ ���Ͽ��� ������ �� �����ϴ�. (0x4C8)
 12월 27, 2019 08:30:10.70 [1828:4712:1227/083010.701:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -118
+
+12월 30, 2019 08:30:03.60 NEW SESSION
+12월 30, 2019 08:30:03.60 [14060:14584:1230/083003.603:ERROR:data_pack.cc(117)] Could not open pak file for writing: ��û�� �۾���, ����ڰ� ������ ������ ���� �ִ� ������ ���Ͽ��� ������ �� �����ϴ�. (0x4C8)
+12월 30, 2019 08:30:27.42 [14060:4144:1230/083027.426:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -118
+12월 30, 2019 12:31:05.72 [14060:4144:1230/123105.728:ERROR:socket_stream.cc(218)] Closing stream with result -2
+12월 30, 2019 12:31:26.73 [14060:4144:1230/123126.733:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -118
+12월 30, 2019 12:49:43.79 [14060:4144:1230/124943.796:ERROR:socket_stream.cc(218)] Closing stream with result -2
+12월 30, 2019 12:51:59.99 [14060:4144:1230/125159.990:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -118

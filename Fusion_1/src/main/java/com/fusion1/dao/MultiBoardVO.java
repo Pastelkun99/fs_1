@@ -1,6 +1,8 @@
 package com.fusion1.dao;
 
-public class MultiBoardVO {
+import java.io.Serializable;
+
+public class MultiBoardVO implements Serializable {
 
 	private int board_no;
 	private String board_name;

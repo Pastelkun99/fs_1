@@ -33,17 +33,17 @@
 </head>
 <body>
 <script type="text/javascript">
-	$(document).ready(function() {
+/* 	$(document).ready(function() {
 	    $('#userTable').DataTable();
-	} );
+	} ); */
 </script>
 	<jsp:include page="adminNavbar.jsp"></jsp:include>
 	<div class="row">
 		<div class="col-md-3"></div>
 		<div class="col-md-6">
 			<h1 style="text-align: center; margin-bottom: 30px;">유저 관리</h1>
-			<table id="userTable" class="display" style="width:100%;">
-				<thead class="thead-dark">
+			<table id="userTable" class="table" style="width:100%;">
+				<thead class="thead-light">
 					<tr>
 						<th scope="col">No</th>
 						<th scope="col">ID</th>
@@ -75,16 +75,64 @@
 							<button type="button" id="userInfoUpdate${userList.userno }" onclick="userInfoUpdate(${userList.userno});" class="btn btn-outline-success">수정</button>
 						</td>
 					</tr>
+					<form id="serializeTest${status.index }">
+						<input type="hidden" name="userno" id="userno" value="${userList.userno }">
+						<input type="hidden" name="userid" id="userid" value="${userList.userid }">
+						<input type="hidden" name="username" id="username" value="${userList.username }">
+					</form>
 				</c:forEach>
 				</tbody>
 			</table>
 			<button type="button" id="excelUpload" onclick="excelUploadOpen();" class="btn btn-warning">엑셀 업로드</button>
 			<button type="button" id="excelDownload" class="btn btn-info">샘플파일 다운로드</button>
+			<button type="button" id="testAjax" class="btn btn-secondary" onclick="testAjax();">테스트</button>
 		</div>
 		<div class="col-md-3"></div>
 	</div>
 <script>
 var url = '${pageContext.request.contextPath}';
+
+jQuery.fn.serializeObject = function() { 
+    var obj = null; 
+    try { 
+        if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) { 
+            var arr = this.serializeArray(); 
+            if(arr) { 
+            obj = {}; 
+            jQuery.each(arr, function() { 
+                obj[this.name] = this.value; }); 
+            } 
+        } 
+    } catch(e) { 
+        alert(e.message); 
+    } finally { } 
+    return obj; 
+ }
+
+function testAjax() {
+	
+	/* var jsonData = {"data1" : 406,
+					"data2" : "두번째 String",
+					"data3" : "세번째 String",
+					"data4" : 2275} */
+	
+	var str = $('#serializeTest0').serializeObject();
+					
+	$.ajax({
+		type : "POST",
+		url : "/mng/somethingEvent.do",
+		contentType : "application/json; charset=UTF-8",
+		/* data : JSON.stringify(jsonData), */
+		data : JSON.stringify(str),
+		dataType : "text",
+		success : function(result) {
+			alert(result);
+		},
+		error : function(error) {
+			alert('Fail...');
+		}
+	});
+}
 
 $('#excelDownload').click(function() {
 		

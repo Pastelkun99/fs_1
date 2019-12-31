@@ -52,17 +52,20 @@ function closeWindow() {
 
 function fileUpload() {
 	
-	var fileName = $('#excelFile').prop("files")[0]['name'];
 	var fileCheck = $('#excelFile').val();
+	alert(fileCheck);
+	var fileName = $('#excelFile').prop("files")[0]['name'];
+	alert(fileName);
+	
 	if(!fileCheck) {
 		alert('파일이 첨부되지 않았습니다.');
 		return false;
 	}
 	
-	if(fileName.indexOf('xlsx') == -1) {
+	/* if(fileName.indexOf('xlsx') == -1) {
 		alert('업로드한 파일은 엑셀 파일이 아닙니다.');
 		return false;
-	}
+	} */
 	
 	var form = $('#fileUploadForm')[0];
 	var data = new FormData(form);

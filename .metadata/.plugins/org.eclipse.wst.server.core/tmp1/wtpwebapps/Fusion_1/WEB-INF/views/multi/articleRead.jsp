@@ -68,6 +68,12 @@
 			
 			<c:if test="${boardConfig.board_replyyn eq 'Y' }">
 				<hr>
+				<div class="btn-group" role="group" aria-label="Basic example">
+  					<button type="button" class="btn btn-secondary" onclick="getReplyListInNew();">최신순</button>
+  					<button type="button" class="btn btn-secondary" onclick="getReplyListInOld();">등록순</button>
+  					<button type="button" class="btn btn-secondary" onclick="getReplyListInScore();">평점순</button>
+				</div>
+				<hr>
 				<div class="row">
 					<div class="col-2">
 						작성자</br>

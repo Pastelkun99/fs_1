@@ -91,7 +91,7 @@
 				<c:forEach items="${menuList }" var="menuList" varStatus="status">
 					<tr id="rowTemp${status.index }" class="rowAttr">
 						<td><strong>${status.index + 1}</strong></td>
-						<td>${menuList.menu_name}</td>
+						<td><strong>${menuList.menu_name}</strong></td>
 						<td>
 							<c:if test="${menuList.menu_useyn eq 'Y' }">
 								활성화
