@@ -1,0 +1,6 @@
+package com.fusion2.controller;
+
+@controller
+public class UserController {
+
+}

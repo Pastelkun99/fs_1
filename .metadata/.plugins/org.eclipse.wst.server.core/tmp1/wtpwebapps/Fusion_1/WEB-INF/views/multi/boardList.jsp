@@ -6,21 +6,10 @@
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ page session="true"%>
 <meta charset="UTF-8">
-<link rel="stylesheet"
-	href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-	integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-	crossorigin="anonymous">
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-	integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-	crossorigin="anonymous"></script>
-<script
-	src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-	integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-	crossorigin="anonymous"></script>
-<script
-	src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-	integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-	crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"	crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"	integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"	crossorigin="anonymous"></script>
+<script	src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"	integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"	crossorigin="anonymous"></script>
+<script	src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"	crossorigin="anonymous"></script>
 <script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.css"/>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.js"></script>
@@ -60,33 +49,6 @@
 }
 </style>
 </head>
-<script>
-	function windowPopup() {
-		var url = '${pageContext.request.contextPath}';
-
-		var pop_title = '${pop_title}';
-		var pop_fromdateString = '${pop_fromdate}';
-		var pop_fromdate = Date.parse(pop_fromdateString);
-
-		var pop_todateString = '${pop_todate}';
-		var pop_todate = Date.parse(pop_todateString);
-
-		var pop_nowDate = new Date().getTime();
-
-		if (pop_nowDate >= pop_fromdate && pop_nowDate <= pop_todate) {
-			var pop_aval = '${pop_aval}';
-			if (pop_aval == 1) {
-				var pop_height = '${pop_height}';
-				var pop_width = '${pop_width}';
-				var pop_content = '${pop_content}';
-				var pop_imageurl = '${pop_imageurl}';
-				var pop_url = '${pop_url}';
-				var opt = 'width=' + pop_width + ", height=" + pop_height;
-				window.open(url + '/mng/showPopup.do', "_blank", opt);
-			}
-		}
-	}
-</script>
 <body>
 <div class="row" style="margin-bottom: 3rem;"></div>
 		<div class="row" style="margin-left: 3rem; margin-right: 25rem;">
@@ -111,48 +73,54 @@
 					<c:if test="${sessionScope.isAdmin eq 1 }">
 						<button type="button" class="btn btn-outline-secondary" onClick="location.href='${pageContext.request.contextPath}/mng/adminCheck.do'">관리자 페이지</button>
 					</c:if>
-					<%-- <button type="button" class="btn btn-dark" onClick="location.href='${pageContext.request.contextPath}/multi/testForm.do'">테스트 폼</button> --%>
-					<button type="button" class="btn btn-dark" onClick="location.href='/multi/individualInfo.do'">유저 개인 페이지</button>
+					<button type="button" class="btn btn-dark" onClick="goToIndividualPage();">유저 개인 페이지</button>
+					<br>
+					<br>
 					
-					<c:if test="${param.board_no ne -1}">
-						<form name="pagefrm" method="get">
-							<input type="hidden" name="page_no" value="1" /> 
-							<select name="pageSize" class="form-control" title="페이징 갯수" onchange="select_page();" style="width:10rem;">
-								<option value="10" <c:if test="${page.pageSize eq '10'}">selected="selected"</c:if>>10개</option>
-								<option value="20" <c:if test="${page.pageSize eq '20'}">selected="selected"</c:if>>20개</option>
-								<option value="50" <c:if test="${page.pageSize eq '50'}">selected="selected"</c:if>>50개</option>
-							</select>
-						</form>
-						<form name="pageSearchfrm" method="get">
-							<input type="hidden" name="board_no" id="board_no" value="${param.board_no }">
-							<input type="hidden" name="page_no" id="page_no" value="1" /> 
-							<input type="hidden" name="pageSize" id="pageSize" value="${page.pageSize }" />
-							<!-- <input type="hidden" id="keyword" name="keyword" value=""/> -->
+					<form name="pagefrm" method="get">
+						<input type="hidden" name="page_no" value="1" /> 
+						<select name="pageSize" class="form-control" title="페이징 갯수" onchange="select_page();" style="width:10rem;">
+							<option value="10" <c:if test="${page.pageSize eq '10'}">selected="selected"</c:if>>10개</option>
+							<option value="20" <c:if test="${page.pageSize eq '20'}">selected="selected"</c:if>>20개</option>
+							<option value="50" <c:if test="${page.pageSize eq '50'}">selected="selected"</c:if>>50개</option>
+						</select>
+					</form>
+						
+					<form name="pageSearchfrm" method="get">
+						<input type="hidden" name="board_no" id="board_no" value="${param.board_no }">
+						<input type="hidden" name="page_no" id="page_no" value="1" /> 
+						<input type="hidden" name="pageSize" id="pageSize" value="${page.pageSize }" />
+						<!-- <input type="hidden" id="keyword" name="keyword" value=""/> -->
+							<div class="input-group mb-1">
+							<div class="col-md-2" style="padding-left: 0; padding-right:0">
 							<select name="searchCon" id="searchCon" class="form-control" title="검색조건 선택">
 								<option value="1" <c:if test="${page.searchCon == '1'}">selected="selected"</c:if>>제목</option>
 								<option value="2" <c:if test="${page.searchCon == '2'}">selected="selected"</c:if>>내용</option>
 								<option value="3" <c:if test="${page.searchCon == '3'}">selected="selected"</c:if>>작성자</option>
 								<option value="4" <c:if test="${page.searchCon == '4'}">selected="selected"</c:if>>전체</option>
 							</select>
-							<div class="input-group mb-3">
-								<input type="text" class="form-control"
-									placeholder="키워드를 입력하시면 찾아드립니다." id="keyword" name="keyword"
-									aria-label="boardSearch" aria-describedby="button-addon2"
-									value="${page.keyword }">
-									
-								<div class="input-group-append">
-									<button class="btn btn-outline-secondary" type="button"
-										id="button-addon2" onclick="search_board()">Search</button>
-								</div>
 							</div>
+							<div class="col-md-10 input-group" style="padding-left: 0; padding-right:0">
+							<input type="text" 
+								   class="form-control"
+								   placeholder="키워드를 입력하시면 찾아드립니다." 
+								   id="keyword" 
+								   name="keyword"
+								   aria-label="boardSearch" aria-describedby="button-addon2"
+								   value="${page.keyword }">
+							<div class="input-group-append">
+								<button class="btn btn-outline-secondary" type="button"
+									id="button-addon2" onclick="search_board()">Search</button>
+							</div>
+							</div>
+						</div>
+					</form>
 						<c:if test="${boardConfig.board_type eq 1 }">
-<%-- 							<h4>알림형 게시판에 접속하셨습니다. <br> 읽지 않은 게시글은 총 ${nonReadCount }개, 이 게시판에서 읽지 않은 글은 ${nonReadCountThisBoard }개 입니다.</h4> --%>
 							<div class="alert alert-info" role="alert">
  								 <strong>알림형 게시판</strong>에 접속하셨습니다.<br> 읽지 않은 게시글은 총 <strong>${nonReadCount }</strong>개, 이 게시판에서 읽지 않은 글은 <strong>${nonReadCountThisBoard }</strong>개 입니다.
 							</div>
 						</c:if>
-						</form>
-							<table class="table">
+				<table class="table">
 					<thead class="thead-light">
 						<tr>
 							<th>순번</th>
@@ -166,14 +134,15 @@
 						<c:forEach var="noticeBoard" items="${noticeList }">
 							<tr>
 								<td><strong>공지</strong></td>
-								<td><a href="#" onclick="javascript:void(window.open('board.do?board_no=${noticeBoard.board_no}', '_blank', 'height=600px, scrollbars=yes'));" />${noticeBoard.board_title }</a>
+								<td>
 								<c:if test="${noticeBoard.reply_cnt ne 0 }">
 								&nbsp;[${noticeBoard.reply_cnt }]
 								</c:if>
+								<strong><a href="#"	onclick="javascript:void(window.open('board.do?board_no=${param.board_no}&article_no=${noticeBoard.article_no}', '_blank', 'width=1000px, height=600px')); return false;">${noticeBoard.article_title}</a></strong>
 								</td>
-								<td>${noticeBoard.board_writer}</td>
-								<td>${noticeBoard.board_hit}</td>
-								<td>${noticeBoard.board_date}</td>
+								<td>${noticeBoard.article_writer}</td>
+								<td>${noticeBoard.article_hit}</td>
+								<td>${noticeBoard.article_date}</td>
 							<tr>
 						</c:forEach>
 							<c:forEach var="article" items="${articleList}" varStatus="status">
@@ -189,13 +158,16 @@
 									<tr>
 										<td><strong>${page.totalCount - (param.page_no-1)*param.pageSize - status.index}</strong></td>								
 										<td>
-											<strong><a href="#"	onclick="javascript:void(window.open('board.do?board_no=${param.board_no}&article_no=${article.article_no}', '_blank', 'scrollbars=1')); return false;"/>${article.article_title}
-											</a></strong>
+											<strong>
+											<c:forEach var="i" begin="0" end="${article.article_groupdepth }" >
+												&nbsp;
+											</c:forEach>
+											<a href="#"	onclick="javascript:void(window.open('board.do?board_no=${param.board_no}&article_no=${article.article_no}', '_blank', 'width=1000px, height=600px')); return false;">${article.article_title}</a></strong>
 											<c:if test="${article.reply_cnt ne 0 }" >
-											&nbsp;[${article.reply_cnt }]
+												&nbsp;[${article.reply_cnt }]
 											</c:if>
 											<c:if test="${fn:indexOf(article.article_content, 'img') ne -1}">
-											&nbsp;<i class="far fa-image"></i>
+												&nbsp;<i class="far fa-image"></i>
 											</c:if>
 											<c:if test="${article.article_secretyn eq 'Y' }">
 												&nbsp;<i class="fas fa-lock"></i>
@@ -209,65 +181,33 @@
 							</c:forEach>
 						</tbody>
 					</table>
-					<nav aria-label="Page navigation example">
-  							<ul class="pagination">
-   								 <li class="page-item">
-   								 	<c:if test="${param.page_no ne 1 }">
-	    								 <a class="page-link" href="${pageContext.request.contextPath }/multi/boardList.do?board_no=${param.board_no }&page_no=${param.page_no-1}&pageSize=${page.pageList}&searchCon=${page.searchCon}&keyword=${page.keyword }" aria-label="Previous">
-	     							 		<span aria-hidden="true">&laquo;</span>
-	      								 </a>
-   								 	</c:if>
-    							 </li>
-    							 <c:forEach begin="1" end="${page.endPage }" var="value">
-	    						 	<li class="page-item"><a class="page-link" href="${pageContext.request.contextPath }/multi/boardList.do?board_no=${param.board_no }&page_no=${value}&pageSize=${page.pageList}&searchCon=${page.searchCon}&keyword=${page.keyword }">${value }</a></li>						 
-    							 </c:forEach>
-    							 <li class="page-item">
-    							 <c:if test="${param.page_no eq page.endPage }">
-     							 	<a class="page-link" href="${pageContext.request.contextPath }/multi/boardList.do?board_no=${param.board_no}&page_no=${param.page_no+1}&pageSize=${page.pageList}&searchCon=${page.searchCon}&keyword=${page.keyword }" aria-label="Next">
-      							 		<span aria-hidden="true">&raquo;</span>
-      							 	</a>
-    							 </c:if>
-    							</li>
-  							</ul>
-						 </nav>
-					</c:if>
-				</c:if>
-				<div class="rows" style="text-align: center; margin-top: 5rem;">
-					<c:if test="${param.board_no eq -1 || param.board_no eq null }">
-						<h3>당신이 놓친 글들</h3>
-						<table class="table table-hover">
-						<caption>당신이 놓친 글이 ${nonReadCount }개 있습니다.</caption>
-						  <thead>
-						    <tr>
-						      <th scope="col">게시판 이름</th>
-						      <th scope="col">글 제목</th>
-						      <th scope="col">날짜</th>
-						    </tr>
-						  </thead>
-						  <tbody>
-						  <c:forEach items="${nonReadList }" var="nonReadList">
-						    <tr>
-						      <td>${nonReadList.board_name }</td>
-						      <td>
-						      	<c:if test="${nonReadList.article_secretyn eq 'Y' }">
-						      		&nbsp;<i class="fas fa-lock"></i>
-						      	</c:if>
-						      	<a href="#" onclick="javascript:void(window.open('board.do?board_no=${nonReadList.board_no}&article_no=${nonReadList.article_no}', '${nonReadList.article_title }', '_blank')); return false;">${nonReadList.article_title }</a>
-						      	<c:if test="${nonReadList.reply_cnt ne 0 }">
-						      	&nbsp;[${nonReadList.reply_cnt }]
-						      	</c:if>
-						      	<c:if test="${fn:indexOf(nonReadList.article_content, 'img') ne -1}">
-								&nbsp;<i class="far fa-image"></i>
+					
+					<nav aria-label="Page navigation example" style="align: center;">
+						<ul class="pagination">
+							<li class="page-item">
+								<!-- 왼쪽 -->
+								<c:if test="${param.page_no ne 1 }">
+  									<a class="page-link" href="${pageContext.request.contextPath }/multi/boardList.do?board_no=${param.board_no }&page_no=${param.page_no-1}&pageSize=${page.pageList}&searchCon=${page.searchCon}&keyword=${page.keyword }" aria-label="Previous">
+   									<span aria-hidden="true">&laquo;</span>
+    								</a>
 								</c:if>
-						      </td>
-						      <td>${nonReadList.article_date }</td>
-						    </tr>
-						  </c:forEach>
-						  </tbody>
-						</table>					
-					<img alt="환영 이미지" src="http://cdnimage.ebn.co.kr/news/201904/news_1555051693_980678_main1.png" width="640px" height="480px">
-					</c:if>
-				</div>
+ 							</li>
+ 							<!-- 네비게이션 -->
+ 							<c:forEach begin="1" end="${page.endPage }" var="value">
+  								<li class="page-item"><a class="page-link" href="${pageContext.request.contextPath }/multi/boardList.do?board_no=${param.board_no }&page_no=${value}&pageSize=${page.pageList}&searchCon=${page.searchCon}&keyword=${page.keyword }">${value }</a></li>						 
+ 							</c:forEach>
+ 							<li class="page-item">
+ 							<!-- 오른쪽 -->
+ 							<c:if test="${param.page_no ne page.endPage && page.endPage ne 0 }">
+  								<a class="page-link" href="${pageContext.request.contextPath }/multi/boardList.do?board_no=${param.board_no}&page_no=${param.page_no+1}&pageSize=${page.pageList}&searchCon=${page.searchCon}&keyword=${page.keyword }" aria-label="Next">
+   								<span aria-hidden="true">&raquo;</span>
+   								</a>
+ 							</c:if>
+ 							</li>
+						</ul>
+					</nav>
+				</c:if>
+				<div class="rows" style="text-align: center; margin-top: 5rem;"></div>
 			</div>
 		</div>
 	
@@ -303,101 +243,55 @@
 			</div>
 		</div>
 	</div>
+<script>
+
+	function goToIndividualPage() {
+		var root = '${pageContext.request.contextPath}';
+		window.open(root + '/multi/individualInfo.do', '_blank', 'width=700px, height=850px');
+	}
 	
-	<script>
-		$(document).ready(function() {
-			var currentUserId = '${sessionScope.userid}';
-			var result = getCookie(currentUserId + "popup");
-			var resultWindow = getCookie(currentUserId + "window");
-			if (resultWindow == currentUserId) {
-				return false;
-			} else {
-				windowPopup();
-			}
+	function logoutLogic() {
+		var root = '${pageContext.request.contextPath}';
+		location.href = '/user/userSignOut.do';
+	}
 
-			if (result == currentUserId) {
-				return false;
-			} else {
-				//document.getElementById('myModal').click();
-			}
-		});
-		
+	function select_page() {
+		var root = '${pageContext.request.contextPath}';
+		var board_no = "${param.board_no}";
+		var pageSize = document.pagefrm.pageSize.value;
+		var searchCon = document.getElementById('searchCon').value;
+		var keyword = document.getElementById('keyword').value;
+		location.href = root + '/multi/boardList.do?board_no=' + board_no + '&page_no=1&pageSize=' + pageSize + '&searchCon=' + searchCon + '&keyword=' + keyword;
+	}
 
-		function setCookie(cname, value, expire) {
-			var todayValue = new Date();
-			todayValue.setDate(todayValue.getDate()	+ expire);
-			document.cookie = cname + "=" + encodeURI(value) + "; expires="	+ todayValue.toGMTString() + "; path=/;";
-		}
+	function search_board() {
+		var page_no = document.getElementById('page_no').value;
+		var pageSize = document.getElementById('pageSize').value;
+		var searchCon = document.getElementById('searchCon').value;
+		var keyword = document.getElementById('keyword').value;
+		document.pageSearchfrm.action = "<c:url value='/multi/boardList.do'/>";
+		document.pageSearchfrm.submit();
+	}
 
-		function getCookie(name) {
-			var cookieName = name + "=";
-			var x = 0;
-			while (x <= document.cookie.length) {
-				var y = (x + cookieName.length);
-				if (document.cookie.substring(x, y) == cookieName) {
-					if ((lastChrCookie = document.cookie.indexOf(";", y)) == -1)
-						lastChrCookie = document.cookie.length;
-					return decodeURI(document.cookie.substring(y, lastChrCookie));
+	window.onload = function() {
+		var log_userid = '${sessionScope.userid}';
+		var log_userreferrer = document.referrer;
+		$.ajax({
+				type : "POST",
+				url : "/log.do",
+				data : {
+					"log_userid" : log_userid,
+					"log_userreferrer" : log_userreferrer
+				},
+				dataType : "json",
+				success : function(result) {
+					/* alert('데이터 전송 성공'); */
+				},
+				error : function(error) {
+					/* alert(error); */
 				}
-				x = document.cookie.indexOf(" ", x) + 1;
-				if (x == 0)
-					break;
-			}
-			return "";
-		}
-
-		function closeNotice() {
-			var currentUserId = '${sessionScope.userid}';
-			setCookie(currentUserId + 'popup', currentUserId, 1);
-			document.getElementById('noticeClose').click();
-		}
-
-		function getContextPath() {
-			var hostIndex = location.href.indexOf(location.host) + location.host.length;
-			return location.href.substring(	hostIndex, location.href.indexOf('/', hostIndex + 1));
-		}
-
-		function logoutLogic() {
-			var root = getContextPath();
-			location.href = '/user/userSignOut.do';
-		}
-
-		function select_page() {
-			var board_no = "${param.board_no}";
-			var pageSize = document.pagefrm.pageSize.value;
-			var searchCon = document.getElementById('searchCon').value;
-			var keyword = document.getElementById('keyword').value;
-			location.href = getContextPath() + '/boardList.do?board_no=' + board_no + '&page_no=1&pageSize=' + pageSize + '&searchCon=' + searchCon + '&keyword=' + keyword;
-		}
-
-		function search_board() {
-			var page_no = document.getElementById('page_no').value;
-			var pageSize = document.getElementById('pageSize').value;
-			var searchCon = document.getElementById('searchCon').value;
-			var keyword = document.getElementById('keyword').value;
-			document.pageSearchfrm.action = "<c:url value='/multi/boardList.do'/>";
-			document.pageSearchfrm.submit();
-		}
-
-		window.onload = function() {
-			var log_userid = '${sessionScope.userid}';
-			var log_userreferrer = document.referrer;
-			$.ajax({
-					type : "POST",
-					url : "/log.do",
-					data : {
-						"log_userid" : log_userid,
-						"log_userreferrer" : log_userreferrer
-					},
-					dataType : "json",
-					success : function(result) {
-						/* alert('데이터 전송 성공'); */
-					},
-					error : function(error) {
-						/* alert(error); */
-					}
-				});
-		}
-	</script>
+			});
+	}
+</script>
 </body>
 </html>

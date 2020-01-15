@@ -22,6 +22,8 @@ public class ReplyServiceImpl implements ReplyService {
 	@Resource(name="sqlSession")
 	SqlSession sqlSession;
 
+	private static final String NAMESPACE = "replyMapper";
+	
 	@Override
 	public int replyWrite(ReplyVO reply) {
 		return dao.replyWrite(reply);
@@ -74,27 +76,27 @@ public class ReplyServiceImpl implements ReplyService {
 
 	@Override
 	public int replyLikeAndHateAction(ReplyVO replyVO) {
-		return sqlSession.insert("replyMapper.replyLikeAndHateAction", replyVO);
+		return sqlSession.insert(NAMESPACE + ".replyLikeAndHateAction", replyVO);
 	}
 
 	@Override
 	public int replyLikeAndHateScoreAdjust(ReplyVO replyVO) {
-		return sqlSession.update("replyMapper.replyLikeAndHateScoreAdjust", replyVO);
+		return sqlSession.update(NAMESPACE + ".replyLikeAndHateScoreAdjust", replyVO);
 	}
 
 	@Override
 	public ReplyVO replyLikeAndHateConfirm(ReplyVO replyVO) {
-		return sqlSession.selectOne("replyMapper.replyLikeAndHateConfirm", replyVO);
+		return sqlSession.selectOne(NAMESPACE + ".replyLikeAndHateConfirm", replyVO);
 	}
 
 	@Override
 	public int replyLikeAndHateLogAdjust(ReplyVO replyVO) {
-		return sqlSession.update("replyMapper.replyLikeAndHateLogAdjust", replyVO);
+		return sqlSession.update(NAMESPACE + ".replyLikeAndHateLogAdjust", replyVO);
 	}
 
 	@Override
 	public int replyLikeAndHateScoreAdjust2(ReplyVO replyVO) {
-		return sqlSession.update("replyMapper.replyLikeAndHateScoreAdjust2", replyVO);
+		return sqlSession.update(NAMESPACE + ".replyLikeAndHateScoreAdjust2", replyVO);
 	}
 	
 	

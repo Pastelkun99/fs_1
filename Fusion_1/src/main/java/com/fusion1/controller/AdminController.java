@@ -14,12 +14,11 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.swing.plaf.multi.MultiRootPaneUI;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,10 +40,7 @@ import com.fusion1.service.AnalysisServiceImpl;
 import com.fusion1.service.FileUploadService;
 import com.fusion1.service.MultiBoardServiceImpl;
 import com.fusion1.service.UserServiceImpl;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
-import net.sf.json.JSONObject;
 
 @Controller
 public class AdminController {
@@ -239,7 +235,7 @@ public class AdminController {
 	@ResponseBody
 	public String excelUploadPost(@RequestParam("excelFile") MultipartFile file, Model model, HttpServletRequest request, HttpServletResponse response) {
 		
-		String result = fileUploadService.restore(file);
+	/*	String result = fileUploadService.restore(file);
 		
 		// 익셉션이 발생하지 않았다면 일단 null 값을 가지지는 않을 것이다.
 		if(result == null || result.equals("")) {
@@ -248,9 +244,9 @@ public class AdminController {
 		} else {
 			// 정상적으로 수행 된 경우
 			return "파일이 정상적으로 업로드 되었습니다.";
-		}
+		}*/
 		
-		/*try {
+		try {
 			String result = fileUploadService.restore(file);
 			Map returnObject = new HashMap();
 			MultipartHttpServletRequest mhsr = (MultipartHttpServletRequest)request;
@@ -285,22 +281,22 @@ public class AdminController {
             }catch (IllegalStateException e) {  
                 e.printStackTrace();
                 return "파일 형식이 올바르지 않습니다.";
-            } catch (IOException e) {  
+            } catch (@SuppressWarnings("hiding") IOException e) {  
                 e.printStackTrace();
                 return "파일 형식이 올바르지 않습니다.";
             } catch (StringIndexOutOfBoundsException e) {
             	e.printStackTrace();
             	return "파일 형식이 올바르지 않습니다.";
-			}*/
+			}
 	}
 	
 	@RequestMapping(value = "/mng/excelDownload.do")
 	public void fileDownload(HttpServletResponse response, HttpServletRequest request, @RequestParam Map<String, String> paramMap) {
 
-		String path = paramMap.get("filePath"); 	// full경로
+		String filePath = paramMap.get("filePath"); 	// full경로
 		String fileName = paramMap.get("fileName"); // 파일명
 
-		File file = new File(path);
+		File file = new File(filePath);
 
 		FileInputStream fileInputStream = null;
 		ServletOutputStream servletOutputStream = null;
@@ -309,24 +305,27 @@ public class AdminController {
 			String downName = null;
 			String browser = request.getHeader("User-Agent");
 			// 파일 인코딩
-			if (browser.contains("MSIE") || browser.contains("Trident") || browser.contains("Chrome")) {// 브라우저, 확인, 파일명, encode
+			if (browser.contains("MSIE") || browser.contains("Trident") || browser.contains("Chrome")) {
+				// 브라우저, 확인, 파일명, encode
+				// MSIE는 IE 10 이하의 버전, 11 이상은 Trident로 처리된다.
+				// 공백이 + 로 처리되는 것을 수정해준다.
 				downName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
 			} else {
 				downName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
 			}
 
 			response.setHeader("Content-Disposition", "attachment;filename=\"" + downName + "\"");
-			response.setContentType("application/octer-stream");
+			response.setContentType("application/octet-stream");
 			response.setHeader("Content-Transfer-Encoding", "binary;");
 
 			fileInputStream = new FileInputStream(file);
 			servletOutputStream = response.getOutputStream();
 
-			byte b[] = new byte[1024];
+			byte byteArr[] = new byte[1024];
 			int data = 0;
 
-			while ((data = (fileInputStream.read(b, 0, b.length))) != -1) {
-				servletOutputStream.write(b, 0, data);
+			while ((data = (fileInputStream.read(byteArr, 0, byteArr.length))) != -1) {
+				servletOutputStream.write(byteArr, 0, data);
 			}
 
 			servletOutputStream.flush();// 출력
@@ -351,7 +350,6 @@ public class AdminController {
 		}
 	}
 	
-	// 팝업을 수정하려고 할 때, 해당 팝업의 DB값을 화면에 보여주고, 이를 수정 가능하도록 한다.
 	@RequestMapping(value="/mng/popupModify.do")
 	public String popupModify(Model model, @RequestParam("pop_id") int pop_id) {
 		PopupVO temp = new PopupVO();
@@ -591,7 +589,7 @@ public class AdminController {
 	@ResponseBody
 	public String infoDeletePost(InfoVO infoVO) {
 		int result = ans.infoDelete(infoVO);
-		int result2 = ans.infoDeleteTrigger(infoVO);
+		ans.infoDeleteTrigger(infoVO);
 		return String.valueOf(result);
 	}
 

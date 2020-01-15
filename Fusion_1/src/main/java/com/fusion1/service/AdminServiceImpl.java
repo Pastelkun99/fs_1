@@ -25,95 +25,97 @@ public class AdminServiceImpl implements AdminService {
 	@Autowired
 	@Resource(name = "sqlSession")
 	SqlSession sqlSession;
+	
+	private static final String NAMESPACE = "adminMapper";
 
 	@Override
 	public List<PopupVO> getPopupInfoList() {
-		return sqlSession.selectList("adminMapper.getPopupInfoList");
+		return sqlSession.selectList(NAMESPACE + ".getPopupInfoList");
 	}
 
 	@Override
 	public PopupVO getPopupInfo(PopupVO popupVO) {
-		return sqlSession.selectOne("adminMapper.getPopupInfo", popupVO);
+		return sqlSession.selectOne(NAMESPACE + ".getPopupInfo", popupVO);
 	}
 
 	@Override
 	public PopupVO getPopupAval() {
-		return sqlSession.selectOne("adminMapper.getPopupAval");
+		return sqlSession.selectOne(NAMESPACE + ".getPopupAval");
 	}
 
 	@Override
 	public int updatePopupInfo(PopupVO popupVO) {
-		return sqlSession.update("adminMapper.updatePopupInfo", popupVO);
+		return sqlSession.update(NAMESPACE + ".updatePopupInfo", popupVO);
 	}
 
 	@Override
 	public int insertPopupInfo(PopupVO popupVO) {
-		return sqlSession.insert("adminMapper.insertPopupInfo", popupVO);
+		return sqlSession.insert(NAMESPACE + ".insertPopupInfo", popupVO);
 	}
 
 	@Override
 	public int deletePopupInfo(PopupVO popupVO) {
-		return sqlSession.delete("adminMapper.deletePopupInfo", popupVO);
+		return sqlSession.delete(NAMESPACE + ".deletePopupInfo", popupVO);
 	}
 
 	@Override
 	public List<MultiBoardVO> getMultiBoardList() {
-		return sqlSession.selectList("adminMapper.getMultiBoardList");
+		return sqlSession.selectList(NAMESPACE + ".getMultiBoardList");
 	}
 
 	@Override
 	public int newBoardAppend(MultiBoardVO multiBoardVO) {
-		return sqlSession.insert("adminMapper.newBoardAppend", multiBoardVO);
+		return sqlSession.insert(NAMESPACE + ".newBoardAppend", multiBoardVO);
 	}
 
 	@Override
 	public MultiBoardVO getMultiBoardOne(MultiBoardVO multiBoardVO) {
-		return sqlSession.selectOne("adminMapper.getMultiBoardOne", multiBoardVO);
+		return sqlSession.selectOne(NAMESPACE + ".getMultiBoardOne", multiBoardVO);
 	}
 
 	@Override
 	public int boardInfoUpdate(MultiBoardVO multiBoardVO) {
-		return sqlSession.update("adminMapper.boardInfoUpdate", multiBoardVO);
+		return sqlSession.update(NAMESPACE + ".boardInfoUpdate", multiBoardVO);
 	}
 
 	@Override
 	public int boardInfoDelete(MultiBoardVO multiBoardVO) {
-		return sqlSession.delete("adminMapper.boardInfoDelete", multiBoardVO);
+		return sqlSession.delete(NAMESPACE + ".boardInfoDelete", multiBoardVO);
 	}
 
 	@Override
 	public int boardOrderUpdate(MultiBoardVO multiBoardVO) {
-		return sqlSession.update("adminMapper.boardOrderUpdate", multiBoardVO);
+		return sqlSession.update(NAMESPACE + ".boardOrderUpdate", multiBoardVO);
 	}
 
 	@Override
 	public List<MenuVO> getMenuList() {
-		return sqlSession.selectList("adminMapper.getMenuList");
+		return sqlSession.selectList(NAMESPACE + ".getMenuList");
 	}
 	
 	@Override
 	public int newMenuAppend(MenuVO menuVO) {
-		return sqlSession.insert("adminMapper.newMenuAppend", menuVO);
+		return sqlSession.insert(NAMESPACE + ".newMenuAppend", menuVO);
 	}
 
 	@Override
 	public MenuVO getMenuInfo(int menu_no) {
-		return sqlSession.selectOne("adminMapper.getMenuInfo", menu_no);
+		return sqlSession.selectOne(NAMESPACE + ".getMenuInfo", menu_no);
 	}
 
 	@Override
 	public int menuInfoUpdate(MenuVO menuVO) {
-		return sqlSession.update("adminMapper.menuInfoUpdate", menuVO);
+		return sqlSession.update(NAMESPACE + ".menuInfoUpdate", menuVO);
 	}
 
 	@Override
 	public int menuInfoDelete(int menu_no) {
-		return sqlSession.delete("adminMapper.menuInfoDelete", menu_no);
+		return sqlSession.delete(NAMESPACE + ".menuInfoDelete", menu_no);
 	}
 
 	@Override
 	public int menuOrderUpdate(MenuVO menuVO) {
-		return sqlSession.update("adminMapper.menuOrderUpdate", menuVO);
+		return sqlSession.update(NAMESPACE + ".menuOrderUpdate", menuVO);
 	}
 
 	@Override
@@ -165,21 +167,16 @@ public class AdminServiceImpl implements AdminService {
                 insertExcelData(map);
             }
             
-            
-            
         } catch(Exception e) {
         	// 파일이 잘못 들어오면 여기에 걸립니다.
         	return null;
         }
-        
         return list;
 	}
 
 	@Override
 	public int insertExcelData(Map<String, Object> map) {
-		return sqlSession.insert("adminMapper.insertExcelData", map);
+		return sqlSession.insert(NAMESPACE + ".insertExcelData", map);
 	}
-
-
 
 }

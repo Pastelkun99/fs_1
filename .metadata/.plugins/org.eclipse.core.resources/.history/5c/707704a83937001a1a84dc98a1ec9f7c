@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+					"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="multiBoardMapper">
+	
+	<select id="getArticleListByBoardNo" parameterType="MultiBoardVO" resultType="ArticleVO">
+		SELECT 
+			   B.article_no,
+			   B.board_no,
+			   B.article_writer,
+			   B.article_userid,
+			   B.article_title,
+			   B.article_content,
+			   B.article_secretyn,
+			   B.article_password,
+			   B.article_parentsno,
+			   B.article_grouporder,
+			   B.article_groupdepth,
+			   B.article_hit,
+			   DATE_FORMAT(article_date, '%Y-%m-%d %H:%i:%s') AS article_date,
+			   B.article_deleteyn,
+			   B.article_noticeyn,
+               (SELECT COUNT(*) FROM replytbl A WHERE A.article_no = B.article_no) as reply_cnt
+		FROM multiboardtbl A, articletbl B
+		WHERE A.board_no = B.board_no AND A.board_no = #{board_no}
+		ORDER BY article_parentsno DESC, article_grouporder ASC, article_date DESC
+	</select>
+	
+	<select id="getArticleListByBoardNo2" parameterType="PagenationVO" resultType="ArticleVO">
+		SELECT 
+			   B.article_no,
+			   B.board_no,
+			   B.article_writer,
+			   B.article_userid,
+			   B.article_title,
+			   B.article_content,
+			   B.article_secretyn,
+			   B.article_password,
+			   B.article_parentsno,
+			   B.article_grouporder,
+			   B.article_groupdepth,
+			   B.article_hit,
+			   DATE_FORMAT(article_date, '%Y-%m-%d %H:%i:%s') AS article_date,
+			   B.article_deleteyn,
+			   B.article_noticeyn,
+			   (SELECT COUNT(*) FROM replytbl A WHERE A.article_no = B.article_no) as reply_cnt
+		FROM multiboardtbl A, articletbl B
+		WHERE A.board_no = B.board_no AND A.board_no = #{board_no}
+		ORDER BY article_parentsno DESC, article_grouporder ASC, article_date DESC LIMIT #{pageCon}, #{pageSize}
+	</select>
+	
+	<select id="getNoticeArticleList" resultType="ArticleVO">
+		SELECT * FROM articletbl WHERE article_noticeyn = 'Y' LIMIT 3
+	</select>
+
+	<select id="getArticleCountByBoardNo" parameterType="MultiBoardVO" resultType="ArticleVO">
+		SELECT COUNT(*) as cnt 
+		from multiboardtbl A, articletbl B 
+		WHERE A.board_no = B.board_no AND A.board_no = #{board_no}
+	</select>
+	
+	<select id="getArticleSearchCount" parameterType="PagenationVO" resultType="ArticleVO">
+		SELECT COUNT(*) AS cnt FROM multiboardtbl A, articletbl B
+		<if test="searchCon == 1">
+			WHERE 
+					A.board_no = B.board_no 
+				AND
+					B.article_title LIKE CONCAT('%', #{keyword}, '%') 
+				AND 
+					B.article_deleteyn = 'N'
+				AND A.board_no = #{board_no} 
+				ORDER BY B.article_date DESC
+		</if>
+		<if test="searchCon == 2">
+			WHERE 
+					A.board_no = B.board_no 
+				AND
+					B.article_content LIKE CONCAT('%', #{keyword}, '%') 
+				AND 
+					B.article_deleteyn = 'N' 
+				AND A.board_no = #{board_no}
+				ORDER BY B.article_date DESC
+		</if>
+		<if test="searchCon == 3">
+			WHERE 
+					A.board_no = B.board_no 
+				AND
+					B.article_writer LIKE CONCAT('%', #{keyword}, '%') 
+				AND 
+					B.article_deleteyn = 'N' 
+				AND A.board_no = #{board_no}
+				ORDER BY B.article_date DESC
+		</if>
+		<if test="searchCon == 4">
+			WHERE A.board_no = B.board_no 
+			AND 
+				B.article_title LIKE CONCAT('%', #{keyword}, '%') 
+			OR 
+				B.article_content LIKE CONCAT('%', #{keyword}, '%')
+			OR 
+				B.article_writer LIKE CONCAT('%', #{keyword}, '%')
+			AND 
+				A.board_no = #{board_no} 
+			AND 
+				B.article_deleteyn = 'N' 
+		</if>
+	</select>
+	
+	<select id="getArticleSearchList" parameterType="PagenationVO" resultType="ArticleVO">
+		SELECT B.*, (SELECT COUNT(*) FROM replytbl A WHERE A.article_no = B.article_no) as reply_cnt FROM multiboardtbl A, articletbl B
+		<if test="searchCon == 1">
+			WHERE 
+				A.board_no = B.board_no
+			AND
+				B.article_title LIKE CONCAT('%', #{keyword}, '%') AND B.article_deleteyn = 'N'
+			AND 
+				A.board_no = #{board_no}
+			ORDER BY B.article_date DESC LIMIT #{pageCon}, #{pageList}
+		</if>
+		<if test="searchCon == 2">
+			WHERE 
+				B.article_content LIKE CONCAT('%', #{keyword}, '%') 
+			AND 
+				B.article_deleteyn = 'N'
+			AND 
+				A.board_no = #{board_no} 
+			ORDER BY B.article_date DESC LIMIT #{pageCon}, #{pageList}
+		</if>
+		<if test="searchCon == 3">
+			WHERE 
+				article_writer LIKE CONCAT('%', #{keyword}, '%') 
+			AND 
+				B.article_deleteyn = 'N'
+			AND 
+				A.board_no = #{board_no}
+			ORDER BY B.article_date DESC LIMIT #{pageCon}, #{pageList}
+		</if>
+		<if test="searchCon == 4">
+			WHERE B.article_title LIKE CONCAT('%', #{keyword}, '%') 
+			OR B.article_content LIKE CONCAT('%', #{keyword}, '%')
+			OR B.article_writer LIKE CONCAT('%', #{keyword}, '%')
+			AND A.board_no = #{board_no} 
+			AND B.article_deleteyn = 'N' LIMIT #{pageCon}, #{pageList}
+		</if>
+	</select>
+	
+	<select id="getArticleOne" parameterType="int" resultType="ArticleVO">
+		SELECT article_no,
+			   board_no,
+			   article_writer,
+			   article_userid,
+			   article_title,
+			   article_content,
+			   article_secretyn,
+			   article_password,
+			   article_parentsno,
+			   article_grouporder,
+			   article_groupdepth,
+			   article_hit,
+			   DATE_FORMAT(article_date, '%Y-%m-%d %h:%i:%s') AS article_date,
+			   article_deleteyn,
+			   article_noticeyn 
+		FROM ARTICLETBL 
+		WHERE article_no = #{article_no}
+	</select>
+	
+	<update id="articleHitUpdate" parameterType="int">
+		UPDATE ARTICLETBL SET article_hit = article_hit + 1 WHERE article_no = #{article_no}
+	</update>
+	
+	<update id="articleDelete" parameterType="ArticleVO">
+		UPDATE ARTICLETBL SET article_deleteyn = 'Y' WHERE article_no = #{article_no}
+	</update>
+	
+	<update id="articleUpdate" parameterType="ArticleVO">
+		UPDATE ARTICLETBL 
+			SET article_title		= #{article_title}, 
+				article_content 	= #{article_content}, 
+				article_userid 		= #{article_userid}
+			WHERE article_no = #{article_no}
+	</update>
+	
+	<insert id="articleInsert" parameterType="ArticleVO">
+		INSERT ARTICLETBL VALUES (0
+								  ,#{board_no}
+								  ,#{article_writer}
+								  ,#{article_userid}
+								  ,#{article_title}
+								  ,#{article_content}
+								  <choose>
+									<when test=" article_secretyn == null">
+										,'N'
+									</when>
+									<otherwise>
+									  ,#{article_secretyn}
+									</otherwise>								  
+								  </choose>
+								  <choose>
+									  <when test=" article_password == '' ">
+									  	,null
+									  </when>
+									  <when test=" article_password != ''">
+									  	,#{article_password}
+									  </when>
+								  </choose>
+								  ,#{article_parentsno}
+								  ,#{article_grouporder}
+								  ,#{article_groupdepth}
+								  ,0
+								  ,now()
+								  ,'N'
+								  <choose>
+								  	<when test="article_noticeyn == null ">
+								  	,'N'
+								  	</when>
+								  	<otherwise>
+									  ,#{article_noticeyn}
+								  	</otherwise>
+								  </choose>
+								  )	
+	</insert>
+	
+	<select id="getPreventInsertedArticle" resultType="ArticleVO">
+		SELECT * FROM articletbl ORDER BY article_no DESC LIMIT 1
+	</select>
+	
+	<update id="articleParentsnoUpdate" parameterType="int">
+		UPDATE ARTICLETBL SET article_parentsno = #{article_no} WHERE article_no = #{article_no}
+	</update>
+	
+	<update id="reWriteGroupOrder" parameterType="ArticleVO">
+		<![CDATA[
+			UPDATE articletbl 
+			SET article_grouporder = article_grouporder + 1 
+			WHERE article_parentsno = #{article_parentsno} AND article_grouporder > #{article_grouporder}
+		]]>
+	</update>
+	
+	<insert id="reArticleInsert" parameterType="ArticleVO">
+		INSERT ARTICLETBL VALUES (0
+								  ,#{board_no}
+								  ,#{article_writer}
+								  ,#{article_userid}
+								  ,#{article_title}
+								  ,#{article_content}
+								  <choose>
+									<when test=" article_secretyn == null">
+										,'N'
+									</when>
+									<otherwise>
+									  ,#{article_secretyn}
+									</otherwise>								  
+								  </choose>
+								  <choose>
+									  <when test=" article_password == '' ">
+									  	,null
+									  </when>
+									  <when test=" article_password != ''">
+									  	,#{article_password}
+									  </when>
+								  </choose>
+								  ,#{article_parentsno}
+								  ,#{article_grouporder}
+								  ,#{article_groupdepth}
+								  ,0
+								  ,now()
+								  ,'N'
+								  <choose>
+								  	<when test="article_noticeyn == null ">
+								  	,'N'
+								  	</when>
+								  	<otherwise>
+									  ,#{article_noticeyn}
+								  	</otherwise>
+								  </choose>
+								  )	
+	</insert>
+
+	<select id="nonReadNoticeArticle" resultType="ArticleVO">
+		SELECT COUNT(*) AS CNT 
+				FROM multiboardtbl A, articletbl B 
+				WHERE A.board_no = B.board_no 
+					AND A.board_type = 1 
+					AND B.article_no NOT IN (SELECT article_no FROM readnoticetbl WHERE user_id = #{user_id});
+	</select>
+	
+	<select id="nonReadNoticeArticleThisBoard" parameterType="MultiBoardVO" resultType="ArticleVO">
+		SELECT COUNT(*) AS CNT
+				FROM articletbl B 
+			WHERE 
+				B.board_no IN (SELECT board_no FROM multiboardtbl WHERE board_type = 1) 
+				AND B.article_no NOT IN (SELECT article_no from readnoticetbl where user_id = #{user_id}) 
+				AND B.board_no = #{board_no};
+	</select>	
+	
+	<insert id="writeNoticeInfo" parameterType="ReadNoticeVO">
+		INSERT INTO readnoticetbl VALUES (0, #{user_id}, #{article_no})
+	</insert>
+	
+	<select id="getNonReadNoticeList" parameterType="MultiBoardVO" resultType="ArticleVO">
+		SELECT A.board_name, B.*, (SELECT COUNT(*) FROM replytbl A WHERE A.article_no = B.article_no) as reply_cnt
+			FROM multiboardtbl A, articletbl B 
+			WHERE B.board_no IN (SELECT board_no FROM multiboardtbl WHERE board_type = 1) 
+					AND B.article_no NOT IN (SELECT article_no from readnoticetbl where user_id = #{user_id})
+					AND B.board_no = A.board_no
+	</select>
+	
+	<insert id="insertTraceLog" parameterType="Map">
+		INSERT INTO tracetbl VALUES (0, #{traceCode}, #{traceUser}, now())
+	</insert>
+</mapper>

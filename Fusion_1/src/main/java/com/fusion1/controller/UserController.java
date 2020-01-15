@@ -1,5 +1,7 @@
 package com.fusion1.controller;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fusion1.dao.UserVO;
+import com.fusion1.service.MultiBoardServiceImpl;
 import com.fusion1.service.UserServiceImpl;
 
 @Controller
@@ -23,42 +26,57 @@ public class UserController {
 	@Autowired
 	UserServiceImpl us;
 	
+	@Autowired
+	MultiBoardServiceImpl ms;
+	
+	
+	// 유저 로그인 메서드
 	@RequestMapping(value="/user/userLogin.do", method=RequestMethod.POST)
-	public String userLogin(@RequestParam("inputID") String inputID, @RequestParam("inputPassword") String inputPW,
+	public String userLogin(@RequestParam("inputID") String inputID, 
+							@RequestParam("inputPassword") String inputPW,
 							HttpServletRequest request, Model model,
-							HttpSession session) {
+							HttpSession session) 
+	{
 		
-		// 입력한 로그인 ID를 토대로 유저 정보를 불러옴.
-		UserVO uservo = us.userLogin(inputID);
+		UserVO uservo = us.userExistCheck(inputID);
 		
+		// 해당 ID가 없는 경우
 		if(uservo == null) {
 			model.addAttribute("msg", "로그인 정보가 일치하지 않습니다.");
 			model.addAttribute("href", request.getContextPath() + "/");
 			return "alert";
 		} else {
-			// 입력한 비밀번호가 DB에서 불러온 비밀번호와 일치하는지 확인함.
 			if(inputPW.equals(uservo.getUserpw())) {
-				// 일치할 경우 세션에 현재 로그인한 유저의 정보를 등록시킴.
+				
 				if(uservo.getUser_aval() == 0) {
 					model.addAttribute("msg", "비활성화된 계정입니다. 관리자에게 문의하십시오.");
 					model.addAttribute("href", request.getContextPath() + "/");
 					return "alert";
 				}
 				
-				if(uservo.getUser_admin() == 1) {
+				if(uservo.getUser_admin() == 1) 
 					session.setAttribute("isAdmin", 1);
-				} else {
-					session.setAttribute("isAdmin",	0);
-				}
+				else
+					session.setAttribute("isAdmin", 0);
 				
 				session.setAttribute("userid", uservo.getUserid());
 				session.setAttribute("username", uservo.getUsername());
+				
+				// 관리자 페이지에 접근할 권한
 				session.setAttribute("LoginAdminPage", 0);
+				
 				model.addAttribute("msg", "로그인에 성공했습니다.");
-				model.addAttribute("href", "/multi/boardList.do?board_no=-1&page_no=1&pageSize=10");
+				model.addAttribute("href", "/multi/boardMain.do");
+				
+				// 접속 시에는 000 코드 삽입.
+				Map<String, Object> traceMap = new HashMap<String, Object>();
+				traceMap.put("traceCode", "000");
+				traceMap.put("traceUser", uservo.getUserid());
+				ms.insertTraceLog(traceMap);
+				
 				return "alert";
+				
 			} else {
-				// 일치하지 않을 경우 경고창 반환.
 				model.addAttribute("msg", "로그인 정보가 일치하지 않습니다.");
 				model.addAttribute("href", request.getContextPath() + "/");
 				return "alert";
@@ -66,30 +84,44 @@ public class UserController {
 		}
 	}
 	
+	
+	// 로그아웃 메서드
+	// 로그아웃 시 모든 세션 값을 제거함.
 	@RequestMapping(value="/user/userSignOut.do", method=RequestMethod.GET)
 	public String userSignOut(Model model, HttpSession session, HttpServletRequest request) {
-		// 로그아웃 하는 경우 모든 세션 정보를 제거 함. (추후 기능 업데이트에 따라 다른 방법을 해야 할 수도..)
+		
+		String curUser = (String)session.getAttribute("userid");
+		
 		session.invalidate();
+		
 		model.addAttribute("msg", "로그아웃 되었습니다.");
 		model.addAttribute("href", request.getContextPath()+"/");
+		
+		// 로그아웃시 005 로그를 남김
+		Map<String, Object> traceMap = new HashMap<String, Object>();
+		traceMap.put("traceCode", "005");
+		traceMap.put("traceUser", curUser);
+		ms.insertTraceLog(traceMap);
+		
 		return "alert";
 	}
 	
-	@RequestMapping(value="/user/userSignUp.do", method=RequestMethod.GET)
-	public String userSignUp() {
-		return "userSignUp";
-	}
 	
+	// 아이디 체크
 	@RequestMapping(value="/user/userIdCheck.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String userIdCheck(HttpServletRequest request, Model model) {
 		// ajax를 사용한 아이디 체크. DB에 접속하여 해당 아이디가 존재하는지 여부를 반환함.
-		String regId = request.getParameter("regId");
+		// result가 1인 경우 사용 가능한 아이디, 0인 경우 사용 불가능한 아이디
+		
 		int result = 0;
+		String regId = request.getParameter("regId");
+		
 		if(regId == null || regId.equals("")) {
 			result = 0;
+			
 		} else {
-			UserVO userCheck = us.userIdCheck(regId);
+			UserVO userCheck = us.userExistCheck(regId);
 			if(userCheck == null) {
 				result = 1;
 			} else {
@@ -99,16 +131,30 @@ public class UserController {
 		return String.valueOf(result);
 	}
 	
+	
+	// 회원 가입 페이지 이동
+	@RequestMapping(value="/user/userSignUp.do", method=RequestMethod.GET)
+	public String userSignUp() {
+		return "user/userSignUp";
+	}
+	
+	
+	// 회원 가입 POST 처리
 	@RequestMapping(value="/user/userSignUp.do", method=RequestMethod.POST)
-	public String userSignUp(@RequestParam("regID") String regID, @RequestParam("regPassword") String regPassword,
-							 @RequestParam("regName") String regName, @RequestParam("regPasswordConfirm") String regPasswordConfirm, 
-							 Model model, HttpServletRequest request) {
+	public String userSignUp(@RequestParam("regID") String regID, 
+							 @RequestParam("regPassword") String regPassword,
+							 @RequestParam("regName") String regName, 
+							 @RequestParam("regPasswordConfirm") String regPasswordConfirm, 
+							 Model model, 
+							 HttpServletRequest request) {
 
-		// 특수문자는 공백 처리
+		// 정규표현식
 		final String specialCharsRegex = "['\"\\-#()@;=*/+<>]";
 		final String sqlRegex = "(union|select|from|where|admin)";
+		
 		final Pattern pattern = Pattern.compile(specialCharsRegex, Pattern.CASE_INSENSITIVE);
 		final Pattern patterns = Pattern.compile(sqlRegex, Pattern.CASE_INSENSITIVE);
+		
 		final Matcher matcher = pattern.matcher(regID);
 		final Matcher matcher2 = patterns.matcher(regID);
 		
@@ -125,6 +171,7 @@ public class UserController {
 				uservo.setUserid(regID);
 				uservo.setUserpw(regPassword);
 				uservo.setUsername(regName);
+				
 				int result = us.userRegister(uservo);
 				
 				if(result != 1) {

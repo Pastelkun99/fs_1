@@ -13,6 +13,7 @@
 <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 <title>권한 확인</title>
 </head>
+<body class="text-center">
 <script type="text/javascript">
 $(function () {
 	  $('#passwordPopOver').popover({
@@ -20,32 +21,19 @@ $(function () {
 	  })
 	})
 </script>
-<div>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</br>
-</div>
+<div class="row" style="margin-bottom: 18rem;"></div>
 <div class="row">
 	<div class="col"></div>
 	<div class="col">
-		<body class="text-center">
 			<form class="form-signin" action="${pageContext.request.contextPath }/multi/ownerCheck.do" method="post">
 				<h1 class="h3 mb-3 font-weight-normal">해당 글은 비밀글입니다.<br>비밀번호를 입력하세요.</h1>
 					<input type="hidden" name="article_no" id="article_no" value="${article.article_no }">
 					<input type="hidden" name="OrderedUrl" id="OrderedUrl" value="${OrderedUrl }">
 					<input type="password" name="inputPassword" class="form-control" placeholder="Password" required>
-				</br>
+				<br>
 				<button class="btn btn-lg btn-primary btn-block" type="submit">Check</button>
-				</br>
-				</br>
+				<br>
+				<br>
 			</form>
 		<c:if test="${userInfo.user_admin eq 1 }">
 			<button type="button" id="passwordPopOver" class="btn btn-secondary" data-container="body" data-toggle="popover" data-placement="bottom" data-content="${article.article_password }">
@@ -53,8 +41,8 @@ $(function () {
 			</button>
 		</c:if>
 		<p class="mt-5 mb-3 text-muted">&copy; Fusionsoft</p>
-		</body>
 	</div>
 	<div class="col"></div>
 </div>
+</body>
 </html>

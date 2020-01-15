@@ -1,0 +1,22 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ page session="true"%>
+
+			  	<c:if test="${fn:length(indiList) lt 1}">
+					<li class="list-group-item">
+						작성한 글이 없습니다.
+					</li>			  	
+			  	</c:if>
+			  	<c:if test="${fn:length(indiList) gt 0 }">
+			    	<c:forEach items="${indiList }" var="indiList">
+				    <li class="list-group-item">
+				    		<strong><a href="#" onclick="goToArticle(${indiList.board_no}, ${indiList.article_no })" data-toggle="modal" data-target="#exampleModal">${indiList.menu_name } - ${indiList.article_title }</a></strong>
+				    			<br>
+				    			<br>
+				    		<p>${indiList.article_content }...</p> 
+				    </li>
+			    	</c:forEach>
+			  	</c:if>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;board.jsp&apos; to &apos;multi&apos;&#x0D;&#x0A;- Original project: &apos;Fusion_1&apos;&#x0D;&#x0A;- Destination element: &apos;multi&apos;&#x0D;&#x0A;- Original element: &apos;board.jsp&apos;" description="Copy file" element1="src/main/webapp/WEB-INF/views/multi/board.jsp" files="1" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1577940399935" target="/Fusion_1/src/main/webapp/WEB-INF/views/multi" units="0" version="1.0"/>
+</session>

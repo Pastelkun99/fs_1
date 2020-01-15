@@ -434,14 +434,19 @@ function subjectInput(q_no) {
  * 하드 코딩 되었다. 이 부분을 가장 우선적으로 손봐야 함. */
 function nextPageCheck(page) {
 	
-	var temp = page;
+	var a_no = '${param.a_no}';
+	var url = '${pageContext.request.contextPath}';
+	location.href= url + '/analysisList.do?page=' + (page+1) + '&a_no=' + a_no;
+}
+	
+ /*	var temp = page;
 	var url = '${pageContext.request.contextPath}';
 	var limit = 2;
 	
-	/* $('input:checkbox[name*="selectGroup"]').each(function() {
+	$('input:checkbox[name*="selectGroup"]').each(function() {
 		var check = $(this).is(':checked').length;
 		alert(check);
-	}) */
+	})
 	
 	if(page == 1) {
 		var a = $('input:checkbox[name="selectGroup1"]:checked').length;
@@ -564,7 +569,7 @@ function nextPageCheck(page) {
 		} 
 		
 	}
-}
+} */
 </script>
 </body>
 </html>

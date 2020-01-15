@@ -9,7 +9,7 @@
 <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
-<h4 style="margin-bottom: 3rem;"><a href="${pageContext.request.contextPath }/multi/boardList.do?board_no=-1&page_no=1&pageSize=10">Board List</a></h4>
+<h4 style="margin-bottom: 3rem;"><a href="${pageContext.request.contextPath }/multi/boardMain.do">Board List</a></h4>
 <c:forEach items="${menuList }" var="menuList">
 	<c:if test="${menuList.menu_useyn eq 'N' }"> 
 	

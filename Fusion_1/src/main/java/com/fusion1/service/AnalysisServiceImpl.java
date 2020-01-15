@@ -7,8 +7,6 @@ import javax.annotation.Resource;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fusion1.dao.AnalysisDAO;
 import com.fusion1.dao.AnswerVO;
@@ -22,178 +20,177 @@ public class AnalysisServiceImpl implements AnalysisService {
 	@Autowired
 	@Resource(name = "sqlSession")
 	SqlSession sqlSession;
+	
+	private static final String NAMESPACE = "analysisMapper";
 
 	@Override
 	public InfoVO getAnalysisInfo(int no) {
-		return sqlSession.selectOne("analysisMapper.getAnalysisInfo", no);
+		return sqlSession.selectOne(NAMESPACE + ".getAnalysisInfo", no);
 	}
 	
 	@Override
 	public List<InfoVO> getAnalysisInfoAvalList() {
-		return sqlSession.selectList("analysisMapper.getAnalysisInfoAvalList");
-	}
+		return sqlSession.selectList(NAMESPACE + ".getAnalysisInfoAvalList");
+	} 
 	
 	@Override
 	public List<InfoVO> getAnalysisInfoList() {
-		return sqlSession.selectList("analysisMapper.getAnalysisInfoList");
+		return sqlSession.selectList(NAMESPACE + ".getAnalysisInfoList");
 	}
 
 	@Override
 	public List<AnalysisDAO> getAnalysisQuestionList(int a_no) {
-		return sqlSession.selectList("analysisMapper.getAnalysisQuestionList", a_no);
+		return sqlSession.selectList(NAMESPACE + ".getAnalysisQuestionList", a_no);
 	}
 
 	@Override
 	public List<AnalysisDAO> getAnalysisSelectList() {
-		return sqlSession.selectList("analysisMapper.getAnalysisSelectList");
+		return sqlSession.selectList(NAMESPACE + ".getAnalysisSelectList");
 	}
 
 	@Override
 	public List<AnswerVO> getAnalysisAnswerList(AnswerVO answerVO) {
-		return sqlSession.selectList("analysisMapper.getAnalysisAnswerList", answerVO);
+		return sqlSession.selectList(NAMESPACE + ".getAnalysisAnswerList", answerVO);
 	}
 
 	@Override
 	public List<AnswerVO> getAnalysisAnswer(AnswerVO answerVO) {
-		return sqlSession.selectList("analysisMapper.getAnalysisAnswer", answerVO);
+		return sqlSession.selectList(NAMESPACE + ".getAnalysisAnswer", answerVO);
 	}
 
 	@Override
 	public int inputAnalysisAnswer(AnswerVO answerVO) {
-		return sqlSession.insert("analysisMapper.inputAnalysisAnswer", answerVO);
+		return sqlSession.insert(NAMESPACE + ".inputAnalysisAnswer", answerVO);
 	}
 
 	@Override
 	public int inputAnalysisUpdate(AnswerVO answerVO) {
-		return sqlSession.update("analysisMapper.inputAnalysisUpdate", answerVO);
+		return sqlSession.update(NAMESPACE + ".inputAnalysisUpdate", answerVO);
 	}
 
 	@Override
 	public List<AnswerVO> getAnalysisAnswerMulti(AnswerVO answerVO) {
-		return sqlSession.selectList("analysisMapper.getAnalysisAnswerMulti", answerVO);
+		return sqlSession.selectList(NAMESPACE + ".getAnalysisAnswerMulti", answerVO);
 	}
 
 	@Override
 	public int deleteAnswer(AnswerVO answerVO) {
-		return sqlSession.delete("analysisMapper.deleteAnswer", answerVO);
+		return sqlSession.delete(NAMESPACE + ".deleteAnswer", answerVO);
 	}
 
 	@Override
 	public int userAnalysisComplete(AnswerVO answerVO) {
-		return sqlSession.delete("analysisMapper.userAnalysisComplete", answerVO);
+		return sqlSession.delete(NAMESPACE + ".userAnalysisComplete", answerVO);
 	}
 
 	@Override
 	public List<AnswerVO> userAnalysisConfirm(AnswerVO answerVO) {
-		return sqlSession.selectList("analysisMapper.userAnalysisConfirm", answerVO);
+		return sqlSession.selectList(NAMESPACE + ".userAnalysisConfirm", answerVO);
 	}
 
 	@Override
 	public List<SelectVO> getSelectList() {
-		return sqlSession.selectList("analysisMapper.getSelectList");
+		return sqlSession.selectList(NAMESPACE + ".getSelectList");
 	}
 
 	@Override
 	public QuestionVO getQuestionInfo(QuestionVO questionVO) {
-		return sqlSession.selectOne("analysisMapper.getQuestionInfo", questionVO);
+		return sqlSession.selectOne(NAMESPACE + ".getQuestionInfo", questionVO);
 	}
 
 	@Override
 	public int updateQuestion(QuestionVO questionVO) {
-		return sqlSession.update("analysisMapper.updateQuestion", questionVO);
+		return sqlSession.update(NAMESPACE + ".updateQuestion", questionVO);
 	}
 
 	@Override
 	public List<SelectVO> getSelectionList() {
-		return sqlSession.selectList("analysisMapper.getSelectionList");
+		return sqlSession.selectList(NAMESPACE + ".getSelectionList");
 	}
 
 	@Override
 	public int appendQuestion(QuestionVO questionVO) {
-		return sqlSession.insert("analysisMapper.appendQuestion", questionVO);
+		return sqlSession.insert(NAMESPACE + ".appendQuestion", questionVO);
 	}
 
 	@Override
 	public QuestionVO getQuestionCount(int a_no) {
-		return sqlSession.selectOne("analysisMapper.getQuestionCount", a_no);
+		return sqlSession.selectOne(NAMESPACE + ".getQuestionCount", a_no);
 	}
 
 	@Override
 	public int deleteQuestion(QuestionVO questionVO) {
-		return sqlSession.delete("analysisMapper.deleteQuestion", questionVO);
+		return sqlSession.delete(NAMESPACE + ".deleteQuestion", questionVO);
 	}
 
 	@Override
 	public List<SelectVO> getSelectionInfo(int q_selection) {
-		return sqlSession.selectList("analysisMapper.getSelectionInfo", q_selection);
+		return sqlSession.selectList(NAMESPACE + ".getSelectionInfo", q_selection);
 	}
 
 	@Override
 	public SelectVO getSelectionOddCount() {
-		return sqlSession.selectOne("analysisMapper.getSelectionOddCount");
+		return sqlSession.selectOne(NAMESPACE + ".getSelectionOddCount");
 	}
 
 	@Override
 	public SelectVO getSelectionEvenCount() {
-		return sqlSession.selectOne("analysisMapper.getSelectionEvenCount");
+		return sqlSession.selectOne(NAMESPACE + ".getSelectionEvenCount");
 	}
 
 	@Override
 	public int inputSelectionGroup(SelectVO selectVO) {
-		return sqlSession.insert("analysisMapper.inputSelectionGroup", selectVO);
+		return sqlSession.insert(NAMESPACE + ".inputSelectionGroup", selectVO);
 	}
 
 	@Override
 	public SelectVO getSelectionInfoValue(SelectVO selectVO) {
-		return sqlSession.selectOne("analysisMapper.getSelectionInfoValue", selectVO);
+		return sqlSession.selectOne(NAMESPACE + ".getSelectionInfoValue", selectVO);
 	}
 
 	@Override
 	public int updateSelect(SelectVO selectVO) {
-		return sqlSession.update("analysisMapper.updateSelect", selectVO);
+		return sqlSession.update(NAMESPACE + ".updateSelect", selectVO);
 	}
 
 	@Override
 	public InfoVO getAnalysisCount() {
-		return sqlSession.selectOne("analysisMapper.getAnalysisCount");
+		return sqlSession.selectOne(NAMESPACE + ".getAnalysisCount");
 	}
 
 	@Override
 	public int inputAnalysisInfo(InfoVO infoVO) {
-		return sqlSession.insert("analysisMapper.inputAnalysisInfo", infoVO);
+		return sqlSession.insert(NAMESPACE + ".inputAnalysisInfo", infoVO);
 	}
 
 	@Override
 	public int infoUpdate(InfoVO infoVO) {
-		return sqlSession.update("analysisMapper.infoUpdate", infoVO);
+		return sqlSession.update(NAMESPACE + ".infoUpdate", infoVO);
 	}
 
 	@Override
 	public int infoDelete(InfoVO infoVO) {
-		return sqlSession.delete("analysisMapper.infoDelete", infoVO);
+		return sqlSession.delete(NAMESPACE + ".infoDelete", infoVO);
 	}
 
 	@Override
 	public int infoDeleteTrigger(InfoVO infoVO) {
-		return sqlSession.delete("analysisMapper.infoDeleteTrigger", infoVO);
+		return sqlSession.delete(NAMESPACE + ".infoDeleteTrigger", infoVO);
 	}
 
 	@Override
 	public int selectionAppend(SelectVO selectVO) {
-		return sqlSession.insert("analysisMapper.selectionAppend", selectVO);
+		return sqlSession.insert(NAMESPACE + ".selectionAppend", selectVO);
 	}
 
 	@Override
 	public SelectVO getSelectionInfoCount(int q_selection) {
-		return sqlSession.selectOne("analysisMapper.getSelectionInfoCount", q_selection);
+		return sqlSession.selectOne(NAMESPACE + ".getSelectionInfoCount", q_selection);
 	}
 
 	@Override
 	public int deleteSelection(SelectVO selectVO) {
-		return sqlSession.delete("analysisMapper.deleteSelection", selectVO);
+		return sqlSession.delete(NAMESPACE + ".deleteSelection", selectVO);
 	}
-
-	
-	
 
 }

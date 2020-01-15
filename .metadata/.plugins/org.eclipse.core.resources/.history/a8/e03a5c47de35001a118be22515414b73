@@ -1,0 +1,23 @@
+package com.fusion1.service;
+
+import javax.annotation.Resource;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fusion1.dao.TraceVO;
+
+public class IndividualServiceImpl implements IndividualService {
+	
+	private static final String NAMESPACE = "individualMapper";
+	
+	@Autowired
+	@Resource(name="sqlSession")
+	private SqlSession sqlSession;
+
+	@Override
+	public TraceVO getCount(String userid) {
+		return sqlSession.selectOne(NAMESPACE + ".getCount", userid);
+	}
+
+}

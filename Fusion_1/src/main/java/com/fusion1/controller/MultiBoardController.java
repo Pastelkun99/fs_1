@@ -5,15 +5,19 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Base64.Encoder;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fusion1.dao.ArticleVO;
 import com.fusion1.dao.BoardVO;
@@ -31,9 +36,11 @@ import com.fusion1.dao.MultiBoardVO;
 import com.fusion1.dao.PagenationVO;
 import com.fusion1.dao.ReadNoticeVO;
 import com.fusion1.dao.ReplyVO;
+import com.fusion1.dao.TraceVO;
 import com.fusion1.dao.UserVO;
 import com.fusion1.service.AdminServiceImpl;
 import com.fusion1.service.BoardServiceImpl;
+import com.fusion1.service.IndividualServiceImpl;
 import com.fusion1.service.MultiBoardServiceImpl;
 import com.fusion1.service.ReplyServiceImpl;
 import com.fusion1.service.UserServiceImpl;
@@ -51,110 +58,98 @@ public class MultiBoardController {
 	@Autowired
 	AdminServiceImpl as;
 	
+	@Autowired
+	UserServiceImpl us;
+	
+	// 댓글 처리 관련
+	@Autowired
+	ReplyServiceImpl rs;
+	
 	@RequestMapping(value="/multi/exit.do")
 	public String exit() {
 		return "multi/exit";
 	}
 	
-	
-	// form 테스트를 위한 컨트롤러 메서드. 실제 구동에서는 필요없음.
-	@RequestMapping(value="/multi/testForm.do")
-	public String testForm(Model model) {
-		PagenationVO page = new PagenationVO();
-		page.setPageCon(0);
-		page.setPageList(10);
-		List<BoardVO> boardList = bs.getBoardList(page);
-		model.addAttribute("boardList", boardList);
-		return "multi/testForm";
-	}
-	
-	@RequestMapping(value="/multi/testFormArticle.do")
-	public String testFormArticle(BoardVO boardVO, Model model) {
-		int board_no = boardVO.getBoard_no();
-		BoardVO thisArticle = bs.getBoardOne(board_no);
-		model.addAttribute("article", thisArticle);
+	@RequestMapping(value="/multi/boardMain.do")
+	public String multiBoardMainPage(Model model, HttpSession session) {
 		
-		return "multi/testFormArticle";
-	}
-	
-	// 신 게시판의 리스트를 불러온다.
-	@RequestMapping(value="/multi/boardList.do")
-	public String multiBoard(Model model, @RequestParam("board_no") int board_no, PagenationVO page, HttpSession session) {
-		
-		// 유저 확인
 		String currentId = (String)session.getAttribute("userid");
+		
 		List<MultiBoardVO> multiList = as.getMultiBoardList();
 		model.addAttribute("boardList", multiList);
 		
-		// 게시판 메인 화면. -1로 넘버를 주었으나 이는 개선이 필요하다.
-		// post로 줄 수는 없는지 확인 바람.
-		if(board_no == -1) {
-			
-			MultiBoardVO supertemp = new MultiBoardVO();
-			supertemp.setUser_id(currentId);
-			
-			ReadNoticeVO info = new ReadNoticeVO();
-			info.setUser_id(currentId);
-			ArticleVO cntOnly = ms.nonReadNoticeArticle(info);
-			int nonReadCount = cntOnly.getCnt();
-			model.addAttribute("nonReadCount", nonReadCount);
-			
-			List<ArticleVO> nonReadList = ms.getNonReadNoticeList(supertemp);
-			model.addAttribute("nonReadList", nonReadList);
-			
-			List<MenuVO> menuList = as.getMenuList();
-			model.addAttribute("menuList", menuList);
-			return "multi/boardList";
-		}
+		MultiBoardVO supertemp = new MultiBoardVO();
+		supertemp.setUser_id(currentId);
+		
+		ReadNoticeVO info = new ReadNoticeVO();
+		info.setUser_id(currentId);
+		ArticleVO cntOnly = ms.nonReadNoticeArticle(info);
+		int nonReadCount = cntOnly.getCnt();
+		model.addAttribute("nonReadCount", nonReadCount);
+		
+		List<ArticleVO> nonReadList = ms.getNonReadNoticeList(supertemp);
+		model.addAttribute("nonReadList", nonReadList);
+		
+		List<MenuVO> menuList = as.getMenuList();
+		model.addAttribute("menuList", menuList);
+		return "multi/boardMain";
+	}
+
+	// 신 게시판의 리스트를 불러온다.
+	@RequestMapping(value="/multi/boardList.do")
+	public String multiBoard(Model model, @RequestParam("board_no") int board_no, PagenationVO pageSetting, HttpSession session) {
+		
+		String currentId = (String)session.getAttribute("userid");
+		
+		List<MultiBoardVO> multiList = as.getMultiBoardList();
+		model.addAttribute("boardList", multiList);
 		
 		// 게시판 정보를 불러왔는데 게시판이 존재하지 않는 경우에 대한 예외처리(null)
 		MultiBoardVO thistemp = new MultiBoardVO();
 		thistemp.setBoard_no(board_no);
+		
 		MultiBoardVO thisboardVO = as.getMultiBoardOne(thistemp);
 		if(thisboardVO == null || thisboardVO.equals(null)) {
 			model.addAttribute("msg", "해당 게시판은 존재하지 않습니다.");
-			model.addAttribute("href", "/multi/boardList.do?board_no=-1&page_no=1&pageSize=10");
+			model.addAttribute("href", "/multi/boardMain.do");
 			return "alert";
 		}
-		
 		
 		MultiBoardVO test = new MultiBoardVO();
 		test.setBoard_no(board_no);
 		
 		// 검색어 및 검색 조건 미지정 상태
-		if(page.getKeyword() == null || page.getKeyword().equals("")) {
-			//System.out.println("얘 뭐임 : " + page.toString());
+		if(pageSetting.getKeyword() == null || pageSetting.getKeyword().equals("")) {
+			
 			MultiBoardVO temp = new MultiBoardVO();
 			temp.setBoard_no(board_no);
 			temp.setUser_id(currentId);
 			
 			// 해당 게시판의 설정 정보를 불러온다.
-			// (view에서 jstl을 사용해 댓글, 비밀글, 답글 처리를 하기 위함.)
 			MultiBoardVO config = as.getMultiBoardOne(temp);
 			model.addAttribute("boardConfig", config);
 			
 			ReadNoticeVO info = new ReadNoticeVO();
 			info.setUser_id(currentId);
 			ArticleVO cntOnly = ms.nonReadNoticeArticle(info);
-			int nonReadCount = cntOnly.getCnt();
-			model.addAttribute("nonReadCount", nonReadCount);
+			model.addAttribute("nonReadCount", cntOnly.getCnt());
 			
 			cntOnly = ms.nonReadNoticeArticleThisBoard(temp);
-			int nonReadCountThisBoard = cntOnly.getCnt();
-			model.addAttribute("nonReadCountThisBoard", nonReadCountThisBoard);
+			model.addAttribute("nonReadCountThisBoard", cntOnly.getCnt());
 			
 			// 해당 게시판의 게시글 총 갯수
 			ArticleVO articleCount = ms.getArticleCountByBoardNo(temp);
 			int totalCount = articleCount.getCnt();
-			int pageSize = page.getPageSize();
-			int page_no = page.getPage_no();
+			
+			int pageSize = pageSetting.getPageSize();
+			int page_no = pageSetting.getPage_no();
 			
 			int endPage = totalCount / pageSize;
-			if (endPage % pageSize > 0) {
+			if (totalCount % pageSize > 0) {
 				endPage++;
 			}
 			
-			// 페이지네이션
+			// 페이지네이션 구축
 			PagenationVO pageVO = new PagenationVO();
 			pageVO.setStartPage(1);
 			pageVO.setEndPage(endPage);
@@ -164,18 +159,22 @@ public class MultiBoardController {
 			pageVO.setPageCon((page_no*pageSize) - pageSize);
 			pageVO.setPageBoardNo((page_no*pageSize));
 			pageVO.setBoard_no(board_no);
-			
 			model.addAttribute("page", pageVO);
-			
+
 			List<ArticleVO> articleList = ms.getArticleListByBoardNo2(pageVO);
 			model.addAttribute("articleList", articleList);
+			
+			List<ArticleVO> noticeList = ms.getNoticeArticleList();
+			model.addAttribute("noticeList", noticeList);
 			
 			List<MenuVO> menuList = as.getMenuList();
 			model.addAttribute("menuList", menuList);
 			
 			return "multi/boardList";
+			
+			
 		} else  {
-			//System.out.println(page.toString());
+			// 검색어 존재
 			
 			MultiBoardVO temp = new MultiBoardVO();
 			temp.setBoard_no(board_no);
@@ -186,33 +185,31 @@ public class MultiBoardController {
 			ReadNoticeVO info = new ReadNoticeVO();
 			info.setUser_id(currentId);
 			ArticleVO cntOnly = ms.nonReadNoticeArticle(info);
-			int nonReadCount = cntOnly.getCnt();
-			model.addAttribute("nonReadCount", nonReadCount);
+			model.addAttribute("nonReadCount", cntOnly.getCnt());
 			
 			cntOnly = ms.nonReadNoticeArticleThisBoard(temp);
-			int nonReadCountThisBoard = cntOnly.getCnt();
-			model.addAttribute("nonReadCountThisBoard", nonReadCountThisBoard);
+			model.addAttribute("nonReadCountThisBoard", cntOnly.getCnt());
 			
-			ArticleVO articleInfo = ms.getArticleSearchCount(page);
+			ArticleVO articleInfo = ms.getArticleSearchCount(pageSetting);
 			int totalCount = articleInfo.getCnt(); 
-			int getPageSize = page.getPageSize();
-			int getPage_no = page.getPage_no();
-			int searchCon = page.getSearchCon();
+			int getPageSize = pageSetting.getPageSize();
+			int getPage_no = pageSetting.getPage_no();
+			int searchCon = pageSetting.getSearchCon();
 			int endPage = totalCount / getPageSize;
-			String keyword = page.getKeyword();
+			String keyword = pageSetting.getKeyword();
 			
-			if(totalCount % page.getPageSize() > 0) {
+			if(totalCount % getPageSize > 0) {
 				endPage++;
 			}
 			
 			PagenationVO pageSearch = new PagenationVO();
 			pageSearch.setStartPage(1);
 			pageSearch.setEndPage(endPage);
-			pageSearch.setPageList(page.getPageSize());
+			pageSearch.setPageList(pageSetting.getPageSize());
 			pageSearch.setPageSize(getPageSize);
 			pageSearch.setBoard_no(board_no);
 			
-			// 페이지 검색 조건과 검색어, 해당 조건에 맞는 게시글 수를 지정해줌.
+			// 페이지 검색 조건과 검색어, 해당 조건에 맞는 게시글 수를 지정.
 			pageSearch.setSearchCon(searchCon);
 			pageSearch.setKeyword(keyword);
 			pageSearch.setTotalCount(totalCount);
@@ -231,111 +228,107 @@ public class MultiBoardController {
 		}
 	}
 	
-	// 게시글 보기. 비밀글 처리를 위해 url을 2개로 나누었다.
-	// 만약 가능하다면 url을 하나로 줄이는 것도 좋을 듯 하다.
+	// 게시글 보기
 	@RequestMapping(value="/multi/board.do", method=RequestMethod.GET)
-	public String board(HttpSession session, @RequestParam("board_no") int board_no, @RequestParam("article_no") int article_no, Model model, HttpServletRequest request) {
+	public String board(@RequestParam("board_no") int board_no, 
+						@RequestParam("article_no") int article_no,
+						@RequestParam(value="decoded", required=false) String decode,
+						Model model, 
+						HttpServletRequest request,
+						HttpSession session) 
+	{
+		
+		if(decode == null) {
+			decode = "0";
+		}
+		
+		// 현재 접속자
 		String currentID = (String)session.getAttribute("userid");
 		
-		if(currentID == null || currentID.equals("")) {
-			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
-			model.addAttribute("href", "/");
-			return "alert";
-		} else {
-			
-			MultiBoardVO thisBoard = new MultiBoardVO();
-			thisBoard.setBoard_no(board_no);
-			
-			thisBoard = as.getMultiBoardOne(thisBoard);
-			model.addAttribute("boardConfig", thisBoard);
-			
-			// 해당 글 읽음 처리
-			ReadNoticeVO read = new ReadNoticeVO();
-			read.setArticle_no(article_no);
-			read.setUser_id(currentID);
-			ms.writeNoticeInfo(read);
-			
-			
-			// 게시글 정보 불러옴
-			ArticleVO article = ms.getArticleOne(article_no);
-			
-			// 줄바꿈 처리
-			String convertedContents = article.getArticle_content();
-			convertedContents = XssPreventer.unescape(convertedContents);
-			article.setArticle_content(convertedContents);
-			
-			// 날짜 처리
-			
-			
-			// 비밀글에 대한 처리
-			if(article.getArticle_secretyn().equals("Y") || article.getArticle_secretyn() == "Y") {
+		MultiBoardVO thisBoard = new MultiBoardVO();
+		thisBoard.setBoard_no(board_no);
+		
+		thisBoard = as.getMultiBoardOne(thisBoard);
+		model.addAttribute("boardConfig", thisBoard);
+		
+		// 해당 글 읽음 처리
+		ReadNoticeVO read = new ReadNoticeVO();
+		read.setArticle_no(article_no);
+		read.setUser_id(currentID);
+		ms.writeNoticeInfo(read);
+		
+		// 게시글 정보 불러옴
+		ArticleVO article = ms.getArticleOne(article_no);
+		
+		if(article.getArticle_deleteyn().equals("Y") || article.getArticle_deleteyn() == "Y") {
+			model.addAttribute("msg", "삭제된 글입니다.");
+			return "multi/exit";
+		}
+		
+		// 줄바꿈 처리
+		String convertedContents = article.getArticle_content();
+		convertedContents = XssPreventer.unescape(convertedContents);
+		article.setArticle_content(convertedContents);
+		
+		// 비밀글에 대한 처리
+		if(article.getArticle_secretyn().equals("Y")) {
+
+			if(decode.equals("1")) {
+				MultiBoardVO thisBoardChecked = new MultiBoardVO();
+				thisBoard.setBoard_no(board_no);
 				
-				String encoded = article.getArticle_password();
-				byte[] encodedByte = encoded.getBytes();
+				thisBoard = as.getMultiBoardOne(thisBoardChecked);
+				model.addAttribute("boardConfig", thisBoard);
 				
-				Decoder decoder = Base64.getDecoder();
-				byte[] decodeByte = decoder.decode(encodedByte);
-				//System.out.println("디코딩된 것 : " + new String(decodeByte));
-				String decoded = new String(decodeByte);
-				article.setArticle_password(decoded);
+				// 게시글 정보 불러옴
+				ArticleVO articleChecked = ms.getArticleOne(article_no);
+				
+				// 줄바꿈 처리
+				String convertedContentsChecked = articleChecked.getArticle_content();
+				convertedContents = XssPreventer.unescape(convertedContentsChecked);
+				article.setArticle_content(convertedContents);
+				
+				// 조회수 up
+				ms.articleHitUpdate(article_no);
 				
 				model.addAttribute("article", article);
-				model.addAttribute("OrderedUrl", request.getRequestURI());
-				UserVO userInfo = us.getUserInfo(currentID);
-				model.addAttribute("userInfo", userInfo);
-				
-				return "/multi/ownerCheck";
+				return "/multi/articleRead";
 			}
 			
-			// 조회수 up
-			ms.articleHitUpdate(article_no);
+			String encoded = article.getArticle_password();
+			byte[] encodedByte = encoded.getBytes();
+			
+			Decoder decoder = Base64.getDecoder();
+			byte[] decodeByte = decoder.decode(encodedByte);
+			String decoded = new String(decodeByte);
+			article.setArticle_password(decoded);
 			
 			model.addAttribute("article", article);
-			return "/multi/board";
+			model.addAttribute("OrderedUrl", request.getRequestURI());
+			UserVO userInfo = us.getUserInfo(currentID);
+			model.addAttribute("userInfo", userInfo);
+			
+			return "/multi/ownerCheck";
 		}
-	}
-	
-	@RequestMapping(value="/multi/articleRead.do", method=RequestMethod.GET)
-	public String articleRead(HttpSession session, @RequestParam("board_no") int board_no, @RequestParam("article_no") int article_no, Model model, HttpServletRequest request) {
-		String currentID = (String)session.getAttribute("userid");
 		
-		if(currentID == null || currentID.equals("")) {
-			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
-			model.addAttribute("href", "/");
-			return "alert";
-		} else {
-			
-			MultiBoardVO thisBoard = new MultiBoardVO();
-			thisBoard.setBoard_no(board_no);
-			
-			thisBoard = as.getMultiBoardOne(thisBoard);
-			model.addAttribute("boardConfig", thisBoard);
-			
-			// 게시글 정보 불러옴
-			ArticleVO article = ms.getArticleOne(article_no);
-			
-			// 줄바꿈 처리
-			String convertedContents = article.getArticle_content();
-			convertedContents = XssPreventer.unescape(convertedContents);
-			article.setArticle_content(convertedContents);
-			
-			// 조회수 up
-			ms.articleHitUpdate(article_no);
-			
-			model.addAttribute("article", article);
-			return "/multi/articleRead";
-		}
+		// 조회수 up
+		ms.articleHitUpdate(article_no);
+		
+		model.addAttribute("article", article);
+		return "/multi/articleRead";
 	}
 	
-	@Autowired
-	UserServiceImpl us;
 	
-	
-	// 암호를 읽어보자.
+	// 비밀글 암호 체크 및 redirect.
 	@RequestMapping(value="/multi/ownerCheck.do", method=RequestMethod.POST)
-	public String ownerCheckPost(@RequestParam("inputPassword") String inputPassword, @RequestParam("article_no") int article_no, 
-								 @RequestParam("OrderedUrl") String url, Model model, HttpServletRequest request, HttpSession session) {
-		//System.out.println("넘어온 패스워드 : " + inputPassword + " 넘어온 아티클넘버 : " + article_no + " 넘어온 url : " + url);
+	public String ownerCheckPost(@RequestParam("inputPassword") String inputPassword, 
+								 @RequestParam("article_no") int article_no, 
+								 @RequestParam("OrderedUrl") String url, 
+								 Model model, 
+								 HttpServletRequest request,
+								 RedirectAttributes rttr,
+								 HttpSession session) 
+	{
 		
 		ArticleVO article = ms.getArticleOne(article_no);
 		int board_no = article.getBoard_no();
@@ -352,7 +345,8 @@ public class MultiBoardController {
 			
 			if(url.indexOf("board") != -1) {
 				model.addAttribute("article", article);
-				return "redirect:/multi/articleRead.do?board_no=" + board_no + "&article_no=" + article_no; 
+				rttr.addAttribute("decoded", "1");
+				return "redirect:/multi/board.do?board_no=" + board_no + "&article_no=" + article_no; 
 			}
 			
 			if(url.indexOf("Edit") != -1) {
@@ -373,44 +367,40 @@ public class MultiBoardController {
 		}
 	}
 	
+	
+	// 글쓰기 form 호출
 	@RequestMapping(value="/multi/articleWrite.do", method=RequestMethod.GET)
 	public String articleWrite(HttpSession session, Model model, @RequestParam("board_no") int board_no) {
-		String currentUser = (String)session.getAttribute("userid");
 		
-		if(currentUser == null || currentUser.equals("")) {
-			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
-			model.addAttribute("href", "/");
+		MultiBoardVO thistemp = new MultiBoardVO();
+		thistemp.setBoard_no(board_no);
+		MultiBoardVO thisboardVO = as.getMultiBoardOne(thistemp);
+		if(thisboardVO == null || thisboardVO.equals(null)) {
+			model.addAttribute("msg", "해당 게시판은 존재하지 않습니다.");
+			model.addAttribute("href", "/multi/boardMain.do");
 			return "alert";
-		} else {
-			
-			MultiBoardVO thistemp = new MultiBoardVO();
-			thistemp.setBoard_no(board_no);
-			MultiBoardVO thisboardVO = as.getMultiBoardOne(thistemp);
-			if(thisboardVO == null || thisboardVO.equals(null)) {
-				model.addAttribute("msg", "해당 게시판은 존재하지 않습니다.");
-				model.addAttribute("href", "/multi/boardList.do?board_no=-1&page_no=1&pageSize=10");
-				return "alert";
-			}
-			
-			MultiBoardVO thisBoard = new MultiBoardVO();
-			thisBoard.setBoard_no(board_no);
-			
-			thisBoard = as.getMultiBoardOne(thisBoard);
-			model.addAttribute("boardConfig", thisBoard);
-			
-			// 게시글 작성 일자 표시를 위해 전달 (다른 방법 있음)
-			SimpleDateFormat formatter = new SimpleDateFormat ("yyyy.MM.dd HH:mm:ss", Locale.KOREA);
-			Date currentTime = new Date();
-			String date = formatter.format(currentTime);
-			model.addAttribute("date", date);
-			return "/multi/articleWrite";
 		}
+		
+		thistemp = as.getMultiBoardOne(thistemp);
+		model.addAttribute("boardConfig", thistemp);
+		
+		// 게시글 작성 일자 표시를 위해 전달 (다른 방법 있음)
+		SimpleDateFormat formatter = new SimpleDateFormat ("yyyy.MM.dd HH:mm:ss", Locale.KOREA);
+		Date currentTime = new Date();
+		String date = formatter.format(currentTime);
+		model.addAttribute("date", date);
+		
+		return "/multi/articleWrite";
 	}
 	
+	
+	// 글쓰기 작업
 	@RequestMapping(value="/multi/articleWrite.do", method=RequestMethod.POST)
 	@ResponseBody
-	public String articleWritePost(ArticleVO article) {
-		//System.out.println(article.toString());
+	@Transactional(rollbackFor={Exception.class})
+	public String articleWritePost(ArticleVO article, HttpSession session) {
+		
+		String currentId = (String)session.getAttribute("userid");
 		
 		if(article.getArticle_secretyn() == null || article.getArticle_secretyn().equals("")) {
 			article.setArticle_secretyn("N");
@@ -424,12 +414,21 @@ public class MultiBoardController {
 			article.setArticle_password(new String(encodedBytes));
 		}
 		
+		// 글 내용 태그 삭제
 		String noTagContent = article.getArticle_content();
 		noTagContent = XssPreventer.unescape(noTagContent);
 		article.setArticle_content(noTagContent);
-		
 		int result = ms.articleInsert(article);
 		
+		// 글쓰기에 성공한 경우 로그 001을 삽입
+		if(result == 1) {
+			Map<String, Object> traceMap = new HashMap<String, Object>();
+			traceMap.put("traceCode", "001");
+			traceMap.put("traceUser", currentId);
+			ms.insertTraceLog(traceMap);
+		}
+		
+		// 답글관련 넘버링을 위해 자신의 글 번호와 parentsno를 일치
 		ArticleVO temp = ms.getPreventInsertedArticle();
 		int parent_no = temp.getArticle_no();
 		ms.articleParentsnoUpdate(parent_no);
@@ -437,13 +436,14 @@ public class MultiBoardController {
 		return String.valueOf(result);
 	}
 	
+	
+	// 글삭제 권한 체크
 	@RequestMapping(value="/multi/articleDeleteCheck.do")
 	public String articleDeleteCheck(HttpSession session, @RequestParam("board_no") int board_no, @RequestParam("article_no") int article_no, Model model, HttpServletRequest request) {
 		
 		String currentID = (String)session.getAttribute("userid");
 		
 		ArticleVO article = ms.getArticleOne(article_no);
-		
 		if(article.getArticle_secretyn().equals("Y") || article.getArticle_secretyn() == "Y") {
 			
 			// 비밀글 처리
@@ -452,7 +452,6 @@ public class MultiBoardController {
 			
 			Decoder decoder = Base64.getDecoder();
 			byte[] decodeByte = decoder.decode(encodedByte);
-			//System.out.println("디코딩된 것 : " + new String(decodeByte));
 			String decoded = new String(decodeByte);
 			article.setArticle_password(decoded);
 			
@@ -466,24 +465,34 @@ public class MultiBoardController {
 		}
 	}
 	
+	
+	// 글 삭제 로직
 	@RequestMapping(value="/multi/articleDelete.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String deleteBoardOne(Model model, HttpSession session, HttpServletRequest request, ArticleVO articleVO) {
-		//System.out.println("ordered : " + articleVO.toString());
+
+		String currentUserId = (String)session.getAttribute("userid");
 		int result = ms.articleDelete(articleVO);
+		
+		// 삭제의 경우 003 로그를 삽입
+		Map<String, Object> traceMap = new HashMap<String, Object>();
+		traceMap.put("traceCode", "003");
+		traceMap.put("traceUser", currentUserId);
+		ms.insertTraceLog(traceMap);
+		
 		return String.valueOf(result);
 	}
 	
+	
+	// 글 수정 권한 체크
 	@RequestMapping(value="/multi/articleEditCheck.do")
 	public String articleEditCheck(HttpSession session, @RequestParam("board_no") int board_no, @RequestParam("article_no") int article_no, Model model, HttpServletRequest request) {
 		
-		ArticleVO article = ms.getArticleOne(article_no);
 		String currentID = (String)session.getAttribute("userid");
-		
+		ArticleVO article = ms.getArticleOne(article_no);
 		if(article.getArticle_secretyn().equals("Y") || article.getArticle_secretyn() == "Y") {
 			
 			//비밀글 처리
-			
 			String encoded = article.getArticle_password();
 			byte[] encodedByte = encoded.getBytes();
 			
@@ -495,16 +504,24 @@ public class MultiBoardController {
 			
 			model.addAttribute("article", article);
 			model.addAttribute("OrderedUrl", request.getRequestURI());
+			
 			UserVO userInfo = us.getUserInfo(currentID);
 			model.addAttribute("userInfo", userInfo);
 			return "/multi/ownerCheck";
+			
 		} else {
 			return "redirect:/multi/articleEdit.do?board_no=" + board_no + "&article_no=" + article_no;
 		}
 	}
 	
+	// 글 수정 폼 호출
 	@RequestMapping(value="/multi/articleEdit.do", method=RequestMethod.GET)
-	public String updateBoardOne(@RequestParam("board_no") int board_no, @RequestParam("article_no") int article_no, Model model, HttpSession session, HttpServletRequest request) {
+	public String updateBoardOne(@RequestParam("board_no") int board_no, 
+								 @RequestParam("article_no") int article_no, 
+								 Model model, 
+								 HttpSession session, 
+								 HttpServletRequest request) 
+	{
 		String currentUser = (String)session.getAttribute("userid");
 		ArticleVO article = ms.getArticleOne(article_no);
 		
@@ -513,11 +530,9 @@ public class MultiBoardController {
 			model.addAttribute("href", request.getContextPath() + "/multi/board.do?board_no=" + request.getParameter("board_no") + "&article_no=" + article.getBoard_no());
 			return "alert";
 		} else if(currentUser.equals("admin")) {
-			// 관리자의 경우 어떤 글이든 수정 가능하도록 처리
 			model.addAttribute("article", article);
 			return "/multi/articleEdit";
 		} else if(currentUser.equals(article.getArticle_userid())) {
-			// 글 쓴 사람의 아이디와, 해당 글을 작성한 사람의 아이디가 같아야만 글을 수정할 수 있음.
 			model.addAttribute("article", article);
 			return "/multi/articleEdit";
 		} else {
@@ -525,27 +540,43 @@ public class MultiBoardController {
 			model.addAttribute("href", request.getContextPath() + "/multi/board.do?board_no=" + request.getParameter("board_no") + "&article_no=" + article.getBoard_no());
 			return "alert";
 		}
+		
 	}
 	
+	// 실제 글 수정 로직
 	@ResponseBody
 	@RequestMapping(value="/multi/articleEdit.do", method=RequestMethod.POST)
-	public String updateBoardOne(ArticleVO article, Model model, HttpSession session, HttpServletRequest request) {
+	public String updateBoardOne(ArticleVO article, 
+								 Model model, 
+								 HttpSession session, 
+								 HttpServletRequest request) 
+	{
 		String currentUser = (String)session.getAttribute("userid");
 		
-		// 수정한 글을 보낼 때 한 번 더 로그인 관련 처리를 함.
 		if(currentUser == null || currentUser.equals("")) {
 			model.addAttribute("msg", "권한이 없습니다.");
 			model.addAttribute("href", request.getContextPath() + "/multi/board.do?board_no=" + request.getParameter("board_no") + "&article_no=" + article.getBoard_no());
 			return "alert";
 		} else if(currentUser.equals("admin")) {
-			// 관리자는 모든 글을 수정 가능함.
 			int result = ms.articleUpdate(article);
+			
+			// 글 수정은 002 로그 삽입
+			Map<String, Object> traceMap = new HashMap<String, Object>();
+			traceMap.put("traceCode", "002");
+			traceMap.put("traceUser", currentUser);
+			ms.insertTraceLog(traceMap);
+			
 			return String.valueOf(result);
 		} else if(currentUser.equals(article.getArticle_userid())) {
-			// 글을 작성한 사람의 아이디와 현재 접속자 아이디가 같아야만 수정이 가능함.
 			int result = ms.articleUpdate(article);
+			
+			Map<String, Object> traceMap = new HashMap<String, Object>();
+			traceMap.put("traceCode", "002");
+			traceMap.put("traceUser", currentUser);
+			ms.insertTraceLog(traceMap);
 			return String.valueOf(result);
 		} else {
+			
 			model.addAttribute("msg", "권한이 없습니다.");
 			model.addAttribute("href", request.getContextPath() + "/multi/board.do?board_no=" + request.getParameter("board_no") + "&article_no=" + article.getBoard_no());
 			return "alert";
@@ -553,48 +584,38 @@ public class MultiBoardController {
 	}
 	
 	
-	// 신 게시판 답글 처리
+	// 게시판 답글 form 호출
 	@RequestMapping(value="/multi/reArticleWrite.do", method=RequestMethod.GET)
-	public String reBoardWrite(@RequestParam("board_no") int board_no, @RequestParam("article_no") int article_no, Model model, HttpSession session) {
+	public String reBoardWrite(@RequestParam("board_no") int board_no, 
+							   @RequestParam("article_no") int article_no, 
+							   Model model, 
+							   HttpSession session) 
+	{
 		String currentUser = (String)session.getAttribute("userid");
 		
-		if(currentUser == null || currentUser.equals("")) {
-			model.addAttribute("msg", "로그인 후 이용할 수 있는 서비스 입니다.");
-			model.addAttribute("href", "/");
-			return "alert";
-		} else {
-			MultiBoardVO temp = new MultiBoardVO();
-			temp.setBoard_no(board_no);
-			temp.setUser_id(currentUser);
-			
-			MultiBoardVO config = as.getMultiBoardOne(temp);
-			model.addAttribute("boardConfig", config);
-			
-			// 답글을 달고자 하는 게시글의 정보를 불러와, View페이지에 Re : 를 뿌려주기위함.
-			ArticleVO articleVO = ms.getArticleOne(article_no);
-			// 현재 날짜-시간 처리
-			SimpleDateFormat formatter = new SimpleDateFormat ("yyyy.MM.dd HH:mm:ss", Locale.KOREA);
-			Date currentTime = new Date();
-			String date = formatter.format(currentTime);
-			
-			model.addAttribute("date", date);
-			model.addAttribute("article", articleVO);
-			return "/multi/reArticle";
-			
-		}
+		MultiBoardVO temp = new MultiBoardVO();
+		temp.setBoard_no(board_no);
+		temp.setUser_id(currentUser);
+		
+		MultiBoardVO config = as.getMultiBoardOne(temp);
+		model.addAttribute("boardConfig", config);
+		
+		ArticleVO articleVO = ms.getArticleOne(article_no);
+		SimpleDateFormat formatter = new SimpleDateFormat ("yyyy.MM.dd HH:mm:ss", Locale.KOREA);
+		Date currentTime = new Date();
+		String date = formatter.format(currentTime);
+		
+		model.addAttribute("date", date);
+		model.addAttribute("article", articleVO);
+		return "/multi/reArticle";
 	}
 	
+	
+	// 게시판 답글 작성
 	@RequestMapping(value="/multi/reArticleWrite.do", method=RequestMethod.POST)
 	@ResponseBody
 	public String reBoardWritePost(ArticleVO articleVO) {
 		
-		//System.out.println(articleVO.toString());
-		//System.out.println("폼에서 넘어온 vo의 값 : " + boardVO.toString());
-		
-		// 답글을 달고자 하는 글의 board_grouporder와 board_groupdepth가 필요하다.
-		// 답글이 될 글의 grouporder와 groupdepth를 먼저 +1해준다.
-		//boardVO.setBoard_grouporder(boardVO.getBoard_grouporder() + 1);
-		//boardVO.setBoard_groupdepth(boardVO.getBoard_groupdepth() + 1);
 		articleVO.setArticle_grouporder(articleVO.getArticle_grouporder() + 1);
 		articleVO.setArticle_groupdepth(articleVO.getArticle_groupdepth() + 1);
 		
@@ -618,44 +639,98 @@ public class MultiBoardController {
 		
 		// 이후 답글을 등록한다.
 		int result = ms.reArticleInsert(articleVO);
-		 
 		return String.valueOf(result);
 	}
 	
+	@Autowired
+	IndividualServiceImpl ism;
+	
 	@RequestMapping(value="/multi/individualInfo.do")
 	public String individualInfo(HttpSession session, Model model) {
+		
 		String currentUserId = (String)session.getAttribute("userid");
-		System.out.println("넘어온 아이디 : " + currentUserId);
+		
+		Map<String, Object> infoMap = new HashMap<String, Object>();
+		infoMap.put("trace_user", currentUserId);
+		
+		TraceVO traveUserInfo = ism.getCount(infoMap);
+		model.addAttribute("traceInfo", traveUserInfo);
 		
 		// 새로운 객체 생성
 		UserVO userVO = new UserVO();
 		userVO.setUserid(currentUserId);
 		List<IndividualVO> indiList = us.getUserIndividualInfoList(userVO);
+		
 		Iterator<IndividualVO> indiListIt = indiList.iterator();
 		while(indiListIt.hasNext()) {
 			IndividualVO info = indiListIt.next();
 			String tag = info.getArticle_content();
 			tag = tag.replaceAll("img", "");
+			tag = tag.replaceAll("<p>", "");
+			tag = tag.replaceAll("</p>", "");
 			String nor = XssPreventer.unescape(tag);
 			info.setArticle_content(nor);
 		}
 		
+		List<MultiBoardVO> multiList = as.getMultiBoardList();
+		
+		model.addAttribute("multiList", multiList);
 		model.addAttribute("indiList", indiList);
 		
 		return "/multi/individualInfo";
 	}
 	
 	
+	@RequestMapping(value="/multi/individualInfoBoardChange.do", method=RequestMethod.POST)
+	public String changeBoardAjax(@RequestParam int board_no, HttpSession session, Model model) {
+		/*System.out.println("받아들인 board_no : " + board_no);
+		System.out.println("접속 중인 ID : " + (String)session.getAttribute("userid"));*/
+		Map<String, Object> infomap = new HashMap<String, Object>();
+		infomap.put("userid", (String)session.getAttribute("userid"));
+		infomap.put("board_no", board_no);
+		
+		Map<String, Object> infoMap = new HashMap<String, Object>();
+		infoMap.put("trace_user", (String)session.getAttribute("userid"));
+		
+		TraceVO traveUserInfo = ism.getCount(infoMap);
+		model.addAttribute("traceInfo", traveUserInfo);
+		
+		List<IndividualVO> indiList =  us.getUserIndividualInfoListByBoardNo(infomap);
+		model.addAttribute("indiList", indiList);
+		return "/multi/indiList";
+	}
 	
 	
-	// 댓글 처리 관련
-	@Autowired
-	ReplyServiceImpl rs;
+	@RequestMapping(value="/multi/articleReadModal.do")
+	public String articleReadModal(ArticleVO articleVO, Model model) {
+		try {
+			ArticleVO article = ms.getArticleOne(articleVO.getArticle_no());
+			model.addAttribute("article", article);
+			
+			List<ReplyVO> reply_list = rs.getReplyList2(articleVO.getArticle_no());
+			model.addAttribute("reply_list", reply_list);
+			
+			MultiBoardVO temtp = new MultiBoardVO();
+			temtp.setBoard_no(articleVO.getBoard_no());
+			MultiBoardVO multiBoardVO = as.getMultiBoardOne(temtp);
+			model.addAttribute("boardConfig", multiBoardVO);
+			
+		} catch (Exception e) {
+			
+		}
+		return "/multi/articleReadModal";
+		
+	}
+	
+
 	
 	// 댓글 작성 프로세스
 	@RequestMapping(value="/multi/writeReplyAction")
 	@ResponseBody
-	public String writeReplyAction(@ModelAttribute ReplyVO reply) {
+	public String writeReplyAction(@ModelAttribute ReplyVO reply, HttpSession session) {
+		
+		String currentUser = (String)session.getAttribute("userid");
+		
 		// 현재 날짜 정보
 		SimpleDateFormat formatter = new SimpleDateFormat ("yyyy.MM.dd HH:mm:ss", Locale.KOREA);
 		Date currentTime = new Date();
@@ -664,11 +739,15 @@ public class MultiBoardController {
 		
 		int result = rs.replyWrite(reply);
 		
-		//ReplyVO updatedReply = rs.getReplyOne();
-		//rs.updateReplyParentsNo(updatedReply);
+		// 댓글 작성의 경우 004 로그를 삽입
+		Map<String, Object> traceMap = new HashMap<String, Object>();
+		traceMap.put("traceCode", "004");
+		traceMap.put("traceUser", currentUser);
+		ms.insertTraceLog(traceMap);
 		
 		return String.valueOf(result);
 	}
+	
 	
 	// 댓글 리스트 불러오기
 	@RequestMapping(value="/multi/getReplyList", method=RequestMethod.GET)
@@ -681,6 +760,7 @@ public class MultiBoardController {
 		}
 		return reply_list;
 	}
+	
 	
 	// 최신순 리스트 불러오기
 	@RequestMapping(value="/multi/getReplyListNew", method=RequestMethod.POST)
@@ -695,6 +775,7 @@ public class MultiBoardController {
 		return result;
 	}
 	
+	
 	// 등록순 리스트 불러오기
 	@RequestMapping(value="/multi/getReplyListOld", method=RequestMethod.POST)
 	@ResponseBody
@@ -704,6 +785,7 @@ public class MultiBoardController {
 		List<ReplyVO> result = rs.getReplyList(replyVO);
 		return result;
 	}
+	
 		
 	// 점수순 리스트 불러오기
 	@RequestMapping(value="/multi/getReplyListScore", method=RequestMethod.POST)
@@ -714,6 +796,7 @@ public class MultiBoardController {
 		List<ReplyVO> result = rs.getReplyList(replyVO);
 		return result;
 	}
+	
 	
 	// 댓글 삭제
 	@RequestMapping(value="/multi/deleteReply", produces="application/text; charset=utf8")
@@ -774,10 +857,9 @@ public class MultiBoardController {
 		System.out.println(replyVO.toString());
 		
 		ReplyVO likeInfo = rs.replyLikeAndHateConfirm(replyVO);
-		int result = 0;
 		if(likeInfo.getCnt() == 0) {
 			// 정보가 없는 경우 신규 등록
-			result = rs.replyLikeAndHateAction(replyVO);
+			rs.replyLikeAndHateAction(replyVO);
 			rs.replyLikeAndHateScoreAdjust(replyVO);
 			return new ReplyVO();
 		} else {
@@ -813,4 +895,6 @@ public class MultiBoardController {
 			}
 		}
 	}
+	
+	
 }

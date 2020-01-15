@@ -1,0 +1,36 @@
+package com.fusion1.controller;
+
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Main {
+
+	public static void main(String[] args) {
+		 
+		Scanner scan = new Scanner(System.in);
+		
+		int subject = scan.nextInt();
+		double[] originScoreArr = new double[subject];
+		double[] corruptedScoreArr = new double[subject];
+		
+		for(int i = 0; i<subject; i++) {
+			originScoreArr[i] = scan.nextInt();
+		}
+		
+		Arrays.sort(originScoreArr);
+		
+		double max_score = originScoreArr[originScoreArr.length-1];
+		double corruptedSum = 0;
+		
+		for(int i = 0; i<subject; i++) {
+			corruptedScoreArr[i] = originScoreArr[i] / max_score * 100;
+			corruptedSum += corruptedScoreArr[i];
+		}
+		
+		double corruptedAvg = corruptedSum / corruptedScoreArr.length;
+		
+		System.out.println(corruptedAvg);
+		
+		
+	}
+}

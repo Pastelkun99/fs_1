@@ -1,6 +1,7 @@
 package com.fusion1.service;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -21,18 +22,13 @@ public class UserServiceImpl implements UserService {
 	SqlSession sqlsession;
 
 	@Override
-	public UserVO userLogin(String inputID) {
-		return sqlsession.selectOne(NAMESPACE + "userLogin", inputID);
+	public UserVO userExistCheck(String inputID) {
+		return sqlsession.selectOne(NAMESPACE + "userExistCheck", inputID);
 	}
 
 	@Override
-	public int userRegister(UserVO uservo) {
-		return sqlsession.insert(NAMESPACE + "userRegister", uservo);
-	}
-
-	@Override
-	public UserVO userIdCheck(String inputID) {
-		return sqlsession.selectOne(NAMESPACE + "userLogin", inputID);
+	public int userRegister(UserVO userVO) {
+		return sqlsession.insert(NAMESPACE + "userRegister", userVO);
 	}
 
 	@Override
@@ -46,18 +42,23 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserVO getUserInfo(String userid) {
-		return sqlsession.selectOne(NAMESPACE + "getUserInfo", userid);
+	public UserVO getUserInfo(String userId) {
+		return sqlsession.selectOne(NAMESPACE + "getUserInfo", userId);
 	}
 
 	@Override
 	public int userInfoUpdate(UserVO userVO) {
-		return sqlsession.update(NAMESPACE + "updateUserInfo", userVO);
+		return sqlsession.update(NAMESPACE + "userInfoUpdate", userVO);
 	}
 
 	@Override
 	public List<IndividualVO> getUserIndividualInfoList(UserVO userVO) {
 		return sqlsession.selectList(NAMESPACE + "getUserIndividualInfoList", userVO);
+	}
+
+	@Override
+	public List<IndividualVO> getUserIndividualInfoListByBoardNo(Map<String, Object> infoMap) {
+		return sqlsession.selectList(NAMESPACE + "getUserIndividualInfoListByBoardNo", infoMap);
 	}
 	
 

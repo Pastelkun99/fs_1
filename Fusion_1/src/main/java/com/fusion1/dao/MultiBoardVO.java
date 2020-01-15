@@ -1,8 +1,7 @@
 package com.fusion1.dao;
 
-import java.io.Serializable;
 
-public class MultiBoardVO implements Serializable {
+public class MultiBoardVO {
 
 	private int board_no;
 	private String board_name;
@@ -90,7 +89,6 @@ public class MultiBoardVO implements Serializable {
 		this.user_id = user_id;
 	}
 	
-
 	public int getMenu_no() {
 		return menu_no;
 	}

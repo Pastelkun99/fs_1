@@ -1,0 +1,43 @@
+package com.fusion1.controller;
+
+import java.util.Scanner;
+
+public class Main {
+
+	public static void main(String[] args) {
+		
+		Scanner scan = new Scanner(System.in);
+		
+		int number = scan.nextInt();
+		int k;
+		int han = 0;
+		int[] a = new int[3];
+		
+		for(int i = 1; i<=number; i++) {
+			if(0 < i && i < 100) {
+				han = i;
+				
+			} else if(i == 1000) {
+				break;
+				
+			} else {
+				
+				k = 0;
+				int temp = i;
+				
+				while(temp > 0) {
+					a[k] = temp % 10;
+					temp /= 10;
+					k++;
+				}
+				
+				if(a[0] - a[1] == a[1] - a[2]) {
+					han++;
+				}
+			}
+		}
+		
+		System.out.println(han);
+		scan.close();
+	}
+}

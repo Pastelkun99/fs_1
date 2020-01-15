@@ -31,8 +31,8 @@
 		<div class="col-xs-8 col-md-8">
 			<h2 class="text-center">게시글 수정</h2>
 			<p>&nbsp;</p>
-			<div class="table table-responsive">
 			<form action="${pageContext.request.contextPath }/multi/articleEdit.do" id="articleUpdate" method="post">
+			<div class="table table-responsive">
 				<table class="table">
 						<tr>
 							<th class="table-success">글번호</th>
@@ -60,9 +60,9 @@
 				<button type="button" class="btn btn-primary" onclick="articleUpdate();">수정 완료</button>
 				<button type="button" class="btn btn-danger" onclick="history.back();">돌아가기</button>
 				<input type="hidden" name="article_userid" id="article_userid" value="${article.article_userid }"/>
+			</form>
 			</div>
 		</div>
-		</form>
 		<script type="text/javascript">
 			function articleUpdate() {
 				var article_no = document.getElementById('article_no').value;

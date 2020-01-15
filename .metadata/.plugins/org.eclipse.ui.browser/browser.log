@@ -80,3 +80,6 @@
 12월 30, 2019 12:31:26.73 [14060:4144:1230/123126.733:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -118
 12월 30, 2019 12:49:43.79 [14060:4144:1230/124943.796:ERROR:socket_stream.cc(218)] Closing stream with result -2
 12월 30, 2019 12:51:59.99 [14060:4144:1230/125159.990:ERROR:connection_factory_impl.cc(418)] Failed to connect to MCS endpoint with error -118
+
+1월 10, 2020 15:10:55.09 NEW SESSION
+1월 10, 2020 15:10:55.47 [1992:516:0110/151051.790:ERROR:gcm_channel_status_request.cc(145)] GCM channel request failed.

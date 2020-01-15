@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+					"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="restMapper">
+
+	<select id="getUserList" resultType="UserVO">
+		SELECT * FROM USERTBL
+	</select>
+	
+	<select id="getUserList2" parameterType="String" resultType="UserVO">
+		SELECT * FROM USERTBL WHERE userid = #{id}
+	</select>
+	
+	<insert id="userAppend" parameterType="UserVO">
+		INSERT INTO USERTBL VALUES (0, #{userid}, #{userpw}, #{username}, 0, 1)
+	</insert>
+	
+	<update id="userModify" parameterType="UserVO">
+		UPDATE USERTBL SET userpw = #{userpw}, username = #{username} WHERE userid = #{userid}   
+	</update>
+	
+	<delete id="userDelete" parameterType="String">
+		DELETE FROM USERTBL WHERE userid = #{id}
+	</delete>
+	
+</mapper>

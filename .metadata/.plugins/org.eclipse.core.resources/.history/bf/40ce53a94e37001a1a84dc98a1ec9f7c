@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+					"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="userMapper">
+	<select id="userExistCheck" resultType="com.fusion1.dao.UserVO">
+		SELECT * FROM usertbl WHERE userid = #{inputID}
+	</select>
+	
+	<insert id="userRegister" parameterType="com.fusion1.dao.UserVO">
+		INSERT INTO USERTBL VALUES (0, #{userid}, #{userpw}, #{username}, 0, 1)
+	</insert>
+	
+	<select id="getAdminInfo" parameterType="com.fusion1.dao.UserVO"  resultType="com.fusion1.dao.UserVO">
+		SELECT * FROM usertbl WHERE user_admin = 1 AND userid = #{userid}
+	</select>
+	
+	<select id="getUserInfo" parameterType="string" resultType="com.fusion1.dao.UserVO">
+		SELECT * FROM usertbl WHERE userid = #{userid}
+	</select>
+	
+	<select id="getUserList" resultType="com.fusion1.dao.UserVO">
+		SELECT * FROM usertbl ORDER BY user_admin DESC
+	</select>
+	
+	<update id="userInfoUpdate" parameterType="com.fusion1.dao.UserVO">
+		UPDATE usertbl SET user_admin = #{user_admin}, 
+						   user_aval = #{user_aval},
+						   userpw = #{userpw},
+						   username = #{username} 
+			   WHERE userno = #{userno}
+	</update>
+	
+	<select id="getUserIndividualInfoList" parameterType="UserVO" resultType="IndividualVO">
+		SELECT
+				A.menu_name,
+				B.board_no,
+				B.article_no,
+				B.article_userid,
+				B.article_writer,
+				B.article_title,
+				substring(B.article_content, 1, 100) as article_content
+		FROM
+				menutbl A,
+				articletbl B,
+				multiboardtbl C
+		WHERE
+				A.menu_no = C.menu_no AND B.board_no = C.board_no AND B.article_userid = #{userid}				
+	</select>
+	
+</mapper>

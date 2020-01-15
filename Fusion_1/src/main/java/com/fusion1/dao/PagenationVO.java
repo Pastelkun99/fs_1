@@ -5,7 +5,7 @@ public class PagenationVO {
 	// 페이지 번호
 	private int page_no;
 	
-	// 받아오기 위한 변수 (몇 개씩 보일 것인가?)
+	// URL에서 받아오기 위한 변수 (몇 개씩 보일 것인가?)
 	private int pageSize;
 	
 	// 총 게시물의 수

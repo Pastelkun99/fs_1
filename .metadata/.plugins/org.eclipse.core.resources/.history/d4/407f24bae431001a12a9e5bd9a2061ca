@@ -1,0 +1,37 @@
+package com.fusion1.controller;
+
+import java.util.Scanner;
+
+public class Main {
+
+	public static void main(String[] args) {
+		 
+		Scanner scan = new Scanner(System.in);
+		
+		int testCase = scan.nextInt();
+		
+		for(int i = 0; i<testCase; i++) {
+			
+			int student = scan.nextInt();
+			int testCaseSum = 0;
+			int[] scoreArr = new int[student];
+			
+			for(int k = 0; k<student; k++) {
+				scoreArr[k] = scan.nextInt();
+				testCaseSum += scoreArr[k];
+			}
+			
+			double testCaseAvg = testCaseSum / student;
+			double count = 0;
+			
+			for(int j = 0; j < student; j++) {
+				if(scoreArr[j] > testCaseAvg) {
+					++count;
+				}
+			}
+			
+			double persent = Math.round(((count / student) * 100.0)*1000.0)/1000.0;
+			System.out.printf("%.2f" + "%", persent);
+		}
+	}
+}

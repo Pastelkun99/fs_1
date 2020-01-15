@@ -34,14 +34,32 @@
 <title>개인 페이지</title>
 </head>
 <body>
-	<div class="row" style="margin-top: 5rem;">
-		<div class="col-md-2"></div>
+	<div class="row" style="margin-bottom: 5rem;">
+		<div class="col-md-2">
+		</div>
 		<div class="col-md-8">
+			<!-- <button class="btn btn-primary" id="userAppend">등록 버튼</button>
+			<button class="btn btn-primary" id="userModify">수정 버튼</button>
+			<button class="btn btn-danger" id="userDelete">삭제 버튼</button> -->
 			<div class="card" style="width:100%;">
 			  <div class="card-header">
-			  	${sessionScope.username }의 갤로그
+			  	<strong>${sessionScope.username }의 개인 페이지</strong>
+		  		<select name="board_selectBox" id="board_selectBox" class="form-control" style="float:right; width:400px;" onchange="changeBoard();">
+		  			<option value="" disabled selected>게시판을 선택해주세요.</option>
+		  			<c:forEach items="${multiList }" var="multiList">
+						<option value="${multiList.board_no }">${multiList.board_name }</option>		  				
+		  			</c:forEach>
+				</select>
 			  </div>
+			<div id="indiListDiv">
 			  <ul class="list-group list-group-flush">
+				  <li class="list-group-item">
+				  	글 쓴 횟수 : <strong>${traceInfo.writeCount }</strong><br>
+				  	글 수정 횟수 : <strong>${traceInfo.editCount }</strong><br>
+				  	글 삭제 횟수 : <strong>${traceInfo.deleteCount}</strong><br>
+				  	댓글 작성 횟수 : <strong>${traceInfo.replyCount}</strong><br>
+				  	로그인 횟수 : <strong>${traceInfo.signoutCount }</strong>
+				  </li>
 			  	<c:if test="${fn:length(indiList) lt 1}">
 					<li class="list-group-item">
 						작성한 글이 없습니다.
@@ -50,20 +68,76 @@
 			  	<c:if test="${fn:length(indiList) gt 0 }">
 			    	<c:forEach items="${indiList }" var="indiList">
 				    <li class="list-group-item">
-				    		<strong><a href="#" onclick="goToArticle(${indiList.board_no}, ${indiList.article_no })">${indiList.menu_name } - ${indiList.article_title }</a></strong><br>
-				    		${indiList.article_content } ...
+				    		<strong><a href="#" onclick="goToArticle(${indiList.board_no}, ${indiList.article_no })" data-toggle="modal" data-target="#exampleModal">${indiList.menu_name } - ${indiList.article_title }</a></strong>
+				    			<br>
+				    			<br>
+				    		<p>${indiList.article_content }...</p> 
 				    </li>
 			    	</c:forEach>
 			  	</c:if>
 			  </ul>
-			</div>
+			 </div>
+		  	</div>
 		</div>
 		<div class="col-md-2"></div>
 	</div>
+		
+	<div class="modal fade bd-example-modal-xl" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-xl" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">게시글</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body" id="gesigul">
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+	      </div>
+	    </div>
+	  </div>
+	</div>
 	<script type="text/javascript">
+		
 		function goToArticle(board_no, article_no) {
-			window.open("/multi/articleRead.do?board_no=" + board_no + "&article_no=" + article_no, "_blank", "width: 800px, height: 800px");
+			
+			$.ajax({
+				type : "post",
+				url : "/multi/articleReadModal.do",
+				data : {"board_no" : board_no,
+						"article_no" : article_no},
+				dataType : "html",
+				success : function(result) {
+					$('#gesigul').html(result);
+				},
+				error : function(error) {
+					alert('error occured');
+					console.log(error);
+				}
+			});
 		}
+		
+		function changeBoard() {
+			
+			var board_no = $('#board_selectBox').val();
+			
+			$.ajax({
+				type : "post",
+				url : "/multi/individualInfoBoardChange.do",
+				data : {"board_no" : board_no},
+				dataType : "html",
+				success : function(result) {
+					$('#indiListDiv').html(result);
+				},
+				error : function(error) {
+					alert('error');
+				}
+			});
+		}
+		
 	</script>
 </body>
 </html>

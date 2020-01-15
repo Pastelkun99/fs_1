@@ -46,14 +46,18 @@
 			   B.article_noticeyn,
 			   (SELECT COUNT(*) FROM replytbl A WHERE A.article_no = B.article_no) as reply_cnt
 		FROM multiboardtbl A, articletbl B
-		WHERE A.board_no = B.board_no AND A.board_no = #{board_no}
-		ORDER BY article_parentsno DESC, article_grouporder ASC, article_date DESC LIMIT #{pageCon}, #{pageList}
+		WHERE A.board_no = B.board_no AND A.board_no = #{board_no} AND B.article_noticeyn = 'N'
+		ORDER BY article_parentsno DESC, article_grouporder ASC, article_date DESC LIMIT #{pageCon}, #{pageSize}
+	</select>
+	
+	<select id="getNoticeArticleList" resultType="ArticleVO">
+		SELECT * FROM articletbl WHERE article_noticeyn = 'Y' LIMIT 3
 	</select>
 
 	<select id="getArticleCountByBoardNo" parameterType="MultiBoardVO" resultType="ArticleVO">
 		SELECT COUNT(*) as cnt 
 		from multiboardtbl A, articletbl B 
-		WHERE A.board_no = B.board_no AND A.board_no = #{board_no}
+		WHERE A.board_no = B.board_no AND A.board_no = #{board_no} AND B.article_noticeyn = 'N'
 	</select>
 	
 	<select id="getArticleSearchCount" parameterType="PagenationVO" resultType="ArticleVO">
@@ -104,7 +108,7 @@
 	</select>
 	
 	<select id="getArticleSearchList" parameterType="PagenationVO" resultType="ArticleVO">
-		SELECT B.* FROM multiboardtbl A, articletbl B
+		SELECT B.*, (SELECT COUNT(*) FROM replytbl A WHERE A.article_no = B.article_no) as reply_cnt FROM multiboardtbl A, articletbl B
 		<if test="searchCon == 1">
 			WHERE 
 				A.board_no = B.board_no
@@ -301,4 +305,8 @@
 					AND B.article_no NOT IN (SELECT article_no from readnoticetbl where user_id = #{user_id})
 					AND B.board_no = A.board_no
 	</select>
+	
+	<insert id="insertTraceLog" parameterType="Map">
+		INSERT INTO tracetbl VALUES (0, #{traceCode}, #{traceUser}, now())
+	</insert>
 </mapper>

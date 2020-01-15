@@ -47,6 +47,7 @@
 					<tr>
 						<th scope="col">No</th>
 						<th scope="col">ID</th>
+						<th scope="col">PW</th>
 						<th scope="col">NAME</th>
 						<th scope="col">관리자 여부</th>
 						<th scope="col">활성화 여부</th>
@@ -58,7 +59,8 @@
 					<tr>
 						<th scope="row">${status.index + 1 }</th>
 						<td><a href="#" onclick="userInfoOpen('${userList.userid }')">${userList.userid }</a></td>
-						<td>${userList.username }</td>
+						<td><input type="text" class="form-control" name="user_password" id="userPw${userList.userno }" value="${userList.userpw }" maxlength="16"></td>
+						<td><input type="text" class="form-control" name="user_name" id="userName${userList.userno }" value="${userList.username }" maxlength="16"></td>
 						<td>
 							<select id="userAdmin${userList.userno }" name="user_admin" class="form-control">
 								<option value="1"<c:if test="${userList.user_admin eq 1 }"> selected </c:if>>관리자</option>
@@ -136,8 +138,8 @@ function testAjax() {
 
 $('#excelDownload').click(function() {
 		
-	var filePath = "C:/upload/Using_This_Sample.xlsx";
-	var fileName = "Using_This_Sample.xlsx";
+	var filePath = "C:/upload/sampleFile.jpg";
+	var fileName = "downloadFile.jpg";
 	
 	location.href='/mng/excelDownload.do?filePath=' + filePath + '&fileName=' + fileName;
 })
@@ -155,13 +157,27 @@ function userInfoOpen(user_id) {
 	
 function userInfoUpdate(no) {
 	var userno = no;
+	var userChangedPW = $('#userPw' + no).val();
+	var userChangedName = $('#userName' + no).val();
 	var userChangedAdmin = $('#userAdmin' + no).val();
 	var userChangedAval = $('#userAval' + no).val();
+	
+	if(userChangedPW.length == 0) {
+		alert('비밀번호가 입력되지 않았습니다.');
+		return false;
+	}
+	
+	if(userChangedName.length == 0) {
+		alert('이름이 입력되지 않았습니다.');
+		return false;
+	}
 	
 	$.ajax({
 		type : "POST",
 		url : "/mng/userInfoUpdate.do",
 		data : {"userno" : userno,
+				"userpw" : userChangedPW,
+				"username" : userChangedName,
 				"user_admin" : userChangedAdmin,
 				"user_aval" : userChangedAval
 		},

@@ -3,8 +3,7 @@
 					"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="userMapper">
-
-	<select id="userLogin" resultType="com.fusion1.dao.UserVO">
+	<select id="userExistCheck" resultType="com.fusion1.dao.UserVO">
 		SELECT * FROM usertbl WHERE userid = #{inputID}
 	</select>
 	
@@ -24,13 +23,17 @@
 		SELECT * FROM usertbl ORDER BY user_admin DESC
 	</select>
 	
-	<update id="updateUserInfo" parameterType="com.fusion1.dao.UserVO">
-		UPDATE usertbl SET user_admin = #{user_admin}, user_aval = #{user_aval} WHERE userno = #{userno}
+	<update id="userInfoUpdate" parameterType="com.fusion1.dao.UserVO">
+		UPDATE usertbl SET user_admin = #{user_admin}, 
+						   user_aval = #{user_aval},
+						   userpw = #{userpw},
+						   username = #{username} 
+			   WHERE userno = #{userno}
 	</update>
 	
 	<select id="getUserIndividualInfoList" parameterType="UserVO" resultType="IndividualVO">
-		SELECT
-				A.menu_name,
+		SELECT			
+				A.board_name as menu_name,
 				B.board_no,
 				B.article_no,
 				B.article_userid,
@@ -38,11 +41,24 @@
 				B.article_title,
 				substring(B.article_content, 1, 100) as article_content
 		FROM
-				menutbl A,
-				articletbl B,
-				multiboardtbl C
-		WHERE
-				A.menu_no = C.menu_no AND B.board_no = C.board_no AND B.article_userid = #{userid}				
+				multiboardtbl A, articletbl B
+		WHERE 
+				A.board_no = B.board_no AND B.article_userid = #{userid}
+	</select>
+	
+	<select id="getUserIndividualInfoListByBoardNo" parameterType="map" resultType="IndividualVO">
+		SELECT			
+				A.board_name as menu_name,
+				B.board_no,
+				B.article_no,
+				B.article_userid,
+				B.article_writer,
+				B.article_title,
+				substring(B.article_content, 1, 100) as article_content
+		FROM
+				multiboardtbl A, articletbl B
+		WHERE 
+				A.board_no = B.board_no AND B.article_userid = #{userid} AND B.board_no = #{board_no}
 	</select>
 	
 </mapper>

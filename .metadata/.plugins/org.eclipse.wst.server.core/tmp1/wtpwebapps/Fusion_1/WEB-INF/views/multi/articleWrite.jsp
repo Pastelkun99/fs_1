@@ -48,12 +48,12 @@
 							<td>${sessionScope.username }</td>
 							<th class="table-success">작성일</th>
 							<td>${date }
-							<%-- <c:if test="${sessionScope.userid eq 'admin'}">
+							<c:if test="${sessionScope.userid eq 'admin'}">
 								<select name="article_noticeyn" id="article_noticeyn" class="form-control" style="float:right; width:100px;" data-code="required">
-									<option value="N">일반</option>
-									<option value="Y">공지</option>
+									<option value="N">일반글</option>
+									<option value="Y">공지글</option>
 								</select>
-							</c:if> --%>
+							</c:if>
 							<c:if test="${boardConfig.board_secretyn eq 'Y' }">
 								<select name="article_secretyn" id="article_secretyn" class="form-control" style="float:right; width:100px;" data-code="required">
 									<option value="N">일반글</option>
@@ -62,7 +62,7 @@
 							</c:if>
 							<!-- 이 레이어는 보이지 않음 -->
 							<div class="layer">
-								<input type="password" id="article_password" class="form-control" name="article_password" placeholder="여기에 비밀번호를 입력해 주세요.">
+								<input type="password" id="article_password" class="form-control" name="article_password" placeholder="여기에 비밀번호를 입력해 주세요." maxlength="20">
 							</div>
 							</td>
 						</tr>
@@ -81,7 +81,7 @@
 				<input type="hidden" name="article_userid" id="article_userid" value="${sessionScope.userid }"/>
 				<button type="button" class="btn btn-primary" onclick="articleWrite();">작성 완료</button>
 				<button type="button" class="btn btn-danger" onclick="self.close();">돌아가기</button>
-			</form>
+			</form>                
 			</div>
 		</div>
 		<script type="text/javascript">

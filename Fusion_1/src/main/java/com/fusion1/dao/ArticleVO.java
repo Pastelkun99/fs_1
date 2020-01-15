@@ -21,7 +21,7 @@ public class ArticleVO {
 	private String menu_name;
 	
 	private String board_name;
-	private String reply_cnt;
+	private int reply_cnt;
 
 	public int getArticle_no() {
 		return article_no;
@@ -167,11 +167,11 @@ public class ArticleVO {
 		this.menu_name = menu_name;
 	}
 	
-	public String getReply_cnt() {
+	public int getReply_cnt() {
 		return reply_cnt;
 	}
 
-	public void setReply_cnt(String reply_cnt) {
+	public void setReply_cnt(int reply_cnt) {
 		this.reply_cnt = reply_cnt;
 	}
 

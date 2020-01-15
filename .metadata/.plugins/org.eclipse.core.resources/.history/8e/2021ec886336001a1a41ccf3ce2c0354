@@ -1,0 +1,80 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ page session="true"%>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+<html>
+<head>
+<title>회원 가입</title>
+</head>
+<body class="text-center">
+<div class="row" style="margin-bottom: 18rem">
+</div>
+<div class="row">
+	<div class="col"></div>
+	<div class="col">
+			<form class="form-signin" action="${pageContext.request.contextPath }/user/userSignUp.do" method="post">
+				<h1 class="h3 mb-3 font-weight-normal">Sign up</h1>
+					<input type="text" name="regID" id="regID" class="form-control" placeholder="ID" autofocus> </br>
+					<p class="result">
+						<span class="msg">아이디를 확인해 주십시오.</span>
+					</p>
+					<button type="button" class="btn btn-warning" onclick="userIdCheck()">아이디 확인</button> </br>
+					</br>
+					<input type="password" name="regPassword" class="form-control" placeholder="Password" required> </br>
+					<input type="password" name="regPasswordConfirm" class="form-control" placeholder="Password Confirm" required> </br>
+					<input type="text" name="regName" class="form-control" placeholder="Name" required> </br>
+					<button class="btn btn-lg btn-primary btn-block" id="registerButton" type="submit" disabled="disabled">Register</button>
+					</br>
+					</br>
+				</form>
+			<button class="btn btn-lg btn-outline-danger" onclick="location.href='${pageContext.request.contextPath}/'">Back to Main</button>
+			<p class="mt-5 mb-3 text-muted">&copy; Fusionsoft</p>
+			</div>
+			<div class="col"></div>
+		</div>
+		<script>
+			function userIdCheck() {
+				var regId = $('#regID').val();
+				var regExp = /^[a-z0-9_]{4,16}$/;
+				var result = regExp.test(regId);
+				
+				if(result) {
+					$.ajax({
+						type : "POST",
+						url : "/user/userIdCheck.do",
+						data : {"regId" : regId},
+						dataType : "json",
+						success : function(result) {
+							if(result == 1) {
+								$(".result .msg").text('사용 가능한 아이디 입니다.');
+								$(".result .msg").attr('style', 'color:#00f');
+								var regId = document.getElementById('regID');
+								regId.readOnly = true;
+								$("#registerButton").removeAttr('disabled');
+							} else {
+								$(".result .msg").text('사용 불가능한 아이디 입니다.');
+								$(".result .msg").attr('style', 'color:#f00');
+								$("#registerButton").attr('disabled', true);
+							}
+						},
+						error : function(error) {
+							alert('아이디 검사 실패');
+						}
+					});
+				} else {
+					$(".result .msg").text('영문, 숫자를 포함한 4자리 이상, 16자리 이하로 지정해주세요.');
+					$(".result .msg").attr('style', 'color:#f00');
+					$("#registerButton").attr('disabled', true);
+					$('#regID').val('');
+				}				
+			}
+		</script>
+	</body>
+</html>

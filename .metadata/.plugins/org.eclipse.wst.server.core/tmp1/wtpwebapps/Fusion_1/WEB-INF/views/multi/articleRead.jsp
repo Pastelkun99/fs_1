@@ -10,6 +10,7 @@
 	src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
 	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
 	crossorigin="anonymous"></script>
+<script src="https://use.fontawesome.com/releases/v5.2.0/js/all.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <html>
 <head>
@@ -51,22 +52,26 @@
 			<!-- 현재 보고 있는 글의 article_no -->
 			<input type="hidden" id="article_no" value="${article.article_no }"/>
 			<!-- 현재 보고 있는 글을 쓴 사람의 id -->
-			<input type="hidden" id="article_id" value="${article.article_userid }"/>
+			<input type="hidden" id="article_userid" value="${article.article_userid }"/>
 			<!-- 현재 로그인 된 사람의 이름 -->
 			<input type="hidden" id="current_user" value="${sessionScope.username }"/>
 			<!-- 현재 로그인 된 사람의 아이디 -->
 			<input type="hidden" id="current_userid" value="${sessionScope.userid }"/>
 			
-			<button type="button" class="btn btn-primary" onClick="location.href='${pageContext.request.contextPath }/multi/articleEditCheck.do?board_no=${param.board_no }&article_no=${article.article_no }'">수정하기</button>
-			<!-- <button type="button" class="btn btn-danger" onClick="articleDelete();">삭제하기</button> -->
-			<button type="button" class="btn btn-danger" onClick="location.href='${pageContext.request.contextPath}/multi/articleDeleteCheck.do?board_no=${param.board_no }&article_no=${article.article_no }'">삭제하기</button>
-			<c:if test="${boardConfig.board_reboardyn eq 'Y' }">
+			<c:if test="${sessionScope.userid eq 'admin' ||article.article_userid eq sessionScope.userid}">
+				<button type="button" class="btn btn-primary" onClick="location.href='${pageContext.request.contextPath }/multi/articleEditCheck.do?board_no=${param.board_no }&article_no=${article.article_no }'">수정하기</button>
+				<button type="button" class="btn btn-danger" onClick="articleDelete();">삭제하기</button>
+			</c:if>
+			
+			<c:if test="${boardConfig.board_reboardyn eq 'Y' && article.article_noticeyn eq 'N'}">
 				<button type="button" class="btn btn-success" onClick="location.href='${pageContext.request.contextPath}/multi/reArticleWrite.do?board_no=${param.board_no }&article_no=${article.article_no}'">답글달기</button>
 			</c:if>
+			
 			<button type="button" class="btn btn-warning" onClick="windowClose();">닫기</button>
+			
 			</div>
 			
-			<c:if test="${boardConfig.board_replyyn eq 'Y' }">
+			<c:if test="${boardConfig.board_replyyn eq 'Y' && article.article_noticeyn eq 'N'}">
 				<hr>
 				<div class="btn-group" role="group" aria-label="Basic example">
   					<button type="button" class="btn btn-secondary" onclick="getReplyListInNew();">최신순</button>
@@ -76,7 +81,8 @@
 				<hr>
 				<div class="row">
 					<div class="col-2">
-						작성자</br>
+						작성자
+						<br>
 						<c:if test="${sessionScope.userid ne null }">
 							<strong>${sessionScope.username }</strong>
 						</c:if>
@@ -85,48 +91,48 @@
 						</c:if>
 					</div>
 					<div class="col-8">
-						<textarea id="replyContent" placeholder="댓글 내용을 입력하십시오." rows="3" style="width:100%"></textarea>
+						<textarea class="form-control" id="replyContent" placeholder="댓글 내용을 입력하십시오." rows="3" style="width:100%"></textarea>
 					</div>
 					<div class="col-2">
 						<input type="button" class="btn-lg btn btn-primary" id="button1" onclick="replyWriteAction();" value="작성"/>
 					</div>
 	  			</div>
-	  			<div>
-				<hr>
-	  			<div id="replyListView">
-		  			<c:forEach items="${reply_list}" var="reply_list">
-		  				<div class="row">
-		  					<div class="col-10">
-		  						<div class="row-1">
-		  							<input type="hidden" id="reply_no${reply_list.reply_no }" value="${reply_list.reply_no }"/>
-		  							<strong>${reply_list.reply_writer }</strong>
-		  						</div>
-		  						<div class="row-3" id="reply_component${reply_list.reply_no }">${reply_list.reply_content }</div>
-		  						<div class="row-1">
-				  					${reply_list.reply_date }	  					  						
-		  						</div>
-		  					</div>
-		  					<div class="col-2">		
-		  					<c:choose>
-		  						<c:when test="${sessionScope.userid eq reply_list.reply_userid}">
-		  							<input type="button" id="reply_config${reply_list.reply_no }" class="btn-sm btn btn-info" onclick="updateReply(${reply_list.reply_no})" value="수정"/>
-		  							<input type="button" id="reply_delete${reply_list.reply_no }" class="btn-sm btn btn-danger" onclick="deleteReply(${reply_list.reply_no})" value="삭제"/>
-	  							</c:when>
-	  							<c:when test="${sessionScope.userid eq 'admin'}">
-	  								<input type="button" id="reply_config${reply_list.reply_no }" class="btn-sm btn btn-info" onclick="updateReply(${reply_list.reply_no})" value="수정"/>
-	  								<input type="button" id="reply_delete${reply_list.reply_no }" class="btn-sm btn btn-danger" onclick="deleteReply(${reply_list.reply_no})" value="삭제"/>
-	  							</c:when>
-	  						</c:choose>
-		  					</div>
-		  				</div>
-					<hr>
-  				</c:forEach>
-	  			</div>
-  			</div> 
 			</c:if>
+			<div>
+			<hr>
+  			<div id="replyListView">
+	  			<c:forEach items="${reply_list}" var="reply_list">
+	  				<div class="row">
+	  					<div class="col-10">
+	  						<div class="row-1">
+	  							<input type="hidden" id="reply_no${reply_list.reply_no }" value="${reply_list.reply_no }"/>
+	  							<strong>${reply_list.reply_writer }</strong>
+	  						</div>
+	  						<div class="row-3" id="reply_component${reply_list.reply_no }">${reply_list.reply_content }</div>
+	  						<div class="row-1">
+			  					${reply_list.reply_date }	  					  						
+	  						</div>
+	  					</div>
+		  					<div class="col-2">		
+	  					<c:choose>
+	  						<c:when test="${sessionScope.userid eq reply_list.reply_userid}">
+	  							<input type="button" id="reply_config${reply_list.reply_no }" class="btn-sm btn btn-info" onclick="updateReply(${reply_list.reply_no})" value="수정"/>
+	  							<input type="button" id="reply_delete${reply_list.reply_no }" class="btn-sm btn btn-danger" onclick="deleteReply(${reply_list.reply_no})" value="삭제"/>
+  							</c:when>
+  							<c:when test="${sessionScope.userid eq 'admin'}">
+  								<input type="button" id="reply_config${reply_list.reply_no }" class="btn-sm btn btn-info" onclick="updateReply(${reply_list.reply_no})" value="수정"/>
+  								<input type="button" id="reply_delete${reply_list.reply_no }" class="btn-sm btn btn-danger" onclick="deleteReply(${reply_list.reply_no})" value="삭제"/>
+  							</c:when>
+  						</c:choose>
+	  					</div>
+	  				</div>
+				<hr>
+ 				</c:forEach>
+  			</div>
+  			</div> 
 			</div>
 		</div>
-		<script>
+	<script>
 	$(document).ready(function() { getReplyList(); });
 	
 	$(window).on('beforeunload', function() {
@@ -405,6 +411,7 @@
 			success : function(result) {
 				getReplyList();
 				$('#replyContent').val('');
+				opener.location.reload();
 			},
 			error : function(error) {
 				alert('오류 발생');
@@ -477,7 +484,6 @@
 				$('#replyListView').html(innerHTML);
 			},
 			error : function(error) {
-				alert('실패');
 			}
 		});
 	}
@@ -543,17 +549,24 @@
 	
 	function deleteReply(reply_no) {
 		// alert('삭제될 번호는' + reply_no);
+		var reply_userid = '${sessionScope.userid}';
+		
 		$.ajax({
-			type : "GET",
+			type : "POST",
 			url : "/multi/deleteReply",
-			data : {"reply_no" : reply_no},
-			dataType : "json",
+			data : {"reply_no" : reply_no,
+					"reply_userid" : reply_userid},
+			dataType : "text",
 			success : function(result) {
-				getReplyList();
-				//location.reload();
+				if(result == 'success') {
+					alert('댓글이 삭제되었습니다.');
+					getReplyList();
+				} else  {
+					alert('fail');
+				}
 			},
 			error : function(error) {
-				alert('오류 발생');
+				alert('여기에 걸렸다');
 			}
 		});
 	}

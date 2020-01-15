@@ -1,8 +1,6 @@
 package com.fusion1.dao;
 
-import java.io.Serializable;
-
-public class UserVO implements Serializable {
+public class UserVO {
 
 	private int userno;
 	private String userid;

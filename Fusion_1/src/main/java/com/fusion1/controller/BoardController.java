@@ -103,7 +103,6 @@ public class BoardController {
 	public String boardList(HttpSession session, Model model, PagenationVO page) {
 		if(page.getKeyword() == null || page.getKeyword().equals("")) {
 			
-			PopupVO temp = new PopupVO();
 			PopupVO popup = ads.getPopupAval();
 			//System.out.println(" 뿌려지는 팝업 : " + popup.toString());
 			model.addAttribute("pop_id", popup.getPop_id());
@@ -263,7 +262,7 @@ public class BoardController {
 		boardVO.setBoard_content(noTagContents);
 		int result = bs.insertBoardOne(boardVO);
 		int parents_no = boardVO.getBoard_no();
-		int result2 = bs.updateBoardParent(parents_no);
+		bs.updateBoardParent(parents_no);
 		
 		return String.valueOf(result);
 	}
@@ -380,7 +379,7 @@ public class BoardController {
 		BoardVO parentsVO = bs.getBoardOne(boardVO.getBoard_no());
 		
 		// 답글을 달고자 하는 글과 해당 글의 상위 글의 grouporder를 +1하는 쿼리를 실행한다.
-		int result2 = bs.reWriteGroupOrder(parentsVO);
+		bs.reWriteGroupOrder(parentsVO);
 		
 		// 이후 답글을 등록한다.
 		int result = bs.reWriteBoard(boardVO);

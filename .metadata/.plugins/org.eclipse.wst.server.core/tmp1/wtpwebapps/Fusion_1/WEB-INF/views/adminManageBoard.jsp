@@ -151,7 +151,7 @@
 			<button type="button" id="orderCommit" onclick="rowEffect();" class="btn btn-primary">순서 반영</button>
 			<button type="button" id="specialBoardAppendChart" onclick="boardChartAppend()" class="btn btn-warning">차트 페이지 추가</button>
 			<button type="button" id="specialBoardAppendAnalysis" onclick="boardAnalAppend()" class="btn btn-warning">설문 페이지 추가</button>
-			<button type="button" id="goToBoardList" onclick="location.href='${pageContext.request.contextPath}/multi/boardList.do?board_no=-1&page_no=1&pageSize=10'" class="btn btn-Info">게시판으로</button>
+			<button type="button" id="goToBoardList" onclick="location.href='${pageContext.request.contextPath}/multi/boardMain.do'" class="btn btn-Info">게시판으로</button>
 		</div>
 		<div class="col-md-3"></div>
 	</div>
