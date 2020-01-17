@@ -106,7 +106,6 @@ public class UserController {
 		return "alert";
 	}
 	
-	
 	// 아이디 체크
 	@RequestMapping(value="/user/userIdCheck.do", method=RequestMethod.POST)
 	@ResponseBody

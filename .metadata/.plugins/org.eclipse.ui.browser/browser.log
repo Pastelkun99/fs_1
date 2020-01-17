@@ -83,3 +83,6 @@
 
 1월 10, 2020 15:10:55.09 NEW SESSION
 1월 10, 2020 15:10:55.47 [1992:516:0110/151051.790:ERROR:gcm_channel_status_request.cc(145)] GCM channel request failed.
+
+1월 16, 2020 15:23:48.46 NEW SESSION
+1월 16, 2020 15:23:48.46 [5512:6332:0116/152348.463:ERROR:CONSOLE(401)] "SyntaxError: Unexpected token (6:3)", source: devtools://devtools/bundled/formatter_worker.js?remoteBase=https://chrome-devtools-frontend.appspot.com/serve_file/@04f0a055010adab4484f7497fbfdbf312c307f1d/&dockSide=undocked (401)
